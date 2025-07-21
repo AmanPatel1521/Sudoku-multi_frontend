@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplayer Sudoku</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-container" class="container-fluid py-3">
+        <header class="main-header text-center mb-4">
+            <h1>Multiplayer Sudoku</h1>
+        </header>
+
+        <div id="room-management" class="mx-auto">
+            <div class="card shadow-lg card-glass">
+                <div class="card-body p-4">
+                    <h2 class="card-title text-center mb-4">Welcome!</h2>
+                    <div class="mb-3">
+                        <label for="player-name-input" class="form-label visually-hidden">Your Name</label>
+                        <input type="text" id="player-name-input" class="form-control form-control-lg" placeholder="Enter your display name">
+                    </div>
+
+                    <ul class="nav nav-pills nav-fill mb-3" id="room-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="create-tab" data-bs-toggle="tab" data-bs-target="#create-pane" type="button" role="tab" aria-controls="create-pane" aria-selected="true">Create Room</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="join-tab" data-bs-toggle="tab" data-bs-target="#join-pane" type="button" role="tab" aria-controls="join-pane" aria-selected="false">Join Room</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="room-tab-content">
+                        <div class="tab-pane fade show active" id="create-pane" role="tabpanel" aria-labelledby="create-tab">
+                            <p class="text-muted text-center small">Choose a difficulty and start a new game.</p>
+                            <div class="input-group">
+                                <select id="difficulty-select" class="form-select form-select-lg">
+                                    <option value="easy">Easy</option>
+                                    <option value="medium">Medium</option>
+                                    <option value="hard">Hard</option>
+                                    <option value="expert">Expert</option>
+                                    <option value="master">Master</option>
+                                    <option value="extreme">Extreme</option>
+                                </select>
+                                <button id="create-room-btn" class="btn btn-primary btn-lg">Create</button>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="join-pane" role="tabpanel" aria-labelledby="join-tab">
+                            <p class="text-muted text-center small">Enter a Room ID to join your friends.</p>
+                            <div class="input-group">
+                                <input type="text" id="room-id-input" class="form-control form-control-lg" placeholder="Enter Room ID">
+                                <button id="join-room-btn" class="btn btn-secondary btn-lg">Join</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loading-indicator" class="text-center mt-3" style="display: none;">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="waiting-room" class="mx-auto" style="display: none;">
+            <div class="card shadow-lg card-glass text-center">
+                <div class="card-body p-4">
+                    <h2 class="card-title mb-3">Waiting for Players</h2>
+                    <p>Share this room code with your friends:</p>
+                    <div class="room-code-display"></div>
+                    <hr class="my-4">
+                    <h3 class="h5 mb-3">Players in Room:</h3>
+                    <ul id="waiting-player-list" class="list-group"></ul>
+                    <button id="start-game-btn" class="btn btn-primary btn-lg w-100 mt-4" disabled>Start Game</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="game-container" class="container-fluid" style="display: none;">
+            <div class="row g-3">
+                <div class="col-lg-3">
+                    <div class="d-flex justify-content-around align-items-center mb-3 card card-glass">
+                        <div id="timer-container" class="text-center">
+                            <span class="label">Time</span>
+                            <div id="timer" class="display-6">00:00</div>
+                        </div>
+                        <button id="pause-button" class="btn btn-icon btn-danger rounded-circle"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5"/></svg></button>
+                    </div>
+                    <div class="card card-glass mb-3">
+                        <div class="card-body">
+                            <h3 class="card-title">Game Info</h3>
+                            <div id="room-info-game" class="d-flex justify-content-between">
+                                <span class="label">Room Code:</span>
+                                <div id="room-id-display" class="badge bg-secondary">N/A</div>
+                            </div>
+                            <div id="difficulty-display-container" class="d-flex justify-content-between mt-2">
+                                <span class="label">Difficulty:</span>
+                                <div id="difficulty-display" class="text-capitalize fw-bold">N/A</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-glass">
+                        <div class="card-body">
+                            <h3 class="card-title">Players</h3>
+                            <ul id="player-list" class="list-group list-group-flush"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="board-container">
+                        <div id="sudoku-board" class="shadow-lg"></div>
+                        <div id="pause-overlay" class="d-none"><div class="display-4">Paused</div></div>
+                    </div>
+                    <div id="game-stats-mobile" class="d-lg-none mt-3 card card-glass">
+                        <div class="card-body text-center d-flex justify-content-around">
+                            <div id="timer-container-mobile">
+                                <span class="label">Time</span>
+                                <div id="timer-mobile" class="display-6">00:00</div>
+                            </div>
+                            <div id="mistakes-container-mobile">
+                                <span class="label">Mistakes</span>
+                                <div id="mistakes-counter-mobile" class="display-6">0 / 3</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3">
+                    <div id="number-palette" class="card card-glass mb-3">
+                        <div class="card-body">
+                            <h3 class="card-title">Numbers</h3>
+                            <div class="number-grid">
+                                <div class="number-button" data-number="1">1</div>
+                                <div class="number-button" data-number="2">2</div>
+                                <div class="number-button" data-number="3">3</div>
+                                <div class="number-button" data-number="4">4</div>
+                                <div class="number-button" data-number="5">5</div>
+                                <div class="number-button" data-number="6">6</div>
+                                <div class="number-button" data-number="7">7</div>
+                                <div class="number-button" data-number="8">8</div>
+                                <div class="number-button" data-number="9">9</div>
+                            </div>
+                            <button class="btn btn-light w-100 mt-2 erase" data-number="0"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eraser-fill" viewBox="0 0 16 16"><path d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293z"/></svg> Erase</button>
+                        </div>
+                    </div>
+                    <div id="actions-container" class="card card-glass">
+                        <div class="card-body">
+                            <h3 class="card-title">Actions</h3>
+                            <div class="actions-grid">
+                                <button id="undo-button" class="btn btn-light"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/></svg><span>Undo</span></button>
+                                <button id="notes-button" class="btn btn-light"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg><span>Notes</span></button>
+                                <button id="hint-button" class="btn btn-primary"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-lightbulb-fill" viewBox="0 0 16 16"><path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a1.99 1.99 0 0 0-.453-.618A6 6 0 0 1 2 6m3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5"/></svg><span>Hint</span></button>
+                                <div id="mistakes-container" class="action-box-item">
+                                    <span class="label">Mistakes</span>
+                                    <div id="mistakes-counter" class="fs-4">0 / 3</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="gameOverModal" tabindex="-1" aria-labelledby="gameOverModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content text-center card-glass">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100" id="gameOverModalLabel">Game Over</h5>
+                </div>
+                <div class="modal-body">
+                    <p id="gameOverMessage" class="fs-5"></p>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-primary w-100" id="play-again-btn">Play Again</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="message-display"></div>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
