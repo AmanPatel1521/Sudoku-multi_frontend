@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         createRoomBtn.disabled = true;
         try {
-            const response = await fetch('http://127.0.0.1:5000/create_room', {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ player_name: playerName, difficulty: difficulty }),
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         joinRoomBtn.disabled = true;
         try {
-            const response = await fetch('http://127.0.0.1:5000/join_room', {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ room_id: inputRoomId, player_name: playerName }),
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         playSoloBtn.disabled = true;
         try {
-            const response = await fetch('http://127.0.0.1:5000/create_room', {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ player_name: playerName, difficulty: difficulty }),
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function connectWebSocket() {
-        socket = io("http://127.0.0.1:5000");
+        socket = io("https://sudoku-multi-backend.onrender.com");
 
         socket.on('connect', () => {
             console.log('Socket.IO connected!');
