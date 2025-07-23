@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.number-button').forEach(button => {
         button.addEventListener('click', handleNumberInput);
-        button.addEventListener('touchstart', handleNumberInput);
     });
     document.addEventListener('keydown', handleKeyDown);
 
@@ -313,10 +312,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 cell.addEventListener('click', () => selectCell(cell));
-                cell.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent double-tap zoom
-                    selectCell(cell);
-                });
                 board.appendChild(cell);
             }
         }
