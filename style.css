@@ -483,7 +483,7 @@ body {
 }
 
 .podium-2 {
-    background-color: #c0c0c0; /* Silver */
+    background-color: #B0B0B0; /* Slightly darker silver for better contrast */
     height: 180px;
     order: 1;
 }
