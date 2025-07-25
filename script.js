@@ -39,7 +39,7 @@ const eliminationMessages = [
     "Eliminated! Take a moment, then prepare for the leaderboard reveal. Your efforts won't be forgotten!"
 ];
 
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://sudoku-multi-backend.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     const roomManagementDiv = document.getElementById('room-management');
