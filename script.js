@@ -39,8 +39,6 @@ const eliminationMessages = [
     "Eliminated! Take a moment, then prepare for the leaderboard reveal. Your efforts won't be forgotten!"
 ];
 
-const API_URL = 'https://sudoku-multi-backend.onrender.com';
-
 document.addEventListener('DOMContentLoaded', () => {
     const roomManagementDiv = document.getElementById('room-management');
     const waitingRoomDiv = document.getElementById('waiting-room');
@@ -70,9 +68,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const finishedOverlay = document.getElementById('finished-overlay');
     const gameOverMessage = document.getElementById('gameOverMessage');
     const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+    const playAgainSoloBtn = document.getElementById('play-again-solo-btn');
     const startGameBtn = document.getElementById('start-game-btn');
     const roomCodeDisplay = document.querySelector('.room-code-display');
     const scoreDisplay = document.getElementById('score');
+    
     const backToLobbyBtnSolo = document.getElementById('back-to-lobby-btn-solo');
     const finishedTitle = document.querySelector('#finished-overlay .finished-title');
     const completionButtons = document.querySelector('#finished-overlay .completion-buttons');
@@ -88,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tooltips.forEach(tooltip => tooltip.hide());
     }
 
+    // Add event listeners to tab buttons to hide tooltips
     document.querySelectorAll('#room-tab button').forEach(tabButton => {
         tabButton.addEventListener('shown.bs.tab', hideTooltips);
     });
@@ -117,210 +118,175 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleCreateRoom() {
         const playerName = playerNameInput.value.trim();
-        if (!playerName) {
-            showTemporaryMessage('Please enter your name.');
-            return;
-        }
         const difficulty = difficultySelect.value;
+        if (!playerName) return alert('Please enter your name.');
+        
         setLoading(true);
+        createRoomBtn.disabled = true;
         try {
-            const response = await fetch(`${API_URL}/create_room`, {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty })
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer' }),
             });
             const data = await response.json();
-            if (response.ok) {
-                roomId = data.room_id;
-                playerId = data.player_id;
-                currentPuzzle = data.puzzle;
-                isHost = true;
-                isSolo = false;
-                playersInRoom.push({ player_id: playerId, player_name: playerName, score: 0, eliminated: false, finished: false });
-                connectSocket();
-                transitionToWaitingRoom();
-                updateWaitingPlayerList();
-                startGameBtn.disabled = false;
-            } else {
-                showTemporaryMessage(`Error: ${data.error}`);
-            }
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+            
+            isHost = true;
+            isSolo = false;
+            console.log('handleCreateRoom: Calling initializeGame (multiplayer)');
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
-            showTemporaryMessage('Could not connect to the server.');
+            console.error('Error creating room:', error);
+            alert(`Failed to create room: ${error.message}`);
         } finally {
             setLoading(false);
+            createRoomBtn.disabled = false;
         }
     }
 
     async function handleJoinRoom() {
         const playerName = playerNameInput.value.trim();
-        const a_roomId = roomIdInput.value.trim();
-        if (!playerName || !a_roomId) {
-            showTemporaryMessage('Please enter your name and a room ID.');
-            return;
-        }
+        const inputRoomId = roomIdInput.value.trim();
+        if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
+
         setLoading(true);
+        joinRoomBtn.disabled = true;
         try {
-            const response = await fetch(`${API_URL}/join_room`, {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, room_id: a_roomId })
+                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName }),
             });
             const data = await response.json();
-            if (response.ok) {
-                roomId = data.room_id;
-                playerId = data.player_id;
-                currentPuzzle = data.puzzle;
-                isHost = false;
-                isSolo = false;
-                connectSocket();
-                transitionToWaitingRoom();
-                startGameBtn.style.display = 'none';
-            } else {
-                showTemporaryMessage(`Error: ${data.error}`);
-            }
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+
+            isHost = false;
+            isSolo = false;
+            console.log('handleJoinRoom: Calling initializeGame (multiplayer)');
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
-            showTemporaryMessage('Could not connect to the server.');
+            console.error('Error joining room:', error);
+            alert(`Failed to join room: ${error.message}`);
         } finally {
             setLoading(false);
+            joinRoomBtn.disabled = false;
         }
     }
 
     async function handlePlaySolo() {
-        const playerName = "Solo Player";
+        hideFinishedOverlay(); // Hide the finished overlay when starting a new solo game
         const difficulty = difficultySelect.value;
+        const playerName = "Solo Player";
+        
         setLoading(true);
+        playSoloBtn.disabled = true;
         try {
-            const response = await fetch(`${API_URL}/create_room`, {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo' })
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo' }),
             });
             const data = await response.json();
-            if (response.ok) {
-                roomId = data.room_id;
-                playerId = data.player_id;
-                currentPuzzle = data.puzzle;
-                isHost = true;
-                isSolo = true;
-                connectSocket();
-                socket.on('connect', () => {
-                    socket.emit('start_game', { room_id: roomId, player_id: playerId });
-                });
-            } else {
-                showTemporaryMessage(`Error: ${data.error}`);
-            }
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+            
+            isHost = true;
+            isSolo = true;
+            console.log('handlePlaySolo: Calling initializeGame (solo)');
+            initializeGame(data.room_id, data.player_id, data.puzzle, difficulty);
         } catch (error) {
-            showTemporaryMessage('Could not connect to the server.');
+            console.error('Error creating room:', error);
+            alert(`Failed to create room: ${error.message}`);
         } finally {
-            setLoading(false);
+            playSoloBtn.disabled = false;
         }
     }
 
-    function handleNumberInput(e) {
-        const number = parseInt(e.target.dataset.number);
-        placeNumber(number);
-    }
+    function initializeGame(newRoomId, newPlayerId, puzzle, difficulty) {
+        roomId = newRoomId;
+        playerId = newPlayerId;
+        currentPuzzle = puzzle;
+        
+        renderBoard(puzzle, currentPuzzle, currentNotesBoard);
+        updateGameInfo(roomId, difficulty, isSolo);
+        connectWebSocket();
 
-    function handleKeyDown(e) {
-        if (e.key >= '1' && e.key <= '9') {
-            placeNumber(parseInt(e.key));
-        } else if (e.key === 'Backspace' || e.key === 'Delete') {
-            placeNumber(0); // Use 0 to represent erasing
-        }
-    }
-
-    function placeNumber(number) {
-        if (!selectedCell || selectedCell.classList.contains('fixed') || isPaused) {
-            return;
-        }
-
-        const r = parseInt(selectedCell.dataset.row);
-        const c = parseInt(selectedCell.dataset.col);
-
-        if (notesMode) {
-            let notes = JSON.parse(selectedCell.dataset.notes || '[]');
-            if (number === 0) { // Clear notes with backspace
-                notes = [];
-            } else {
-                const index = notes.indexOf(number);
-                if (index > -1) {
-                    notes.splice(index, 1);
-                } else {
-                    notes.push(number);
-                    notes.sort((a, b) => a - b);
-                }
-            }
-            currentNotesBoard[r][c] = notes;
-            renderNotes(selectedCell, notes);
-            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: notes });
+        if (isSolo) {
+            console.log('initializeGame: isSolo is true, waiting for game_started event.');
         } else {
-            const currentValue = parseInt(selectedCell.textContent) || 0;
-            if (currentValue === number) {
-                return; // No change
-            }
-            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: number });
+            console.log('initializeGame: isSolo is false, calling transitionToWaitingRoom()');
+            transitionToWaitingRoom();
         }
     }
 
-    function connectSocket() {
+    function connectWebSocket() {
         if (socket) {
             socket.disconnect();
         }
-        socket = io(API_URL);
+        socket = io("https://sudoku-multi-backend.onrender.com");
 
         socket.on('connect', () => {
-            console.log('Connected to server');
+            console.log('Socket.IO connected!');
             socket.emit('join', { room_id: roomId, player_id: playerId });
+            
+            if (isSolo) {
+                console.log('connect: isSolo is true, emitting start_game');
+                socket.emit('start_game', { room_id: roomId, player_id: playerId });
+            }
         });
 
-        socket.on('current_players', (data) => {
-            playersInRoom = data.players;
-            updatePlayerList();
-            updateWaitingPlayerList();
+        socket.on('disconnect', () => {
+            console.log('Socket.IO disconnected!');
+            showLeaderboard([], 'Disconnected from the room.');
         });
 
         socket.on('game_started', (data) => {
+            console.log('game_started event received! isSolo:', isSolo);
             transitionToGameView(isSolo);
-            updateGameInfo(roomId, difficultySelect.value, isSolo);
             startTimer(data.start_time);
+            if (isSolo) {
+                setLoading(false);
+            }
         });
 
         socket.on('game_state_update', (data) => {
-            const { game_state, mistakes, hints, score, last_move } = data;
-            currentPuzzle = game_state.current_board;
-            currentNotesBoard = game_state.notes_board;
-            renderBoard(game_state.puzzle, game_state.current_board, game_state.notes_board);
-            updateStats(mistakes, hints, score);
-
-            if (last_move) {
-                const { row, col, value, is_correct } = last_move;
-                const cell = board.querySelector(`[data-row='${row}'][data-col='${col}']`);
+            currentPuzzle = data.game_state.current_board;
+            currentNotesBoard = data.game_state.notes_board;
+            renderBoard(data.game_state.puzzle, currentPuzzle, currentNotesBoard);
+            updateStats(data.mistakes, data.hints_used, data.score);
+            if (data.last_move) {
+                const { row, col, value, is_correct } = data.last_move;
+                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
                 if (cell) {
-                    if (!is_correct) {
-                        cell.classList.add('wrong');
-                        setTimeout(() => cell.classList.remove('wrong'), 1000);
-                    } else {
+                    if (is_correct) {
                         cell.classList.add('correct-flash');
                         setTimeout(() => cell.classList.remove('correct-flash'), 500);
+                    } else {
+                        cell.classList.add('wrong');
                     }
+                }
+                if (value !== 0) {
+                    highlightActiveNumbers(value);
+                } else {
+                    clearHighlights();
                 }
             }
         });
-        
+
         socket.on('hint_given', (data) => {
             const { row, col, value, hints_used, score } = data;
-            const cell = board.querySelector(`[data-row='${row}'][data-col='${col}']`);
-            if (cell) {
-                cell.textContent = value;
-                cell.classList.add('hint-flash');
+            const hintedCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+            if (hintedCell) {
+                hintedCell.textContent = value;
+                hintedCell.classList.add('fixed', 'hint-flash');
                 flashRelatedCells(row, col, value);
-                setTimeout(() => cell.classList.remove('hint-flash'), 1000);
+                setTimeout(() => hintedCell.classList.remove('hint-flash'), 1000);
             }
             updateStats(null, hints_used, score);
         });
 
         socket.on('player_eliminated', (data) => {
-            showTemporaryMessage(`${data.player_name} has been eliminated!`);
+            showTemporaryMessage(`${data.player_name} has been eliminated!`)
         });
 
         socket.on('eliminated', (data) => {
@@ -328,28 +294,83 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('player_finished', (data) => {
+            if (!isSolo) { // Only show message for multiplayer
+                showTemporaryMessage(`${data.player_name} has finished the puzzle!`)
+            }
             if (data.player_id === playerId) {
+                stopTimer();
+                disableInput();
                 showFinishedOverlay();
-            } else {
-                showTemporaryMessage(`${data.player_name} has finished the puzzle!`);
             }
         });
 
         socket.on('game_over', (data) => {
             stopTimer();
-            hideFinishedOverlay();
-            if (!isSolo) {
+            disableInput();
+            if (isSolo) {
+                // For solo mode, the finishedOverlay is already shown by player_finished,
+                // and it serves as the game over screen. The message is already set.
+                // No need to hide it here.
+            } else {
+                hideFinishedOverlay(); // Only hide for multiplayer, as leaderboard modal will show.
                 showLeaderboard(data.leaderboard, data.message);
             }
         });
 
+        socket.on('current_players', (data) => {
+            playersInRoom = data.players;
+            updatePlayerList();
+            updateWaitingPlayerList();
+            if (isHost && !isSolo) {
+                startGameBtn.disabled = playersInRoom.length < 2;
+            }
+        });
+
         socket.on('player_left', (data) => {
-            showTemporaryMessage(`${data.player_name} has left the room.`);
+            showTemporaryMessage(`${data.player_name} left the room.`);
         });
 
         socket.on('error', (data) => {
-            showTemporaryMessage(`Error: ${data.message}`);
+            alert(`Error: ${data.message}`);
         });
+    }
+
+    function handleNumberInput(e) {
+        if (isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+        
+        const value = parseInt(e.currentTarget.dataset.number);
+        const r = parseInt(selectedCell.dataset.row);
+        const c = parseInt(selectedCell.dataset.col);
+
+        if (notesMode) {
+            toggleNote(selectedCell, value);
+            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
+        } else {
+            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
+        }
+    }
+
+    function handleKeyDown(e) {
+        if (isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+
+        const r = parseInt(selectedCell.dataset.row);
+        const c = parseInt(selectedCell.dataset.col);
+
+        if (e.key >= '1' && e.key <= '9') {
+            const value = parseInt(e.key);
+            if (notesMode) {
+            toggleNote(selectedCell, value);
+            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
+        } else {
+            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
+        }
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+            if (notesMode) {
+                socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: [] });
+            } else {
+                socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: 0 });
+            }
+        }
     }
 
     const renderBoard = (puzzle, currentBoard, notesBoard) => {
@@ -776,6 +797,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         gameOverModal.show();
     }
+
+    // Removed showSoloCompletionMessage as it's no longer needed.
+    // The logic for solo completion message is now handled directly in socket.on('game_over')
 
     disableInput();
 });
