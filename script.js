@@ -14,9 +14,6 @@ let gameOverModal = null;
 let isReconnecting = false;
 let currentNotesBoard = Array(9).fill(0).map(() => Array(9).fill(0).map(() => []));
 
-let currentHintLogic = [];
-let currentHintIndex = 0;
-
 const funnyMessages = [
     "Wow, you're fast! Now, try to look busy.",
     "You've finished! Time to practice your victory dance.",
@@ -82,14 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const completionButtons = document.querySelector('#finished-overlay .completion-buttons');
     const messageIcon = document.querySelector('#finished-overlay .message-icon');
 
-    const smartHintCarousel = document.getElementById('smart-hint-carousel');
-    const shNavLeft = document.getElementById('sh-nav-left');
-    const shNavRight = document.getElementById('sh-nav-right');
-    const shNavSubmit = document.getElementById('sh-nav-submit');
-    const shCarouselName = smartHintCarousel.querySelector('.smart-hint-carousel-name');
-    const shCarouselDesc = smartHintCarousel.querySelector('.smart-hint-carousel-desc');
-    const shNavDots = smartHintCarousel.querySelector('.sh-nav-dots');
-
     gameOverModal = new bootstrap.Modal(document.getElementById('gameOverModal'));
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     const tooltips = tooltipTriggerList.map(function (tooltipTriggerEl) {
@@ -124,10 +113,6 @@ document.addEventListener('DOMContentLoaded', () => {
         hideFinishedOverlay();
         transitionToRoomView();
     });
-
-    shNavLeft.addEventListener('click', () => navigateHintCarousel(-1));
-    shNavRight.addEventListener('click', () => navigateHintCarousel(1));
-    shNavSubmit.addEventListener('click', hideHintCarousel);
 
     document.querySelectorAll('.number-button').forEach(button => {
         button.addEventListener('click', handleNumberInput);
@@ -329,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('hint_given', (data) => {
-            const { row, col, value, hints_used, score, hint_logic } = data;
+            const { row, col, value, hints_used, score } = data;
             const hintedCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
             if (hintedCell) {
                 hintedCell.textContent = value;
@@ -338,9 +323,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => hintedCell.classList.remove('hint-flash'), 1000);
             }
             updateStats(null, hints_used, score);
-            if (hint_logic) {
-                displayHintLogic(hint_logic);
-            }
         });
 
         socket.on('player_eliminated', (data) => {
@@ -648,62 +630,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (hints !== null && hints !== undefined) {
             const hintsLeft = 3 - hints;
-            const hintCountBadge = document.getElementById('hint-count-badge');
-            if(hintCountBadge) hintCountBadge.textContent = hintsLeft;
+            const hintButtonSpan = hintButton.querySelector('span');
+            if(hintButtonSpan) hintButtonSpan.textContent = `Hint (${hintsLeft} left)`;
             hintButton.disabled = hintsLeft <= 0;
         }
         if (score !== null && score !== undefined) {
             const scoreDisplay = document.getElementById('score');
             if(scoreDisplay) scoreDisplay.textContent = score;
         }
-    }
-
-    function displayHintLogic(logic) {
-        currentHintLogic = logic.steps;
-        shCarouselName.textContent = logic.name;
-        currentHintIndex = 0;
-        updateHintCarouselUI();
-        smartHintCarousel.classList.add('show');
-    }
-
-    function updateHintCarouselUI() {
-        shCarouselDesc.innerHTML = '';
-        shNavDots.innerHTML = '';
-
-        currentHintLogic.forEach((step, index) => {
-            const descItem = document.createElement('div');
-            descItem.classList.add('smart-hint-carousel-desc-item');
-            descItem.innerHTML = step;
-            if (index === currentHintIndex) {
-                descItem.classList.add('active');
-            } else if (index > currentHintIndex) {
-                descItem.classList.add('next');
-            } else {
-                descItem.classList.add('prev');
-            }
-            shCarouselDesc.appendChild(descItem);
-
-            const dot = document.createElement('div');
-            dot.classList.add('sh-nav-dots-item');
-            if (index === currentHintIndex) {
-                dot.classList.add('active');
-            }
-            shNavDots.appendChild(dot);
-        });
-
-        shNavLeft.disabled = currentHintIndex === 0;
-        shNavRight.disabled = currentHintIndex === currentHintLogic.length - 1;
-    }
-
-    function navigateHintCarousel(direction) {
-        currentHintIndex += direction;
-        updateHintCarouselUI();
-    }
-
-    function hideHintCarousel() {
-        smartHintCarousel.classList.remove('show');
-        currentHintLogic = [];
-        currentHintIndex = 0;
     }
 
     function startTimer(serverStartTime) {
@@ -807,7 +741,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timerDisplayMobile) timerDisplayMobile.textContent = '00:00';
         board.innerHTML = '';
         hideFinishedOverlay();
-        hideHintCarousel();
     }
     
     function updateGameInfo(roomId, difficulty, isSoloParam) {
