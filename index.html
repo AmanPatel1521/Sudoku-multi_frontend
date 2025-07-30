@@ -78,8 +78,8 @@
         </div>
 
         <div id="game-container" class="container-fluid" style="display: none;">
-            <div class="row">
-                <div class="game-panel-left">
+            <div class="row g-3">
+                <div class="col-lg-3">
                     <div class="card card-glass mb-3">
                         <div class="card-body d-flex justify-content-between align-items-center p-2">
                             <div id="timer-container" class="text-center">
@@ -110,38 +110,27 @@
                     </div>
                 </div>
 
-                <div class="game-panel-middle">
+                <div class="col-lg-6">
                     <div class="board-container">
                         <div id="sudoku-board" class="shadow-lg"></div>
                         <div id="pause-overlay" class="d-none"></div>
                         
                     </div>
                     <div id="game-stats-mobile" class="d-lg-none mt-3 card card-glass">
-                            <div class="card-body text-center d-flex justify-content-around">
-                                <div id="timer-container-mobile">
-                                    <span class="label">Time</span>
-                                    <div id="timer-mobile" class="display-6">00:00</div>
-                                </div>
-                                <div id="mistakes-container-mobile">
-                                    <span class="label">Mistakes</span>
-                                    <div id="mistakes-counter-mobile" class="display-6">0 / 3</div>
-                                </div>
+                        <div class="card-body text-center d-flex justify-content-around">
+                            <div id="timer-container-mobile">
+                                <span class="label">Time</span>
+                                <div id="timer-mobile" class="display-6">00:00</div>
                             </div>
-                        </div>
-                        <div id="smart-hint-carousel" class="smart-hint-carousel mt-3" style="display: none;">
-                            <div class="smart-hint-carousel-name"></div>
-                            <div class="smart-hint-carousel-desc" style="min-height: 40px;"></div>
-                            <div class="smart-hint-carousel-nav">
-                                <button class="sh-nav-button" id="sh-nav-left" disabled>&lt;</button>
-                                <button class="sh-nav-button" id="sh-nav-right">&gt;</button>
-                                <button class="sh-nav-submit" id="sh-nav-submit">OK</button>
-                                <div class="sh-nav-dots"></div>
+                            <div id="mistakes-container-mobile">
+                                <span class="label">Mistakes</span>
+                                <div id="mistakes-counter-mobile" class="display-6">0 / 3</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="game-panel-right">
+                <div class="col-lg-3">
                     <div id="score-container" class="mb-3">
                         <span class="label">Score</span>
                         <div id="score">0</div>
@@ -168,7 +157,7 @@
                             <div class="actions-bar">
                                 <button id="undo-button" class="btn btn-icon rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Undo"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-arrow-counterclockwise" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2z"/><path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466"/></svg></button>
                                 <button id="notes-button" class="btn btn-icon rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Notes"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.5.5 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11z"/></svg></button>
-                                <button id="hint-button" class="btn btn-icon rounded-circle position-relative" data-bs-toggle="tooltip" data-bs-placement="top" title="Hint"><span id="hint-count-badge" class="badge bg-dark position-absolute top-0 start-100 translate-middle rounded-pill">3</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-lightbulb-fill" viewBox="0 0 16 16"><path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a1.99 1.99 0 0 0-.453-.618A6 6 0 0 1 2 6m3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5"/></svg></button>
+                                <button id="hint-button" class="btn btn-icon rounded-circle" data-bs-toggle="tooltip" data-bs-placement="top" title="Hint"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-lightbulb-fill" viewBox="0 0 16 16"><path d="M2 6a6 6 0 1 1 10.174 4.31c-.203.196-.359.4-.453.619l-.762 1.769A.5.5 0 0 1 10.5 13h-5a.5.5 0 0 1-.46-.302l-.761-1.77a1.99 1.99 0 0 0-.453-.618A6 6 0 0 1 2 6m3 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1l-.224.447a1 1 0 0 1-.894.553H6.618a1 1 0 0 1-.894-.553L5.5 15a.5.5 0 0 1-.5-.5"/></svg></button>
                                 <div id="mistakes-container" class="action-box-item text-center">
                                     <span class="label">Mistakes</span>
                                     <div id="mistakes-counter" class="fs-4">0 / 3</div>
