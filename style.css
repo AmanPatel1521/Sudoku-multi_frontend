@@ -22,8 +22,6 @@ body {
 
 #main-container.container-fluid {
     transition: filter 0.3s ease-in-out;
-    height:100vh;
-    overflow:hidden;
 }
 
 .main-header {
@@ -654,4 +652,11 @@ body {
     border-color: #4a55a8;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(90, 103, 216, 0.4);
+}
+
+@media screen and (min-width: 1024px) {
+#main-container{
+    height:100vh;
+    overflow:hidden;
+}
 }
