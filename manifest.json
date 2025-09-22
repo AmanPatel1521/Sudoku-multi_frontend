@@ -1,0 +1,16 @@
+{
+  "name": "Multiplayer Sudoku",
+  "short_name": "Sudoku",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#5a67d8",
+  "description": "A web-based multiplayer Sudoku game.",
+  "icons": [
+    {
+      "src": "images/icons/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ]
+}
