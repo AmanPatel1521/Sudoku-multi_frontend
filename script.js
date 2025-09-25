@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         createRoomBtn.disabled = true;
         try {
-            const response = await fetch('http://localhost:8000/create_room', {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer' }),
