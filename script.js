@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true);
         joinRoomBtn.disabled = true;
         try {
-            const response = await fetch('http://localhost:8000/join_room', {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ room_id: inputRoomId, player_name: playerName }),
