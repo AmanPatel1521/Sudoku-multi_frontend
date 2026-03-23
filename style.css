@@ -663,29 +663,7 @@ body {
     }
 }
 
-.divider {
-    position: relative;
-    text-align: center;
-    color: var(--light-text-color);
-}
 
-.divider::before,
-.divider::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 40%;
-    height: 1px;
-    background-color: #e2e8f0;
-}
-
-.divider::before {
-    left: 0;
-}
-
-.divider::after {
-    right: 0;
-}
 
 #leaderboard-podium {
     display: flex; /* Added display flex */
