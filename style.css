@@ -118,6 +118,7 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     border-radius: 1.5rem;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--text-color) !important;
 }
 
 .card-glass:hover {
@@ -202,6 +203,13 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     line-height: 1.2;
 }
 
+#timer {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
 .card-title {
     font-size: 1.25rem;
     font-weight: 700;
@@ -257,6 +265,7 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     transition: opacity 0.3s ease;
     z-index: 1;
     box-shadow: 0 0 20px var(--primary-glow);
+    background: var(--card-background);
 }
 
 .cell {
@@ -266,8 +275,8 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     font-size: clamp(1.2rem, 4vw, 2rem);
     font-weight: 800;
     color: var(--accent-color);
-    background-color: rgba(15, 23, 42, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background-color: rgba(128, 128, 128, 0.05);
+    border: 1px solid var(--border-color);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
 }
@@ -279,12 +288,12 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 .cell:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(139, 92, 246, 0.15);
 }
 
 .cell.fixed {
     color: var(--text-color);
-    background-color: rgba(30, 41, 59, 0.8);
+    background-color: rgba(128, 128, 128, 0.15);
 }
 
 .cell.selected {
