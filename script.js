@@ -563,9 +563,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('game_started', (data) => {
             transitionToGameView(isSolo);
             startTimer(data.start_time);
-            if (isSolo) {
-                setLoading(false);
-            }
+            setLoading(false);
         });
 
         socket.on('game_state_update', (data) => {
