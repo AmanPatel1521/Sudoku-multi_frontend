@@ -134,6 +134,15 @@ document.addEventListener('DOMContentLoaded', () => {
             osc.start(now); osc.stop(now + 0.6);
         }
     }
+    
+    function disableMenuButtons(disabled) {
+        if(playSoloBtn) playSoloBtn.disabled = disabled;
+        if(quickPlayBtn) quickPlayBtn.disabled = disabled;
+        if(createRoomBtn) createRoomBtn.disabled = disabled;
+        if(joinRoomBtn) joinRoomBtn.disabled = disabled;
+        if(dailyChallengeBtn && !dailyChallengeBtn.innerHTML.includes('Completed Today')) dailyChallengeBtn.disabled = disabled;
+    }
+    
     const gameContainer = document.getElementById('game-container');
     const board = document.getElementById('sudoku-board');
     const mistakesCounter = document.getElementById('mistakes-counter');
@@ -319,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const playerName = playerNameInput.value.trim() || 'Guest';
         const avatar = playerAvatarSelect.value;
         setLoading(true);
+        disableMenuButtons(true);
 
         try {
             const response = await fetch("https://sudoku-multi-backend.onrender.com/start_daily_game", {
@@ -337,10 +347,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const errorData = await response.json();
                 alert("Error: " + errorData.error);
                 setLoading(false);
+                disableMenuButtons(false);
             }
         } catch (err) {
             alert("Failed to connect to the server.");
             setLoading(false);
+            disableMenuButtons(false);
         }
     }
 
@@ -384,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!playerName) return alert('Please enter your name.');
         
         setLoading(true);
-        createRoomBtn.disabled = true;
+        disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
@@ -412,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
 
         setLoading(true);
-        joinRoomBtn.disabled = true;
+        disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
@@ -430,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Failed to join room: ${error.message}`);
         } finally {
             setLoading(false);
-            joinRoomBtn.disabled = false;
+            disableMenuButtons(false);
         }
     }
 
@@ -441,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         
         setLoading(true);
-        playSoloBtn.disabled = true;
+        disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
@@ -458,7 +470,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error creating room:', error);
             alert(`Failed to create room: ${error.message}`);
         } finally {
-            playSoloBtn.disabled = false;
+            setLoading(false);
+            disableMenuButtons(false);
         }
     }
 
@@ -501,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!playerName) return alert('Please enter your name.');
         
         setLoading(true);
-        if(quickPlayBtn) quickPlayBtn.disabled = true;
+        disableMenuButtons(true);
         
         if (socket) socket.disconnect();
         socket = io("https://sudoku-multi-backend.onrender.com");
@@ -513,14 +526,15 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('match_found', (data) => {
             isHost = false;
             isSolo = false;
-            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
-            // Quick Play overrides room_id, prevents duplicate 'join' from initializeGame's connectWebSocket 
-            // wait, initializeGame calls connectWebSocket which drops current connection and re-establishes.
-            // That's actually fine, backend just clears us from queue.
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty, true);
+        });
+        
+        socket.on('disconnect', () => {
+             disableMenuButtons(false); // Enable buttons if aborted somehow
         });
     }
 
-    function initializeGame(newRoomId, newPlayerId, puzzle, difficulty) {
+    function initializeGame(newRoomId, newPlayerId, puzzle, difficulty, useExistingSocket = false) {
         roomId = newRoomId;
         playerId = newPlayerId;
         resetGameState();
@@ -528,7 +542,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         renderBoard(puzzle, currentPuzzle, currentNotesBoard);
         updateGameInfo(roomId, difficulty, isSolo);
-        connectWebSocket();
+        connectWebSocket(useExistingSocket);
 
         if (isSolo) {
             // isSolo is true, waiting for game_started event
@@ -539,19 +553,39 @@ document.addEventListener('DOMContentLoaded', () => {
         chatSendBtn.disabled = false;
     }
 
-    function connectWebSocket() {
-        if (socket) {
-            socket.disconnect();
-        }
-        socket = io("https://sudoku-multi-backend.onrender.com");
-
-        socket.on('connect', () => {
-            socket.emit('join', { room_id: roomId, player_id: playerId });
-            
-            if (isSolo) {
-                socket.emit('start_game', { room_id: roomId, player_id: playerId });
+    function connectWebSocket(useExistingSocket = false) {
+        if (!useExistingSocket) {
+            if (socket) {
+                socket.disconnect();
             }
-        });
+            socket = io("https://sudoku-multi-backend.onrender.com");
+        }
+
+        if (!useExistingSocket) {
+            socket.on('connect', () => {
+                socket.emit('join', { room_id: roomId, player_id: playerId });
+                
+                if (isSolo) {
+                    socket.emit('start_game', { room_id: roomId, player_id: playerId });
+                }
+            });
+        } else {
+            if (socket.connected) {
+                socket.emit('join', { room_id: roomId, player_id: playerId });
+            }
+        }
+        
+        socket.off('disconnect');
+        socket.off('game_started');
+        socket.off('game_state_update');
+        socket.off('eliminated');
+        socket.off('player_eliminated');
+        socket.off('player_finished');
+        socket.off('game_over');
+        socket.off('current_players');
+        socket.off('player_joined');
+        socket.off('player_left');
+        socket.off('chat_message');
 
         socket.on('disconnect', () => {
             if (!isReconnecting && !isSolo) {
