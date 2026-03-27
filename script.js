@@ -67,8 +67,50 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomIdInput = document.getElementById('room-id-input');
     const joinRoomBtn = document.getElementById('join-room-btn');
     const playSoloBtn = document.getElementById('play-solo-btn');
+    const quickPlayBtn = document.getElementById('quick-play-btn');
     const loadingIndicator = document.getElementById('loading-indicator');
     const messageDisplay = document.getElementById('message-display');
+    const playerAvatarSelect = document.getElementById('player-avatar-select');
+    
+    let isSoundEnabled = true;
+    let isLightMode = false;
+    const soundToggle = document.getElementById('sound-toggle');
+    const themeToggle = document.getElementById('theme-toggle');
+    if (localStorage.getItem('sudoku-sound') === 'false') { isSoundEnabled = false; if(soundToggle) soundToggle.checked = false; }
+    if (localStorage.getItem('sudoku-theme') === 'light') { isLightMode = true; if(themeToggle) themeToggle.checked = true; document.body.classList.add('light-mode'); }
+    if(soundToggle) soundToggle.addEventListener('change', (e) => { isSoundEnabled = e.target.checked; localStorage.setItem('sudoku-sound', isSoundEnabled); });
+    if(themeToggle) themeToggle.addEventListener('change', (e) => {
+        isLightMode = e.target.checked; localStorage.setItem('sudoku-theme', isLightMode ? 'light' : 'dark');
+        if (isLightMode) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
+    });
+    
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playSound(type) {
+        if (!isSoundEnabled) return;
+        if (!audioCtx) { try { audioCtx = new AudioContextClass(); } catch(e) { return; } }
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'tap') {
+            osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'correct') {
+            osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(554, now + 0.1);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'win') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(659, now + 0.2);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
+        }
+    }
     const gameContainer = document.getElementById('game-container');
     const board = document.getElementById('sudoku-board');
     const mistakesCounter = document.getElementById('mistakes-counter');
@@ -177,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     createRoomBtn.addEventListener('click', handleCreateRoom);
     joinRoomBtn.addEventListener('click', handleJoinRoom);
     playSoloBtn.addEventListener('click', handlePlaySolo);
+    if(quickPlayBtn) quickPlayBtn.addEventListener('click', handleQuickPlay);
     startGameBtn.addEventListener('click', () => socket.emit('start_game', { room_id: roomId, player_id: playerId }));
     
     document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', () => socket.emit('hint', { room_id: roomId, player_id: playerId })));
@@ -238,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleCreateRoom() {
         const playerName = playerNameInput.value.trim();
         const difficulty = difficultySelect.value;
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName) return alert('Please enter your name.');
         
         setLoading(true);
@@ -246,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer' }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer', avatar: avatar }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -265,6 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleJoinRoom() {
         const playerName = playerNameInput.value.trim();
         const inputRoomId = roomIdInput.value.trim();
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
 
         setLoading(true);
@@ -273,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName }),
+                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName, avatar: avatar }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -293,7 +338,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handlePlaySolo() {
         hideFinishedOverlay();
         const difficulty = difficultySelect.value;
-        const playerName = "Solo Player";
+        const playerName = playerNameInput.value.trim() || "Solo Player";
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         
         setLoading(true);
         playSoloBtn.disabled = true;
@@ -301,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo' }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -347,6 +393,32 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Failed to start new game: ${error.message}`);
             setLoading(false);
         }
+    }
+
+    function handleQuickPlay() {
+        const playerName = playerNameInput.value.trim();
+        const difficulty = difficultySelect.value;
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        if (!playerName) return alert('Please enter your name.');
+        
+        setLoading(true);
+        if(quickPlayBtn) quickPlayBtn.disabled = true;
+        
+        if (socket) socket.disconnect();
+        socket = io("https://sudoku-multi-backend.onrender.com");
+        
+        socket.on('connect', () => {
+            socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty });
+        });
+        
+        socket.on('match_found', (data) => {
+            isHost = false;
+            isSolo = false;
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
+            // Quick Play overrides room_id, prevents duplicate 'join' from initializeGame's connectWebSocket 
+            // wait, initializeGame calls connectWebSocket which drops current connection and re-establishes.
+            // That's actually fine, backend just clears us from queue.
+        });
     }
 
     function initializeGame(newRoomId, newPlayerId, puzzle, difficulty) {
@@ -424,8 +496,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (is_correct) {
                         cell.classList.add('correct-flash');
                         setTimeout(() => cell.classList.remove('correct-flash'), 500);
+                        if(value !== 0) playSound('correct');
                     } else {
                         cell.classList.add('wrong');
+                        if(value !== 0) playSound('error');
                     }
                 }
                 if (value !== 0) {
@@ -492,6 +566,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 playerState = 'finished';
                 updateUI();
                 showFinishedOverlay();
+                playSound('win');
+                if(typeof confetti === 'function') {
+                    const duration = 3000, end = Date.now() + duration, colors = ['#8b5cf6', '#0ea5e9', '#ffffff'];
+                    (function frame(){
+                        confetti({particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors});
+                        confetti({particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors});
+                        if (Date.now() < end) requestAnimationFrame(frame);
+                    }());
+                }
             }
         });
 
@@ -533,13 +616,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('chat_message', (data) => {
-            const { player_name, message } = data;
+            const { player_name, avatar, message } = data;
             const messageElement = document.createElement('div');
             messageElement.classList.add('chat-message');
             if (player_name === getPlayerNameById(playerId)) {
                 messageElement.classList.add('my-message');
             }
-            messageElement.innerHTML = `<span class="sender">${player_name}:</span> <span class="message">${message}</span>`;
+            messageElement.innerHTML = `<span class="sender">${avatar || '😎'} ${player_name}:</span> <span class="message">${message}</span>`;
+            playSound('tap');
             
             const chatMessages = document.getElementById('chat-messages');
             if(chatMessages) {
@@ -577,28 +661,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleKeyDown(e) {
-        if (isChatFocused()) {
+        if (isChatFocused() || playerState !== 'playing' || isPaused) return;
+
+        let r = selectedCell ? parseInt(selectedCell.dataset.row) : 4;
+        let c = selectedCell ? parseInt(selectedCell.dataset.col) : 4;
+
+        if (e.key === 'ArrowUp') r = Math.max(0, r - 1);
+        else if (e.key === 'ArrowDown') r = Math.min(8, r + 1);
+        else if (e.key === 'ArrowLeft') c = Math.max(0, c - 1);
+        else if (e.key === 'ArrowRight') c = Math.min(8, c + 1);
+
+        if (e.key.startsWith('Arrow')) {
+            const nextCell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+            if(nextCell) selectCell(nextCell);
+            e.preventDefault();
             return;
         }
-        if (playerState !== 'playing' || isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
 
-        const r = parseInt(selectedCell.dataset.row);
-        const c = parseInt(selectedCell.dataset.col);
+        if (!selectedCell || selectedCell.classList.contains('fixed')) return;
 
         if (e.key >= '1' && e.key <= '9') {
             const value = parseInt(e.key);
             if (notesMode) {
-            toggleNote(selectedCell, value);
-            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
-        } else {
-            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
-        }
+                toggleNote(selectedCell, value);
+                socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
+            } else {
+                socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
+            }
         } else if (e.key === 'Backspace' || e.key === 'Delete') {
             if (notesMode) {
                 socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: [] });
             } else {
                 socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: 0 });
             }
+        } else if (e.key.toLowerCase() === 'u') {
+            socket.emit('undo', { room_id: roomId, player_id: playerId });
+        } else if (e.key.toLowerCase() === 'h') {
+            socket.emit('hint', { room_id: roomId, player_id: playerId });
+        } else if (e.key.toLowerCase() === 'n') {
+            toggleNotesMode();
         }
     }
 
@@ -638,6 +739,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const selectCell = (cell) => {
+        playSound('tap');
         if (selectedCell) {
             selectedCell.classList.remove('selected');
         }
