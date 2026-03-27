@@ -329,12 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 const data = await response.json();
-                roomId = data.room_id;
-                playerId = data.player_id;
+                isHost = true;
                 isSolo = true;
                 isDailyGame = true;
-                connectWebSocket();
-                transitionToGameView(true);
+                initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
             } else {
                 const errorData = await response.json();
                 alert("Error: " + errorData.error);
