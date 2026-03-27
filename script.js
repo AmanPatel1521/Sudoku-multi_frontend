@@ -424,6 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeGame(newRoomId, newPlayerId, puzzle, difficulty) {
         roomId = newRoomId;
         playerId = newPlayerId;
+        resetGameState();
         currentPuzzle = puzzle;
         
         renderBoard(puzzle, currentPuzzle, currentNotesBoard);
@@ -431,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
         connectWebSocket();
 
         if (isSolo) {
-            console.log('initializeGame: isSolo is true, waiting for game_started event.');
+            // isSolo is true, waiting for game_started event
         } else {
             transitionToWaitingRoom();
         }
@@ -446,7 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
         socket = io("https://sudoku-multi-backend.onrender.com");
 
         socket.on('connect', () => {
-            console.log('Socket.IO connected!');
             socket.emit('join', { room_id: roomId, player_id: playerId });
             
             if (isSolo) {
@@ -455,7 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('disconnect', () => {
-            console.log('Socket.IO disconnected!');
             if (!isReconnecting && !isSolo) {
                 showLeaderboard([], 'Disconnected from the room.');
             }
@@ -463,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('game_started', (data) => {
-            console.log('Game started, start_time:', data.start_time);
             transitionToGameView(isSolo);
             startTimer(data.start_time);
             if (isSolo) {
@@ -1065,7 +1063,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function transitionToWaitingRoom() {
-        console.log('transitionToWaitingRoom called.');
         roomManagementDiv.style.display = 'none';
         gameContainer.style.display = 'none';
         waitingRoomDiv.style.display = 'block';
@@ -1097,7 +1094,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (mobileChatPanel) {
             mobileChatPanel.classList.remove('open');
         }
-        console.log('transitionToGameView called. isSoloParam:', isSoloParam);
         roomManagementDiv.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         gameContainer.style.display = 'block';
