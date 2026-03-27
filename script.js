@@ -6,6 +6,7 @@ let roomId = null;
 let playerId = null;
 let isHost = false;
 let isSolo = false;
+let isDailyGame = false;
 let timerInterval = null;
 let elapsedTime = 0;
 let isPaused = false;
@@ -13,6 +14,19 @@ let playersInRoom = [];
 let gameOverModal = null;
 let isReconnecting = false;
 let playerState = 'playing';
+
+let sudokuProgression = JSON.parse(localStorage.getItem('sudokuDaily')) || {
+    coins: 0,
+    streak: 0,
+    lastClaimDate: null,
+    lastDailyCompleted: null
+};
+
+function saveProgression() {
+    localStorage.setItem('sudokuDaily', JSON.stringify(sudokuProgression));
+    const coinCountSpan = document.getElementById('coin-count');
+    if (coinCountSpan) coinCountSpan.textContent = sudokuProgression.coins;
+}
 let currentNotesBoard = Array(9).fill(0).map(() => Array(9).fill(0).map(() => []));
 let incorrectCells = Array(9).fill(0).map(() => Array(9).fill(false));
 
@@ -71,6 +85,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading-indicator');
     const messageDisplay = document.getElementById('message-display');
     const playerAvatarSelect = document.getElementById('player-avatar-select');
+    
+    const coinCountDisplay = document.getElementById('coin-count');
+    const dailyChallengeBtn = document.getElementById('daily-challenge-btn');
+    const dailyBadge = document.getElementById('daily-badge');
+    const claimRewardBtn = document.getElementById('claim-reward-btn');
+    let dailyRewardModalObj = null;
+    if (document.getElementById('dailyRewardModal')) {
+        dailyRewardModalObj = new bootstrap.Modal(document.getElementById('dailyRewardModal'), { backdrop: 'static', keyboard: false });
+    }
     
     let isSoundEnabled = true;
     let isLightMode = false;
@@ -220,6 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
     joinRoomBtn.addEventListener('click', handleJoinRoom);
     playSoloBtn.addEventListener('click', handlePlaySolo);
     if(quickPlayBtn) quickPlayBtn.addEventListener('click', handleQuickPlay);
+    if(dailyChallengeBtn) dailyChallengeBtn.addEventListener('click', handleDailyChallenge);
     startGameBtn.addEventListener('click', () => socket.emit('start_game', { room_id: roomId, player_id: playerId }));
     
     document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', () => socket.emit('hint', { room_id: roomId, player_id: playerId })));
@@ -244,6 +268,83 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.addEventListener('keydown', handleKeyDown);
+
+    function checkDailyProgression() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (coinCountDisplay) coinCountDisplay.textContent = sudokuProgression.coins;
+
+        if (sudokuProgression.lastDailyCompleted === today) {
+            if (dailyChallengeBtn) {
+                dailyChallengeBtn.disabled = true;
+                dailyChallengeBtn.innerHTML = `✅ Completed Today`;
+                dailyChallengeBtn.classList.remove('glow-btn', 'btn-warning');
+                dailyChallengeBtn.classList.add('btn-secondary', 'text-white');
+            }
+        }
+
+        if (sudokuProgression.lastClaimDate !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (sudokuProgression.lastClaimDate !== yesterday.toISOString().split('T')[0] && sudokuProgression.lastClaimDate !== null) {
+                sudokuProgression.streak = 0;
+            }
+
+            const rewardStreakObj = document.getElementById('reward-streak');
+            if (rewardStreakObj) rewardStreakObj.textContent = sudokuProgression.streak + 1;
+            
+            if (dailyRewardModalObj) dailyRewardModalObj.show();
+        }
+    }
+
+    if (claimRewardBtn) {
+        claimRewardBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            sudokuProgression.lastClaimDate = today;
+            sudokuProgression.streak += 1;
+            sudokuProgression.coins += 100;
+            saveProgression();
+            dailyRewardModalObj.hide();
+            playSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.8 } });
+            }
+        });
+    }
+
+    checkDailyProgression();
+
+    async function handleDailyChallenge() {
+        playSound('tap');
+        const playerName = playerNameInput.value.trim() || 'Guest';
+        const avatar = playerAvatarSelect.value;
+        setLoading(true);
+
+        try {
+            const response = await fetch("https://sudoku-multi-backend.onrender.com/start_daily_game", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: playerName, avatar: avatar })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                roomId = data.room_id;
+                playerId = data.player_id;
+                isSolo = true;
+                isDailyGame = true;
+                connectWebSocket();
+                transitionToGameView(true);
+            } else {
+                const errorData = await response.json();
+                alert("Error: " + errorData.error);
+                setLoading(false);
+            }
+        } catch (err) {
+            alert("Failed to connect to the server.");
+            setLoading(false);
+        }
+    }
 
     function sendChatMessage(message) {
         const messageToSend = message || chatInput.value.trim();
@@ -572,6 +673,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         confetti({particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors});
                         if (Date.now() < end) requestAnimationFrame(frame);
                     }());
+                }
+
+                if (isDailyGame) {
+                    const today = new Date().toISOString().split('T')[0];
+                    if (sudokuProgression.lastDailyCompleted !== today) {
+                        sudokuProgression.lastDailyCompleted = today;
+                        sudokuProgression.coins += 500;
+                        saveProgression();
+                        setTimeout(() => {
+                           alert(`🎉 DAILY CHALLENGE COMPLETED! 🎉\nYou have been awarded 500 Coins!`);
+                           checkDailyProgression();
+                        }, 1500);
+                    }
                 }
             }
         });
@@ -1201,6 +1315,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentPuzzle = [];
         notesMode = false;
         isPaused = false;
+        isDailyGame = false;
         isGameActive = true;
         if (pauseOverlay.classList.contains('d-none') === false) togglePause();
         playersInRoom = [];

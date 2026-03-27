@@ -16,6 +16,10 @@
         <header class="main-header text-center mb-4 position-relative">
             <h1>Multiplayer Sudoku</h1>
             <div class="position-absolute top-50 translate-middle-y d-flex gap-2" style="right: 15px;">
+                <div class="d-flex align-items-center bg-dark bg-opacity-50 rounded-pill px-2 py-1 border border-warning" title="Coins">
+                    <span class="fs-5 me-1">🪙</span>
+                    <span id="coin-count" class="fw-bold text-warning" style="font-family: monospace;">0</span>
+                </div>
                 <button id="tutorial-btn" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#tutorialModal">How to Play</button>
                 <button id="settings-btn" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️</button>
             </div>
@@ -25,6 +29,11 @@
             <div class="card shadow-lg card-glass">
                 <div class="card-body p-4 position-relative">
                     <h2 class="card-title text-center mb-4">Welcome!</h2>
+
+                    <button class="btn btn-warning btn-lg w-100 mb-3 fw-bold glow-btn position-relative overflow-hidden shadow-lg" id="daily-challenge-btn" style="border-radius: 1rem; border: none; font-size: 1.25rem;">
+                        <span class="position-relative z-1 text-dark">🔥 Play Daily Challenge <span class="badge bg-danger ms-2 shadow-sm" id="daily-badge">NEW</span></span>
+                    </button>
+
                     <div class="d-grid gap-2">
                         <button class="btn btn-primary btn-lg" id="play-solo-btn">Play Solo</button>
                         <button class="btn btn-primary btn-lg" id="quick-play-btn">Quick Play (Matchmaking)</button>
@@ -372,6 +381,21 @@
         </div>
     </div>
     
+    <!-- Daily Reward Modal -->
+    <div class="modal fade" id="dailyRewardModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-glass text-center p-4" style="border: 2px solid var(--bs-warning); box-shadow: 0 0 20px rgba(255, 193, 7, 0.4);">
+                <div class="modal-body">
+                    <h2 class="mb-3 text-warning fw-bold">Daily Reward!</h2>
+                    <div class="display-1 mb-3 glow-animation" id="reward-chest">🎁</div>
+                    <p class="fs-4 mb-2 text-light p-2 bg-dark bg-opacity-25 rounded"><strong class="text-warning">+100 🪙</strong> coins!</p>
+                    <p class="fs-5 text-muted mb-4">Current Streak: <span id="reward-streak" class="fw-bold text-white">1</span> 🔥</p>
+                    <button id="claim-reward-btn" class="btn btn-warning btn-lg w-100 fw-bold glow-btn text-dark" style="border-radius: 1rem;">Claim Reward</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>

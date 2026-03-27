@@ -1329,3 +1329,20 @@ body.solo-mode #chat-tab {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     z-index: 10;
 }
+/* Daily Rewards & UI Glows */
+.glow-btn {
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+}
+.glow-btn:hover {
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+    transform: translateY(-2px);
+}
+.glow-animation {
+    animation: chestHover 2.5s infinite ease-in-out;
+    filter: drop-shadow(0 0 15px rgba(255, 193, 7, 0.8));
+}
+@keyframes chestHover {
+    0% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.5)); }
+    50% { transform: translateY(-10px) scale(1.05); filter: drop-shadow(0 0 25px rgba(255, 193, 7, 1)); }
+    100% { transform: translateY(0px) scale(1); filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.5)); }
+}
