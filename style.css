@@ -58,6 +58,10 @@ input.form-control, select.form-select {
     color: var(--text-color) !important;
 }
 
+input.form-control::placeholder, select.form-select::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
 input.form-control:focus, select.form-select:focus {
     background-color: rgba(15, 23, 42, 0.8) !important;
     border-color: var(--primary-color) !important;
@@ -68,6 +72,10 @@ body.light-mode input.form-control, body.light-mode select.form-select {
     background-color: rgba(255, 255, 255, 0.7) !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
     color: var(--text-color) !important;
+}
+
+body.light-mode input.form-control::placeholder, body.light-mode select.form-select::placeholder {
+    color: rgba(0, 0, 0, 0.5) !important;
 }
 
 body.light-mode input.form-control:focus, body.light-mode select.form-select:focus {
@@ -1015,9 +1023,13 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 .chat-message:not(.my-message) {
-    background-color: #e9ecef;
+    background-color: rgba(255, 255, 255, 0.1);
     color: var(--text-color);
     align-self: flex-start;
+}
+
+body.light-mode .chat-message:not(.my-message) {
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 #chat-pane .chat-messages {
