@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (socket) socket.disconnect();
         socket = io("https://sudoku-multi-backend.onrender.com");
         
-        socket.on('connect', () => {
+        socket.once('connect', () => {
             socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty });
         });
         
@@ -570,9 +570,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else {
-            if (socket.connected) {
-                socket.emit('join', { room_id: roomId, player_id: playerId });
-            }
+            socket.emit('join', { room_id: roomId, player_id: playerId });
         }
         
         socket.off('disconnect');
