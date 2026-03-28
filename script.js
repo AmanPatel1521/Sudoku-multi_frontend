@@ -1141,6 +1141,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateWaitingPlayerList() {
+        if (!waitingPlayerListUl) return;
+        
         const newPlayersMap = new Map(playersInRoom.map(p => [p.player_id, p]));
 
         Array.from(waitingPlayerListUl.children).forEach(listItem => {
@@ -1155,15 +1157,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!listItem) {
                 listItem = document.createElement('li');
-                listItem.className = 'list-group-item';
+                listItem.className = 'list-group-item bg-transparent border-0 d-flex align-items-center mb-2 px-0';
                 listItem.dataset.playerId = player.player_id;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'player-avatar me-3 shadow-sm';
+                avatar.style.width = '40px';
+                avatar.style.height = '40px';
+                avatar.style.fontSize = '1.2rem';
+                avatar.textContent = (player.avatar || '😎');
+                
+                const nameInfo = document.createElement('div');
+                nameInfo.className = 'flex-grow-1';
+                
+                const nameLabel = document.createElement('div');
+                nameLabel.className = 'fw-bold text-white h6 mb-0';
+                nameLabel.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
+                
+                const statusLabel = document.createElement('div');
+                statusLabel.className = 'small text-warning fw-semibold';
+                statusLabel.textContent = (player.player_id === playerId ? 'Ready to play' : 'Ready to challenge you!');
+                
+                nameInfo.appendChild(nameLabel);
+                nameInfo.appendChild(statusLabel);
+                
+                listItem.appendChild(avatar);
+                listItem.appendChild(nameInfo);
+                
                 waitingPlayerListUl.insertBefore(listItem, waitingPlayerListUl.children[index]);
-            }
-
-            listItem.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
-            
-            if (waitingPlayerListUl.children[index] !== listItem) {
-                 waitingPlayerListUl.insertBefore(listItem, waitingPlayerListUl.children[index]);
+            } else {
+                // Update text just in case (e.g. "Ready" status)
+                const nameLabel = listItem.querySelector('.fw-bold');
+                if (nameLabel) nameLabel.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
             }
         });
     }
