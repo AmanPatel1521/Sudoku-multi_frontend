@@ -153,25 +153,123 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     color: #ffffff !important;
 }
 
-/* Force all text in the waiting room card to be white/visible on desktop */
-#waiting-room .card-glass {
-    background: rgba(15, 25, 50, 0.92) !important;
-    border: 1px solid rgba(139, 92, 246, 0.4) !important;
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(139, 92, 246, 0.2) !important;
+/* ============================================
+   WAITING ROOM — Fully self-contained styles
+   ============================================ */
+#waiting-room {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9000;
+    background: rgba(10, 15, 30, 0.85);
+    backdrop-filter: blur(4px);
 }
 
-#waiting-room h2,
-#waiting-room h3,
-#waiting-room p,
-#waiting-room .card-title,
-#waiting-room .h5 {
-    color: #ffffff !important;
+#waiting-room-card {
+    background: #1a2540;
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(139, 92, 246, 0.2);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 480px;
+    color: #ffffff;
+    text-align: center;
 }
 
-#waiting-room hr {
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    opacity: 1 !important;
+#waiting-room-card h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
 }
+
+#waiting-room-card p {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+#waiting-room-card hr {
+    border-color: rgba(255, 255, 255, 0.15);
+    margin: 1.25rem 0;
+}
+
+#waiting-room-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    text-align: left;
+}
+
+#waiting-player-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1rem 0;
+}
+
+#waiting-player-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.75rem;
+    margin-bottom: 0.5rem;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+#waiting-room-card .player-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.3);
+    border: 2px solid rgba(139, 92, 246, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+#match-countdown-container {
+    margin: 1.5rem 0;
+    padding: 1.25rem;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 1rem;
+}
+
+.match-found-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 0.5rem;
+}
+
+#match-countdown-timer {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 0 20px rgba(255, 193, 7, 0.5);
+}
+
+.starting-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+
 
 .room-code-display {
     background: rgba(139, 92, 246, 0.2);

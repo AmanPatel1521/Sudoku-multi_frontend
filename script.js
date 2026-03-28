@@ -1283,7 +1283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function transitionToWaitingRoom() {
         roomManagementDiv.style.display = 'none';
         gameContainer.style.display = 'none';
-        waitingRoomDiv.style.display = 'block';
+        waitingRoomDiv.style.display = 'flex';
         roomCodeDisplay.textContent = roomId;
         
         if (window.innerWidth < 992) { // Mobile
