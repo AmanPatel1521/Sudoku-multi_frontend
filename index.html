@@ -97,23 +97,27 @@
             </div>
         </div>
 
-        <div id="waiting-room" class="mx-auto" style="display: none;">
-            <div class="card shadow-lg card-glass">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <div class="col-12">
-                            <h2 class="card-title mb-3">Waiting for Players</h2>
-                            <p>Share this room code with your friends:</p>
-                            <div class="room-code-display"></div>
-                            <hr class="my-4">
-                            <h3 class="h5 mb-3">Players in Room:</h3>
-                            <ul id="waiting-player-list" class="list-group"></ul>
-                            <div id="match-countdown-container" class="mt-4 text-center" style="display: none;">
-                                <div class="h4 text-warning mb-2">Match Found!</div>
-                                <div id="match-countdown-timer" class="display-4 fw-bold text-white mb-2">5</div>
-                                <div class="text-muted">Starting in any second...</div>
+        <div id="waiting-room" class="container" style="display: none;">
+            <div class="row justify-content-center mt-5">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="card shadow-lg card-glass">
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <div class="col-12 text-center">
+                                    <h2 class="card-title mb-3">Waiting for Players</h2>
+                                    <p>Share this room code with your friends:</p>
+                                    <div class="room-code-display fs-3 fw-bold text-primary mb-3"></div>
+                                    <hr class="my-4">
+                                    <h3 class="h5 mb-4 text-start">Players in Room:</h3>
+                                    <ul id="waiting-player-list" class="list-group mb-4"></ul>
+                                    <div id="match-countdown-container" class="mt-4 text-center" style="display: none;">
+                                        <div class="h4 text-warning mb-2">Match Found!</div>
+                                        <div id="match-countdown-timer" class="display-4 fw-bold text-white mb-2">5</div>
+                                        <div class="text-muted">Starting in any second...</div>
+                                    </div>
+                                    <button id="start-game-btn" class="btn btn-primary btn-lg w-100 mt-4 shadow-sm" disabled>Start Game</button>
+                                </div>
                             </div>
-                            <button id="start-game-btn" class="btn btn-primary btn-lg w-100 mt-4" disabled>Start Game</button>
                         </div>
                     </div>
                 </div>
