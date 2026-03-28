@@ -517,7 +517,9 @@ document.addEventListener('DOMContentLoaded', () => {
         disableMenuButtons(true);
         
         if (socket) socket.disconnect();
-        socket = io("https://sudoku-multi-backend.onrender.com");
+        socket = io("https://sudoku-multi-backend.onrender.com", {
+            transports: ['websocket']
+        });
         
         socket.once('connect', () => {
             socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty });
@@ -554,25 +556,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function connectWebSocket(useExistingSocket = false) {
-        if (!useExistingSocket) {
-            if (socket) {
-                socket.disconnect();
-            }
-            socket = io("https://sudoku-multi-backend.onrender.com");
+        if (!useExistingSocket && socket) {
+            socket.disconnect();
+            socket = io("https://sudoku-multi-backend.onrender.com", {
+                transports: ['websocket']
+            });
         }
 
-        if (!useExistingSocket) {
-            socket.on('connect', () => {
+        socket.on('connect', () => {
+            if (roomId && playerId) {
                 socket.emit('join', { room_id: roomId, player_id: playerId });
-                
-                if (isSolo) {
+                if (isSolo && !useExistingSocket) {
                     socket.emit('start_game', { room_id: roomId, player_id: playerId });
                 }
-            });
-        } else {
-            socket.emit('join', { room_id: roomId, player_id: playerId });
+            }
+        });
+
+        if (useExistingSocket) {
+             socket.emit('join', { room_id: roomId, player_id: playerId });
         }
-        
+
         socket.off('disconnect');
         socket.off('game_started');
         socket.off('game_state_update');
