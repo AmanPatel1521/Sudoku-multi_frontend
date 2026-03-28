@@ -1153,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const newPlayersMap = new Map(playersInRoom.map(p => [p.player_id, p]));
 
-        Array.from(waitingPlayerListUl.children).forEach(listItem => {
+        Array.from(listUl.children).forEach(listItem => {
             const pId = listItem.dataset.playerId;
             if (!newPlayersMap.has(pId)) {
                 listItem.remove();
@@ -1161,7 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         playersInRoom.forEach((player, index) => {
-            let listItem = waitingPlayerListUl.querySelector(`[data-player-id="${player.player_id}"]`);
+            let listItem = listUl.querySelector(`[data-player-id="${player.player_id}"]`);
 
             if (!listItem) {
                 listItem = document.createElement('li');
@@ -1303,6 +1303,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(chatPanel) chatPanel.style.display = 'block';
         }
         updateStats(0, 0, 0);
+        updateWaitingPlayerList(); // Render the pre-populated player list immediately
 
         // Countdown handling
         if (matchCountdownContainer) {
