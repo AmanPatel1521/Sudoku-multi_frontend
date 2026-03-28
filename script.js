@@ -556,29 +556,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function connectWebSocket(useExistingSocket = false) {
+        console.log("connectWebSocket called. useExistingSocket:", useExistingSocket, "roomId:", roomId, "playerId:", playerId);
+        
         if (!useExistingSocket && socket) {
             socket.disconnect();
+            socket = null;
+        }
+
+        if (!socket) {
             socket = io("https://sudoku-multi-backend.onrender.com", {
                 transports: ['websocket']
             });
         }
 
-        socket.on('connect', () => {
-            if (roomId && playerId) {
-                socket.emit('join', { room_id: roomId, player_id: playerId });
-                if (isSolo && !useExistingSocket) {
-                    socket.emit('start_game', { room_id: roomId, player_id: playerId });
-                }
-            }
-        });
-
-        if (useExistingSocket) {
-             socket.emit('join', { room_id: roomId, player_id: playerId });
-        }
-
+        // 1. Clear ALL old listeners to prevent duplicates and memory leaks
+        socket.off('connect');
         socket.off('disconnect');
         socket.off('game_started');
         socket.off('game_state_update');
+        socket.off('hint_given');
         socket.off('eliminated');
         socket.off('player_eliminated');
         socket.off('player_finished');
@@ -587,15 +583,41 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.off('player_joined');
         socket.off('player_left');
         socket.off('chat_message');
+        socket.off('error');
 
-        socket.on('disconnect', () => {
+        // 2. Define the core Join logic
+        const performJoinRoom = () => {
+            if (roomId && playerId) {
+                console.log("Emitting JOIN event to server. Room:", roomId, "Player:", playerId);
+                socket.emit('join', { room_id: roomId, player_id: playerId });
+                if (isSolo) {
+                    socket.emit('start_game', { room_id: roomId, player_id: playerId });
+                }
+            }
+        };
+
+        // 3. Attach standard status listeners
+        socket.on('connect', () => {
+            console.log("Socket connected/reconnected. Sid:", socket.id);
+            performJoinRoom();
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log("Socket disconnected. Reason:", reason);
             if (!isReconnecting && !isSolo) {
                 showLeaderboard([], 'Disconnected from the room.');
             }
             isReconnecting = false;
         });
 
+        socket.on('error', (data) => {
+            console.error("Socket error:", data);
+            alert(`Error: ${data.message}`);
+        });
+
+        // 4. Attach GAME logic listeners
         socket.on('game_started', (data) => {
+            console.log("CRITICAL: game_started event received!", data);
             transitionToGameView(isSolo);
             startTimer(data.start_time);
             setLoading(false);
@@ -607,6 +629,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.last_move) {
                 const { row, col, value, is_correct } = data.last_move;
+                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                
                 if (value === 0) {
                     incorrectCells[row][col] = false;
                 } else if (!is_correct) {
@@ -614,14 +638,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     incorrectCells[row][col] = false;
                 }
-            }
 
-            renderBoard(data.game_state.puzzle, currentPuzzle, currentNotesBoard);
-            updateStats(data.mistakes, data.hints_used, data.score);
-
-            if (data.last_move) {
-                const { row, col, value, is_correct } = data.last_move;
-                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
                 if (cell) {
                     if (is_correct) {
                         cell.classList.add('correct-flash');
@@ -636,6 +653,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     highlightActiveNumbers(value);
                 }
             }
+            
+            renderBoard(currentPuzzle, currentPuzzle, currentNotesBoard);
+            updateStats(data.mistakes, data.hints, data.score);
         });
 
         socket.on('hint_given', (data) => {
@@ -651,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         socket.on('player_eliminated', (data) => {
-            showTemporaryMessage(`${data.player_name} has been eliminated!`)
+            showTemporaryMessage(`${data.player_name} has been eliminated!`);
         });
 
         socket.on('eliminated', (data) => {
@@ -660,36 +680,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showEliminationOverlay(data.message);
         });
 
-        function updateUI() {
-            const gameButtons = document.querySelectorAll('.number-button, #actions-container button, #mobile-controls button');
-            const chatInputs = document.querySelectorAll('#chat-input, #chat-send-btn');
-            const presetChatButtons = document.querySelectorAll('.preset-chat-btn');
-
-            if (playerState === 'playing') {
-                gameButtons.forEach(button => button.disabled = false);
-                chatInputs.forEach(button => button.disabled = false);
-                presetChatButtons.forEach(button => button.disabled = false);
-                document.addEventListener('keydown', handleKeyDown);
-            } else if (playerState === 'finished' || playerState === 'eliminated') {
-                gameButtons.forEach(button => button.disabled = true);
-                chatInputs.forEach(button => button.disabled = false);
-                presetChatButtons.forEach(button => button.disabled = false);
-                document.removeEventListener('keydown', handleKeyDown);
-            }
-            else if (playerState === 'game_over') {
-                gameButtons.forEach(button => button.disabled = true);
-                chatInputs.forEach(button => button.disabled = true);
-                presetChatButtons.forEach(button => button.disabled = true);
-                if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
-                if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
-                if(mobileChatPanel) mobileChatPanel.classList.remove('open');
-                document.removeEventListener('keydown', handleKeyDown);
-            }
-        }
-
         socket.on('player_finished', (data) => {
             if (!isSolo) {
-                showTemporaryMessage(`${data.player_name} has finished the puzzle!`)
+                showTemporaryMessage(`${data.player_name} has finished the puzzle!`);
             }
             if (data.player_id === playerId) {
                 stopTimer();
@@ -721,20 +714,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        socket.on('eliminated', (data) => {
-            if (data.player_id === playerId) {
-                playerState = 'eliminated';
-                updateUI();
-                showEliminationOverlay(data.message);
-            }
-        });
-
         socket.on('game_over', (data) => {
             stopTimer();
             playerState = 'game_over';
             updateUI();
             if (isSolo) {
-                // For solo mode, the finishedOverlay is already shown by player_finished,
+                // Handled in player_finished
             } else {
                 hideFinishedOverlay();
                 showLeaderboard(data.leaderboard, data.message);
@@ -754,10 +739,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showTemporaryMessage(`${data.player_name} left the room.`);
         });
 
-        socket.on('error', (data) => {
-            alert(`Error: ${data.message}`);
-        });
-
         socket.on('chat_message', (data) => {
             const { player_name, avatar, message } = data;
             const messageElement = document.createElement('div');
@@ -768,10 +749,10 @@ document.addEventListener('DOMContentLoaded', () => {
             messageElement.innerHTML = `<span class="sender">${avatar || '😎'} ${player_name}:</span> <span class="message">${message}</span>`;
             playSound('tap');
             
-            const chatMessages = document.getElementById('chat-messages');
-            if(chatMessages) {
-                chatMessages.appendChild(messageElement);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+            const chatMessagesList = document.getElementById('chat-messages');
+            if(chatMessagesList) {
+                chatMessagesList.appendChild(messageElement);
+                chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
             }
 
             if (mobileChatPanel && !mobileChatPanel.classList.contains('open')) {
@@ -782,6 +763,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 desktopChatNotificationDot.classList.remove('d-none');
             }
         });
+
+        function updateUI() {
+            const gameButtons = document.querySelectorAll('.number-button, #actions-container button, #mobile-controls button');
+            const chatInputs = document.querySelectorAll('#chat-input, #chat-send-btn');
+            const presetChatButtons = document.querySelectorAll('.preset-chat-btn');
+
+            if (playerState === 'playing') {
+                gameButtons.forEach(button => button.disabled = false);
+                chatInputs.forEach(button => button.disabled = false);
+                presetChatButtons.forEach(button => button.disabled = false);
+                document.addEventListener('keydown', handleKeyDown);
+            } else if (playerState === 'finished' || playerState === 'eliminated') {
+                gameButtons.forEach(button => button.disabled = true);
+                chatInputs.forEach(button => button.disabled = false);
+                presetChatButtons.forEach(button => button.disabled = false);
+                document.removeEventListener('keydown', handleKeyDown);
+            } else if (playerState === 'game_over') {
+                gameButtons.forEach(button => button.disabled = true);
+                chatInputs.forEach(button => button.disabled = true);
+                presetChatButtons.forEach(button => button.disabled = true);
+                if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+                if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+                if(mobileChatPanel) mobileChatPanel.classList.remove('open');
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        }
+
+        // 5. If we're already connected (Matchmaking case), trigger the Join sequence immediately
+        if (socket.connected) {
+            console.log("Socket is already connected. Triggering immediate join.");
+            performJoinRoom();
+        }
     }
 
     function handleNumberInput(e) {
