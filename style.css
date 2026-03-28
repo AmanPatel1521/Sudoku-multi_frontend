@@ -150,23 +150,44 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 
 #room-management .card-title, #waiting-room .card-title {
     font-weight: 700;
-    color: var(--text-color);
+    color: #ffffff !important;
+}
+
+/* Force all text in the waiting room card to be white/visible on desktop */
+#waiting-room .card-glass {
+    background: rgba(15, 25, 50, 0.92) !important;
+    border: 1px solid rgba(139, 92, 246, 0.4) !important;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(139, 92, 246, 0.2) !important;
+}
+
+#waiting-room h2,
+#waiting-room h3,
+#waiting-room p,
+#waiting-room .card-title,
+#waiting-room .h5 {
+    color: #ffffff !important;
+}
+
+#waiting-room hr {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    opacity: 1 !important;
 }
 
 .room-code-display {
-    background: rgba(0,0,0,0.05);
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid rgba(139, 92, 246, 0.5);
     padding: 1rem;
-    border-radius: 0.5rem;
+    border-radius: 0.75rem;
     font-size: 1.5rem;
     font-weight: 700;
     text-align: center;
     letter-spacing: 2px;
-    color: var(--primary-color);
+    color: #c4b5fd !important;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 .room-code-display:hover {
-    background: rgba(0,0,0,0.1);
+    background: rgba(139, 92, 246, 0.3);
 }
 
 .nav-pills .nav-link {
