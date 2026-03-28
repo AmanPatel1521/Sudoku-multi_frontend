@@ -534,11 +534,13 @@ document.addEventListener('DOMContentLoaded', () => {
             isHost = false;
             isSolo = false;
             isMatchmakingRoom = data.is_matchmaking || false;
+            playersInRoom = data.players || [];
+            console.log("DEBUG: match_found event received with players:", playersInRoom.length);
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty, true);
         });
         
         socket.on('disconnect', () => {
-             disableMenuButtons(false); // Enable buttons if aborted somehow
+             disableMenuButtons(false); 
         });
     }
 
