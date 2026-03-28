@@ -159,6 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const difficultyDisplay = document.getElementById('difficulty-display');
     const playerListUl = document.getElementById('player-list');
     const waitingPlayerListUl = document.getElementById('waiting-player-list');
+    const matchCountdownContainer = document.getElementById('match-countdown-container');
+    const matchCountdownTimer = document.getElementById('match-countdown-timer');
     const pauseOverlay = document.getElementById('pause-overlay');
     const finishedOverlay = document.getElementById('finished-overlay');
     const gameOverMessage = document.getElementById('gameOverMessage');
@@ -583,6 +585,8 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.off('player_joined');
         socket.off('player_left');
         socket.off('chat_message');
+        socket.off('match_countdown');
+        socket.off('match_cancelled');
         socket.off('error');
 
         // 2. Define the core Join logic
@@ -656,6 +660,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             renderBoard(currentPuzzle, currentPuzzle, currentNotesBoard);
             updateStats(data.mistakes, data.hints, data.score);
+        });
+
+        socket.on('match_countdown', (data) => {
+            console.log("Match countdown:", data.seconds);
+            if (matchCountdownContainer && matchCountdownTimer) {
+                matchCountdownContainer.style.display = 'block';
+                matchCountdownTimer.textContent = data.seconds;
+                playSound('tap');
+            }
+        });
+
+        socket.on('match_cancelled', (data) => {
+            console.log("Match cancelled:", data.message);
+            alert(data.message);
+            transitionToRoomView();
         });
 
         socket.on('hint_given', (data) => {
@@ -1243,6 +1262,21 @@ document.addEventListener('DOMContentLoaded', () => {
             if(chatPanel) chatPanel.style.display = 'block';
         }
         updateStats(0, 0, 0);
+
+        // Countdown handling
+        if (matchCountdownContainer) {
+            // Only show countdown UI for Quick Play matches (internal rooms)
+            // Rooms with length 8 are usually UUID shards from matchmaking
+            if (roomId && roomId.length === 8) {
+                matchCountdownContainer.style.display = 'block';
+                if(startGameBtn) startGameBtn.style.display = 'none';
+                if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'none';
+            } else {
+                matchCountdownContainer.style.display = 'none';
+                if(startGameBtn) startGameBtn.style.display = 'block';
+                if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'block';
+            }
+        }
     }
 
     function transitionToGameView(isSoloParam) {
@@ -1371,6 +1405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.textContent = '00:00';
         if (timerDisplayMobile) timerDisplayMobile.textContent = '00:00';
         board.innerHTML = '';
+        if (matchCountdownContainer) matchCountdownContainer.style.display = 'none';
         hideFinishedOverlay();
     }
     
