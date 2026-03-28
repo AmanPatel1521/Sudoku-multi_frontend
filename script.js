@@ -1065,6 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updatePlayerList() {
         const playerLists = [document.getElementById('player-list'), document.getElementById('mobile-player-list')];
+        console.log("DEBUG: updatePlayerList called. player-list found:", !!playerLists[0], "mobile-player-list found:", !!playerLists[1]);
         
         playerLists.forEach(playerListUl => {
             if (!playerListUl) return;
@@ -1143,7 +1144,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateWaitingPlayerList() {
-        if (!waitingPlayerListUl) return;
+        const listUl = document.getElementById('waiting-player-list');
+        if (!listUl) {
+            console.error("DEBUG: updateWaitingPlayerList failed - list UL not found");
+            return;
+        }
+        console.log("DEBUG: updateWaitingPlayerList updating with players:", playersInRoom.length);
         
         const newPlayersMap = new Map(playersInRoom.map(p => [p.player_id, p]));
 
@@ -1186,7 +1192,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 listItem.appendChild(avatar);
                 listItem.appendChild(nameInfo);
                 
-                waitingPlayerListUl.insertBefore(listItem, waitingPlayerListUl.children[index]);
+                listUl.insertBefore(listItem, listUl.children[index]);
+                // Force a UI reflow to ensure transparency and borders are correctly rendered on desktop
+                listUl.style.display = 'none';
+                listUl.offsetHeight; 
+                listUl.style.display = 'block';
             } else {
                 // Update text just in case (e.g. "Ready" status)
                 const nameLabel = listItem.querySelector('.fw-bold');

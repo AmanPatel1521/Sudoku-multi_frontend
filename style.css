@@ -144,6 +144,8 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 #waiting-room {
     max-width: 800px;
     width: 100%;
+    position: relative;
+    z-index: 100;
 }
 
 #room-management .card-title, #waiting-room .card-title {
@@ -241,9 +243,11 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 
 #player-list .list-group-item, #waiting-player-list .list-group-item {
     font-weight: 600;
-    background: transparent;
-    color: var(--text-color);
-    border-color: rgba(255,255,255,0.1);
+    background: rgba(0, 0, 0, 0.35) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    margin-bottom: 8px;
+    border-radius: 12px !important;
     transition: background-color 0.2s ease;
 }
 #player-list .list-group-item:hover, #waiting-player-list .list-group-item:hover {
