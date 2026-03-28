@@ -13,6 +13,7 @@ let isPaused = false;
 let playersInRoom = [];
 let gameOverModal = null;
 let isReconnecting = false;
+let isMatchmakingRoom = false;
 let playerState = 'playing';
 
 let sudokuProgression = JSON.parse(localStorage.getItem('sudokuDaily')) || {
@@ -410,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             isHost = true;
             isSolo = false;
+            isMatchmakingRoom = false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
             console.error('Error creating room:', error);
@@ -438,6 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             isHost = false;
             isSolo = false;
+            isMatchmakingRoom = false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
             console.error('Error joining room:', error);
@@ -530,6 +533,7 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('match_found', (data) => {
             isHost = false;
             isSolo = false;
+            isMatchmakingRoom = data.is_matchmaking || false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty, true);
         });
         
@@ -1265,15 +1269,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Countdown handling
         if (matchCountdownContainer) {
-            // Only show countdown UI for Quick Play matches (internal rooms)
-            // Rooms with length 8 are usually UUID shards from matchmaking
-            if (roomId && roomId.length === 8) {
+            // Only show countdown UI for Quick Play matches
+            if (isMatchmakingRoom) {
                 matchCountdownContainer.style.display = 'block';
                 if(startGameBtn) startGameBtn.style.display = 'none';
                 if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'none';
             } else {
                 matchCountdownContainer.style.display = 'none';
-                if(startGameBtn) startGameBtn.style.display = 'block';
+                if(startGameBtn) {
+                    startGameBtn.style.display = 'block';
+                    // Enable start button if host and enough players
+                    startGameBtn.disabled = !isHost || (playersInRoom.length < 2 && !isSolo);
+                }
                 if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'block';
             }
         }
