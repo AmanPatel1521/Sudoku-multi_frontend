@@ -1316,7 +1316,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isMatchmakingRoom) {
                 matchCountdownContainer.style.display = 'block';
                 if(startGameBtn) startGameBtn.style.display = 'none';
-                if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'none';
+                const rcSection = document.getElementById('room-code-section');
+                if(rcSection) rcSection.style.display = 'none';
             } else {
                 matchCountdownContainer.style.display = 'none';
                 if(startGameBtn) {
@@ -1324,7 +1325,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Enable start button if host and enough players
                     startGameBtn.disabled = !isHost || (playersInRoom.length < 2 && !isSolo);
                 }
-                if(roomCodeDisplay && roomCodeDisplay.parentElement) roomCodeDisplay.parentElement.style.display = 'block';
+                const rcSection = document.getElementById('room-code-section');
+                if(rcSection) rcSection.style.display = 'block';
             }
         }
     }
