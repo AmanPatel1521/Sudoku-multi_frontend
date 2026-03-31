@@ -553,10 +553,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeGame(newRoomId, newPlayerId, puzzle, difficulty, useExistingSocket = false) {
         roomId = newRoomId;
         playerId = newPlayerId;
-        resetGameState();
+        gameStartTime = Date.now();
         currentPuzzle = puzzle;
+        initialPuzzle = puzzle;
         
-        renderBoard(puzzle, currentPuzzle, currentNotesBoard);
+        renderBoard(initialPuzzle, currentPuzzle, currentNotesBoard);
         updateGameInfo(roomId, difficulty, isSolo);
         connectWebSocket(useExistingSocket);
 
@@ -671,7 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sr = selectedCell ? selectedCell.dataset.row : null;
             const sc = selectedCell ? selectedCell.dataset.col : null;
 
-            renderBoard(puzzle, currentPuzzle, currentNotesBoard);
+            renderBoard(initialPuzzle, currentPuzzle, currentNotesBoard);
             
             // Restore selection and recursively highlight freshly rendered matching numbers
             if (sr !== null && sc !== null) {
@@ -1452,6 +1453,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetGameState() {
         elapsedTime = 0;
         currentPuzzle = [];
+        initialPuzzle = [];
         notesMode = false;
         isPaused = false;
         isDailyGame = false;
