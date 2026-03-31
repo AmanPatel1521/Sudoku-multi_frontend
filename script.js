@@ -647,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const { row, col, value, is_correct } = data.last_move;
                 const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
                 
-                if (value === 0) {
+                if (parseInt(value) === 0) {
                     incorrectCells[row][col] = false;
                 } else if (!is_correct) {
                     incorrectCells[row][col] = true;
@@ -671,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sr = selectedCell ? selectedCell.dataset.row : null;
             const sc = selectedCell ? selectedCell.dataset.col : null;
 
-            renderBoard(currentPuzzle, currentPuzzle, currentNotesBoard);
+            renderBoard(puzzle, currentPuzzle, currentNotesBoard);
             
             // Restore selection and recursively highlight freshly rendered matching numbers
             if (sr !== null && sc !== null) {
