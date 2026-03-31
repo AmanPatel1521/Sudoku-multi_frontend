@@ -665,12 +665,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         if(value !== 0) playSound('error');
                     }
                 }
-                if (value !== 0) {
-                    highlightActiveNumbers(value);
-                }
             }
             
+            // Backup selection before DOM destruction
+            const sr = selectedCell ? selectedCell.dataset.row : null;
+            const sc = selectedCell ? selectedCell.dataset.col : null;
+
             renderBoard(currentPuzzle, currentPuzzle, currentNotesBoard);
+            
+            // Restore selection and recursively highlight freshly rendered matching numbers
+            if (sr !== null && sc !== null) {
+                const restoredCell = document.querySelector(`.cell[data-row='${sr}'][data-col='${sc}']`);
+                if (restoredCell) selectCell(restoredCell, true);
+            }
+
             updateStats(data.mistakes, data.hints, data.score);
         });
 
@@ -925,8 +933,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateNumberPalette();
     };
 
-    const selectCell = (cell) => {
-        playSound('tap');
+    const selectCell = (cell, silent = false) => {
+        if (!silent) playSound('tap');
         if (selectedCell) {
             selectedCell.classList.remove('selected');
         }
