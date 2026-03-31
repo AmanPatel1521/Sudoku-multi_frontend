@@ -141,17 +141,11 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
     max-width: 550px;
 }
 
-#waiting-room {
-    max-width: 800px;
-    width: 100%;
-    position: relative;
-    z-index: 100;
+#room-management .card-title {
+    font-weight: 700;
+    color: var(--text-color);
 }
 
-#room-management .card-title, #waiting-room .card-title {
-    font-weight: 700;
-    color: #ffffff !important;
-}
 
 /* ============================================
    WAITING ROOM — Fully self-contained styles
