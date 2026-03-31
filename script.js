@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const playSoloBtn = document.getElementById('play-solo-btn');
     const quickPlayBtn = document.getElementById('quick-play-btn');
     const loadingIndicator = document.getElementById('loading-indicator');
+    const loadingText = document.getElementById('loading-text');
     const messageDisplay = document.getElementById('message-display');
     const playerAvatarSelect = document.getElementById('player-avatar-select');
     
@@ -330,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playSound('tap');
         const playerName = playerNameInput.value.trim() || 'Guest';
         const avatar = playerAvatarSelect.value;
-        setLoading(true);
+        setLoading(true, 'Initializing solo game...');
         disableMenuButtons(true);
 
         try {
@@ -398,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName) return alert('Please enter your name.');
         
-        setLoading(true);
+        setLoading(true, 'Searching for opponent...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -427,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
 
-        setLoading(true);
+        setLoading(true, 'Creating new room...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
@@ -457,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const playerName = playerNameInput.value.trim() || "Solo Player";
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         
-        setLoading(true);
+        setLoading(true, 'Joining room...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -491,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         resetGameState();
-        setLoading(true);
+        setLoading(true, 'Loading daily challenge...');
 
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -518,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName) return alert('Please enter your name.');
         
-        setLoading(true);
+        setLoading(true, 'Loading...');
         disableMenuButtons(true);
         
         if (socket) socket.disconnect();
@@ -1474,8 +1475,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if(mobileDifficultyDisplay) mobileDifficultyDisplay.textContent = difficulty;
     }
 
-    function setLoading(isLoading) {
-        loadingIndicator.style.display = isLoading ? 'block' : 'none';
+    function setLoading(isLoading, message = 'Loading...') {
+        loadingIndicator.style.display = isLoading ? 'flex' : 'none';
+        if (loadingText) loadingText.textContent = message;
     }
 
     function showTemporaryMessage(text) {

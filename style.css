@@ -1439,16 +1439,30 @@ body.solo-mode #chat-tab {
 
 }
 
-#loading-indicator {
+.loading-overlay {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    z-index: 10;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border-radius: inherit;
+}
+
+/* Enforce obvious greyed-out disabled states globally */
+button:disabled, .btn:disabled {
+    opacity: 0.6 !important;
+    pointer-events: none !important;
+    filter: grayscale(80%) !important;
+    box-shadow: none !important;
+    transform: none !important;
+    cursor: not-allowed !important;
 }
 /* Daily Rewards & UI Glows */
 .glow-btn {
