@@ -549,6 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initializeGame(newRoomId, newPlayerId, puzzle, difficulty, useExistingSocket = false) {
         roomId = newRoomId;
         playerId = newPlayerId;
+        playerState = 'playing'; // Reinitialize interaction status
         gameStartTime = Date.now();
         currentPuzzle = puzzle;
         initialPuzzle = puzzle;
