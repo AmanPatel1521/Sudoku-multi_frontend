@@ -415,10 +415,9 @@ document.addEventListener('DOMContentLoaded', () => {
             isMatchmakingRoom = false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
-            console.error('Error creating room:', error);
             alert(`Failed to create room: ${error.message}`);
-        } finally {
-            createRoomBtn.disabled = false;
+            setLoading(false);
+            disableMenuButtons(false);
         }
     }
 
@@ -444,9 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMatchmakingRoom = false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
-            console.error('Error joining room:', error);
             alert(`Failed to join room: ${error.message}`);
-        } finally {
             setLoading(false);
             disableMenuButtons(false);
         }
@@ -475,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Error creating room:', error);
             alert(`Failed to create room: ${error.message}`);
-        } finally {
             setLoading(false);
             disableMenuButtons(false);
         }
@@ -1311,10 +1307,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if(chatPanel) chatPanel.style.display = 'block';
         } else { // Desktop
             if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
-            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.remove('d-none');
+            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none'); // Auto-open, no toggle needed
             if (chatPanel && chatPanel.parentElement !== desktopChatPanel) {
                 desktopChatPanel.appendChild(chatPanel);
             }
+            desktopChatPanel.classList.add('open');
             if(chatPanel) chatPanel.style.display = 'block';
         }
         updateStats(0, 0, 0);
