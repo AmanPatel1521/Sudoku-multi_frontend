@@ -444,14 +444,14 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 .cell.wrong {
-    background-color: var(--error-color);
-    color: white;
+    background-color: var(--error-color) !important;
+    color: white !important;
     animation: shake 0.4s;
 }
 
 .cell.incorrect {
-    background-color: var(--error-color);
-    color: white;
+    background-color: var(--error-color) !important;
+    color: white !important;
 }
 
 .cell.correct-flash {

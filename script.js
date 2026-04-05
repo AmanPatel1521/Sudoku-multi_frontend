@@ -1445,7 +1445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         stopTimer();
         resetGameState();
-        playSoloBtn.disabled = false;
+        disableMenuButtons(false);
     }
 
     function resetGameState() {
