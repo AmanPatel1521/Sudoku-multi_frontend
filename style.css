@@ -1453,15 +1453,33 @@ body.solo-mode #chat-tab {
         box-shadow: none !important;
     }
 
-    #mobile-chat-panel #chat-panel .card-body {
-        height: auto;
-        flex-grow: 1;
-        overflow-y: auto;
+    /* Ensure the injected chat panel fits the screen and doesn't expand infinitely */
+    #mobile-chat-panel #chat-panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        margin-top: 0 !important;
+        border: none;
+        box-shadow: none;
+        background: transparent;
     }
 
-    .mobile-chat .card-body {
-        height: calc(100vh - 10rem);
+    #mobile-chat-panel #chat-panel .card-body {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+        overflow: hidden;
+        padding: 0;
+    }
+
+    #mobile-chat-panel #chat-panel .card-title {
+        display: none; /* Hide the nested 'Chat' title since mobile-chat-header already has one */
+    }
+
+    #mobile-chat-panel .chat-messages {
+        flex-grow: 1;
         overflow-y: auto;
+        border: none;
     }
 
 }
