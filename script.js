@@ -643,7 +643,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (data.last_move) {
                 const { row, col, value, is_correct } = data.last_move;
-                const cell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
                 
                 if (parseInt(value) === 0) {
                     incorrectCells[row][col] = false;
@@ -651,17 +650,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     incorrectCells[row][col] = true;
                 } else {
                     incorrectCells[row][col] = false;
-                }
-
-                if (cell) {
-                    if (is_correct) {
-                        cell.classList.add('correct-flash');
-                        setTimeout(() => cell.classList.remove('correct-flash'), 500);
-                        if(value !== 0) playSound('correct');
-                    } else {
-                        cell.classList.add('wrong');
-                        if(value !== 0) playSound('error');
-                    }
                 }
             }
             
@@ -671,6 +659,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             renderBoard(initialPuzzle, currentPuzzle, currentNotesBoard);
             
+            // Reapply animations to the newly rendered DOM targets
+            if (data.last_move) {
+                const { row, col, value, is_correct } = data.last_move;
+                const newCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                if (newCell && parseInt(value) !== 0) {
+                    if (is_correct) {
+                        newCell.classList.add('correct-flash');
+                        setTimeout(() => newCell.classList.remove('correct-flash'), 500);
+                        playSound('correct');
+                    } else {
+                        newCell.classList.add('wrong');
+                        setTimeout(() => newCell.classList.remove('wrong'), 400);
+                        playSound('error');
+                    }
+                }
+            }
+
             // Restore selection and recursively highlight freshly rendered matching numbers
             if (sr !== null && sc !== null) {
                 const restoredCell = document.querySelector(`.cell[data-row='${sr}'][data-col='${sc}']`);

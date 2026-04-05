@@ -450,8 +450,7 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 .cell.incorrect {
-    background-color: var(--error-color) !important;
-    color: white !important;
+    color: var(--error-color) !important;
 }
 
 .cell.correct-flash {
