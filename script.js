@@ -3,7 +3,12 @@ let currentPuzzle = [];
 let notesMode = false;
 let socket = null;
 let roomId = null;
-let playerId = null;
+let playerId = localStorage.getItem('sudokuPlayerId');
+if (!playerId) {
+    // Generate persistent anonymous UUID
+    playerId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'p_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('sudokuPlayerId', playerId);
+}
 let isHost = false;
 let isSolo = false;
 let isDailyGame = false;
@@ -20,7 +25,8 @@ let sudokuProgression = JSON.parse(localStorage.getItem('sudokuDaily')) || {
     coins: 0,
     streak: 0,
     lastClaimDate: null,
-    lastDailyCompleted: null
+    lastDailyCompleted: null,
+    ownedAvatars: ['😎', '🤠', '👽', '🦄', '🐱', '🐶', '🐼', '🤖']
 };
 
 function saveProgression() {
@@ -77,6 +83,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const roomManagementDiv = document.getElementById('room-management');
     const waitingRoomDiv = document.getElementById('waiting-room');
     const playerNameInput = document.getElementById('player-name-input');
+    const playerAvatarSelect = document.getElementById('player-avatar-select');
+    
+    // Load persisted profile into UI
+    const savedName = localStorage.getItem('sudokuPlayerName');
+    const savedAvatar = localStorage.getItem('sudokuPlayerAvatar');
+    if (savedName) playerNameInput.value = savedName;
+    if (savedAvatar) playerAvatarSelect.value = savedAvatar;
+    
     const difficultySelect = document.getElementById('difficulty-select');
     const createRoomBtn = document.getElementById('create-room-btn');
     const roomIdInput = document.getElementById('room-id-input');
@@ -86,7 +100,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingIndicator = document.getElementById('loading-indicator');
     const loadingText = document.getElementById('loading-text');
     const messageDisplay = document.getElementById('message-display');
-    const playerAvatarSelect = document.getElementById('player-avatar-select');
     
     const coinCountDisplay = document.getElementById('coin-count');
     const dailyChallengeBtn = document.getElementById('daily-challenge-btn');
@@ -101,6 +114,74 @@ document.addEventListener('DOMContentLoaded', () => {
     let isLightMode = false;
     const soundToggle = document.getElementById('sound-toggle');
     const themeToggle = document.getElementById('theme-toggle');
+
+    // Phase 3: Global Leaderboard & Achievements
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const achievementsBtn = document.getElementById('achievements-btn');
+    const globalLeaderboardList = document.getElementById('global-leaderboard-list');
+    const achievementsContainer = document.getElementById('achievements-container');
+
+    if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', async () => {
+            globalLeaderboardList.innerHTML = '<li class="list-group-item text-center">Loading...</li>';
+            try {
+                const response = await fetch('https://sudoku-multi-backend.onrender.com/leaderboard');
+                const data = await response.json();
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => `
+                        <li class="list-group-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'bg-primary bg-opacity-25' : ''}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold">${index + 1}.</span>
+                                <span>${item.avatar}</span>
+                                <span>${item.username}</span>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">${item.score} <small class="text-muted">pts</small></div>
+                                <small class="text-success">${item.wins} Wins</small>
+                            </div>
+                        </li>
+                    `).join('');
+                } else {
+                    globalLeaderboardList.innerHTML = '<li class="list-group-item text-center">No scores yet!</li>';
+                }
+            } catch (err) {
+                globalLeaderboardList.innerHTML = '<li class="list-group-item text-center text-danger">Failed to load leaderboard.</li>';
+            }
+        });
+    }
+
+    const ACHIEVEMENT_DEFS = [
+        { id: 'novice', name: 'Novice', desc: 'Complete 1 Easy Sudoku', icon: 'ach_novice.png' },
+        { id: 'speedster', name: 'Speedster', desc: 'Complete any Sudoku under 3 minutes', icon: 'ach_speedster.png' },
+        { id: 'perfect', name: 'Perfect Game', desc: 'Complete any puzzle with 0 mistakes', icon: 'ach_perfect.png' },
+    ];
+
+    if (achievementsBtn) {
+        achievementsBtn.addEventListener('click', async () => {
+            achievementsContainer.innerHTML = '<div class="col-12 text-center py-3">Loading...</div>';
+            try {
+                const response = await fetch(`https://sudoku-multi-backend.onrender.com/achievements/${playerId}`);
+                const data = await response.json();
+                const unlocked = data.achievements || [];
+
+                achievementsContainer.innerHTML = ACHIEVEMENT_DEFS.map(ach => {
+                    const isUnlocked = unlocked.includes(ach.id);
+                    return `
+                        <div class="col-4 mb-3 position-relative">
+                            <div class="card card-glass text-center p-2 h-100 ${isUnlocked ? 'border-success' : 'border-secondary opacity-50'}" style="transition: transform 0.2s;">
+                                <img src="${ach.icon}" alt="${ach.name}" class="img-fluid mb-2 mx-auto" style="max-width: 60px; filter: ${isUnlocked ? 'none' : 'grayscale(100%) opacity(0.5)'};">
+                                <h6 class="mb-1 text-light" style="font-size: 0.9rem;">${ach.name}</h6>
+                                <p class="text-muted small mb-0 lh-sm" style="font-size: 0.7rem;">${ach.desc}</p>
+                                ${isUnlocked ? '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">UNLOCKED</span>' : '🔒'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                achievementsContainer.innerHTML = '<div class="col-12 text-center text-danger">Failed to load achievements.</div>';
+            }
+        });
+    }
     if (localStorage.getItem('sudoku-sound') === 'false') { isSoundEnabled = false; if(soundToggle) soundToggle.checked = false; }
     if (localStorage.getItem('sudoku-theme') === 'light') { isLightMode = true; if(themeToggle) themeToggle.checked = true; document.body.classList.add('light-mode'); }
     if(soundToggle) soundToggle.addEventListener('change', (e) => { isSoundEnabled = e.target.checked; localStorage.setItem('sudoku-sound', isSoundEnabled); });
@@ -168,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOverMessage = document.getElementById('gameOverMessage');
     const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
     const playAgainSoloBtn = document.getElementById('play-again-solo-btn');
+    const spectateBtn = document.getElementById('spectate-btn');
     const startGameBtn = document.getElementById('start-game-btn');
     const roomCodeDisplay = document.querySelector('.room-code-display');
     const scoreDisplay = document.getElementById('score');
@@ -273,7 +355,14 @@ document.addEventListener('DOMContentLoaded', () => {
         transitionToRoomView();
     });
 
-    playAgainSoloBtn.addEventListener('click', handlePlayAgainSolo);
+    if (playAgainSoloBtn) playAgainSoloBtn.addEventListener('click', handlePlayAgainSolo);
+    if (spectateBtn) {
+        spectateBtn.addEventListener('click', () => {
+            hideFinishedOverlay();
+            messageDisplay.innerHTML = `<div class="alert alert-info text-center shadow-lg border-info mb-0">👁️ <strong>SPECTATING</strong>: Waiting for others to finish...</div>`;
+            document.getElementById('board-overlay').style.display = 'block'; // Ensure grid interactions remain blocked
+        });
+    }
 
     backToLobbyBtnSolo.addEventListener('click', () => {
         hideFinishedOverlay();
@@ -327,6 +416,60 @@ document.addEventListener('DOMContentLoaded', () => {
 
     checkDailyProgression();
 
+    function initShop() {
+        if (!sudokuProgression.ownedAvatars) {
+            sudokuProgression.ownedAvatars = ['😎', '🤠', '👽', '🦄', '🐱', '🐶', '🐼', '🤖'];
+            saveProgression();
+        }
+        
+        // Refresh Dropdown
+        const allAvatars = [...new Set(sudokuProgression.ownedAvatars)];
+        if (playerAvatarSelect) {
+            const currentSelected = localStorage.getItem('sudokuPlayerAvatar') || allAvatars[0];
+            playerAvatarSelect.innerHTML = '';
+            allAvatars.forEach(av => {
+                const opt = document.createElement('option');
+                opt.value = av;
+                opt.textContent = av;
+                playerAvatarSelect.appendChild(opt);
+            });
+            playerAvatarSelect.value = currentSelected;
+        }
+
+        // Bind Store Buttons
+        document.querySelectorAll('.buy-avatar-btn').forEach(btn => {
+            const avatar = btn.getAttribute('data-avatar');
+            const price = parseInt(btn.getAttribute('data-price'));
+            
+            if (sudokuProgression.ownedAvatars.includes(avatar)) {
+                btn.textContent = 'Owned';
+                btn.classList.replace('btn-warning', 'btn-success');
+                btn.classList.replace('btn-info', 'btn-success');
+                btn.disabled = true;
+            }
+
+            btn.addEventListener('click', () => {
+                if (sudokuProgression.ownedAvatars.includes(avatar)) return;
+                if (sudokuProgression.coins >= price) {
+                    sudokuProgression.coins -= price;
+                    sudokuProgression.ownedAvatars.push(avatar);
+                    saveProgression();
+                    playSound('correct');
+                    btn.textContent = 'Owned';
+                    btn.classList.replace('btn-warning', 'btn-success');
+                    btn.classList.replace('btn-info', 'btn-success');
+                    btn.disabled = true;
+                    initShop();
+                } else {
+                    playSound('mistake');
+                    alert(`Not enough coins! You need ${price} 🪙.`);
+                }
+            });
+        });
+    }
+    
+    initShop();
+
     async function handleDailyChallenge() {
         playSound('tap');
         const playerName = playerNameInput.value.trim() || 'Guest';
@@ -338,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch("https://sudoku-multi-backend.onrender.com/start_daily_game", {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, avatar: avatar })
+                body: JSON.stringify({ player_name: playerName, avatar: avatar, player_id: playerId })
             });
 
             if (response.ok) {
@@ -398,6 +541,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName) return alert('Please enter your name.');
+
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         
         setLoading(true, 'Searching for opponent...');
         disableMenuButtons(true);
@@ -405,7 +551,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer', avatar: avatar }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer', avatar: avatar, player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -426,6 +572,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputRoomId = roomIdInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
 
         setLoading(true, 'Creating new room...');
         disableMenuButtons(true);
@@ -433,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName, avatar: avatar }),
+                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName, avatar: avatar, player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -461,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -494,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: "Solo Player", difficulty: difficulty, game_mode: 'solo' }),
+                body: JSON.stringify({ player_name: "Solo Player", difficulty: difficulty, game_mode: 'solo', player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -514,6 +662,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         if (!playerName) return alert('Please enter your name.');
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         
         setLoading(true, 'Loading...');
         disableMenuButtons(true);
@@ -524,7 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         socket.once('connect', () => {
-            socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty });
+            socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty, player_id: playerId });
         });
         
         socket.on('match_found', (data) => {
@@ -1510,10 +1660,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const message = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
             gameOverMessage.textContent = message;
             messageIcon.innerHTML = '&#10003;';
+            if (spectateBtn) spectateBtn.style.display = 'none';
         } else {
             const message = multiplayerCompletionMessages[Math.floor(Math.random() * multiplayerCompletionMessages.length)];
             gameOverMessage.textContent = message;
             messageIcon.innerHTML = '&#127942;';
+            if (spectateBtn) spectateBtn.style.display = 'block';
         }
         if(mobileInfoTabs) mobileInfoTabs.style.display = 'none';
         finishedOverlay.classList.add('show');
@@ -1557,10 +1709,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const place = index + 1;
             const podiumEl = document.createElement('div');
             podiumEl.className = `podium-place podium-${place}`;
+            const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
+            const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
             podiumEl.innerHTML = `
                 <div class="podium-rank">${place}</div>
                 <div class="podium-name">${player.player_name}</div>
-                <div class="podium-score">${player.score}</div>
+                <div class="podium-score">${player.score} pts</div>
+                <div class="small mt-1 text-info">${accuracy}% Acc | ${timeStr}</div>
             `;
             podiumContainer.appendChild(podiumEl);
         });
@@ -1569,9 +1724,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const rank = index + 4;
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
+            const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
             listItem.innerHTML = `
-                <span><strong>#${rank}</strong> ${player.player_name}</span>
-                <span class="badge bg-secondary">${player.score}</span>
+                <span><strong>#${rank}</strong> ${player.player_name} <small class="text-muted ms-2">${accuracy}% | ${timeStr}</small></span>
+                <span class="badge bg-secondary">${player.score} pts</span>
             `;
             listContainer.appendChild(listItem);
         });

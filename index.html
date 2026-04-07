@@ -17,10 +17,12 @@
             <div class="d-none d-md-block w-100"></div>
             <h1 class="mb-0 text-center w-100">Multiplayer Sudoku</h1>
             <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-2 w-100">
-                <div class="d-flex align-items-center bg-dark bg-opacity-50 rounded-pill px-2 py-1 border border-warning shadow-sm" title="Coins">
-                    <span class="fs-5 me-1">🪙</span>
+                <button id="shop-btn" class="btn bg-dark bg-opacity-50 rounded-pill px-2 py-1 border border-warning shadow-sm d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#shopModal" title="Coin Shop">
+                    <span class="fs-5 me-1 hover-bounce">🛒</span>
                     <span id="coin-count" class="fw-bold text-warning" style="font-family: monospace;">0</span>
-                </div>
+                </button>
+                <button id="leaderboard-btn" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#leaderboardModal" title="Global Leaderboard">🌍</button>
+                <button id="achievements-btn" class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#achievementsModal" title="Achievements">🏆</button>
                 <button id="tutorial-btn" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#tutorialModal">How to Play</button>
                 <button id="settings-btn" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#settingsModal">⚙️</button>
             </div>
@@ -295,9 +297,10 @@
             <div class="message-icon"></div>
             <h2 class="finished-title"></h2>
             <p id="gameOverMessage" class="fs-5 mb-4"></p>
-            <div class="completion-buttons">
-                <button id="play-again-solo-btn" class="btn btn-primary">Play Again</button>
-                <button id="back-to-lobby-btn-solo" class="btn btn-secondary">Back to Lobby</button>
+            <div class="completion-buttons w-100 px-4">
+                <button id="play-again-solo-btn" class="btn btn-primary w-100 mb-2">Play Again</button>
+                <button id="spectate-btn" class="btn btn-info w-100 mb-2 text-dark fw-bold">👁️ Spectate Match</button>
+                <button id="back-to-lobby-btn-solo" class="btn btn-secondary w-100">Back to Lobby</button>
             </div>
         </div>
     </div>
@@ -334,6 +337,68 @@
     <div id="message-display"></div>
 
     <!-- Modals -->
+    <!-- Achievements Modal -->
+    <div class="modal fade" id="achievementsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content card-glass">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 text-center">🏆 Achievements</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row text-center" id="achievements-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaderboard Modal -->
+    <div class="modal fade" id="leaderboardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content card-glass">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 text-center">🌍 Global Leaderboard</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <ul class="list-group list-group-flush" id="global-leaderboard-list">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Shop Modal -->
+    <div class="modal fade" id="shopModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content card-glass">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title w-100 text-center">🛒 Coin Shop</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <p class="text-warning fw-bold mb-4">Unlock premium avatars with your Daily Challenge coins!</p>
+                    <div class="d-flex justify-content-center flex-wrap gap-3 mb-3">
+                        <!-- Premium Avatars -->
+                        <div class="card card-glass border-warning text-center p-3" style="width: 100px;">
+                            <div class="display-3 mb-2">🐉</div>
+                            <button class="btn btn-warning btn-sm fw-bold w-100 buy-avatar-btn" data-avatar="🐉" data-price="500">500 🪙</button>
+                        </div>
+                        <div class="card card-glass border-warning text-center p-3" style="width: 100px;">
+                            <div class="display-3 mb-2">🤖</div>
+                            <button class="btn btn-warning btn-sm fw-bold w-100 buy-avatar-btn" data-avatar="🤖" data-price="500">500 🪙</button>
+                        </div>
+                        <div class="card card-glass border-info text-center p-3" style="width: 100px;">
+                            <div class="display-3 mb-2">👾</div>
+                            <button class="btn btn-info btn-sm fw-bold text-dark w-100 buy-avatar-btn" data-avatar="👾" data-price="1000">1000 🪙</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="tutorialModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content card-glass">
