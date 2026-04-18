@@ -1463,7 +1463,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(chatPanel) chatPanel.style.display = 'block';
         } else { // Desktop
             if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
-            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none'); // Auto-open, no toggle needed
+            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.remove('d-none'); // Keep toggle accessible if panel is closed
             if (chatPanel && chatPanel.parentElement !== desktopChatPanel) {
                 desktopChatPanel.appendChild(chatPanel);
             }
@@ -1718,8 +1718,9 @@ document.addEventListener('DOMContentLoaded', () => {
             podiumEl.innerHTML = `
                 <div class="podium-rank">${place}</div>
                 <div class="podium-name">${player.player_name}</div>
-                <div class="podium-score">${player.score} pts</div>
-                <div class="small mt-1 text-info">${accuracy}% Acc | ${timeStr}</div>
+                <div class="podium-score mb-2">${player.score} pts</div>
+                <div class="small fw-bold text-warning">⏱️ ${timeStr}</div>
+                <div class="small fw-bold text-success">🎯 ${accuracy}%</div>
             `;
             podiumContainer.appendChild(podiumEl);
         });
@@ -1731,8 +1732,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
             const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
             listItem.innerHTML = `
-                <span><strong>#${rank}</strong> ${player.player_name} <small class="text-muted ms-2">${accuracy}% | ${timeStr}</small></span>
-                <span class="badge bg-secondary">${player.score} pts</span>
+                <span class="fw-bold">#${rank} <span class="ms-2 fw-normal">${player.player_name}</span></span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark">⏱️ ${timeStr}</span>
+                    <span class="badge bg-success">🎯 ${accuracy}%</span>
+                    <span class="badge bg-primary ms-1">${player.score} pts</span>
+                </div>
             `;
             listContainer.appendChild(listItem);
         });
