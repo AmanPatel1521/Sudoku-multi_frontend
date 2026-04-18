@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playSound('tap');
         const playerName = playerNameInput.value.trim() || 'Guest';
         const avatar = playerAvatarSelect.value;
-        setLoading(true, 'Initializing solo game...');
+        setLoading(true, 'Loading daily challenge...');
         disableMenuButtons(true);
 
         try {
@@ -545,7 +545,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
         
-        setLoading(true, 'Searching for opponent...');
+        setLoading(true, 'Creating new room...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
 
-        setLoading(true, 'Creating new room...');
+        setLoading(true, 'Joining room...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const playerName = playerNameInput.value.trim() || "Solo Player";
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
         
-        setLoading(true, 'Joining room...');
+        setLoading(true, 'Initializing solo mode...');
         disableMenuButtons(true);
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -636,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         resetGameState();
-        setLoading(true, 'Loading daily challenge...');
+        setLoading(true, 'Initializing solo mode...');
 
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
@@ -665,7 +665,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
         
-        setLoading(true, 'Loading...');
+        setLoading(true, 'Searching for opponent...');
         disableMenuButtons(true);
         
         if (socket) socket.disconnect();
