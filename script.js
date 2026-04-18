@@ -768,7 +768,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.on('disconnect', (reason) => {
             console.log("Socket disconnected. Reason:", reason);
-            if (!isReconnecting && !isSolo) {
+            if (!isReconnecting && !isSolo && reason !== "io client disconnect") {
                 showLeaderboard([], 'Disconnected from the room.');
             }
             isReconnecting = false;
@@ -1661,11 +1661,15 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOverMessage.textContent = message;
             messageIcon.innerHTML = '&#10003;';
             if (spectateBtn) spectateBtn.style.display = 'none';
+            if (playAgainSoloBtn) playAgainSoloBtn.style.display = 'block';
+            if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'block';
         } else {
             const message = multiplayerCompletionMessages[Math.floor(Math.random() * multiplayerCompletionMessages.length)];
             gameOverMessage.textContent = message;
             messageIcon.innerHTML = '&#127942;';
             if (spectateBtn) spectateBtn.style.display = 'block';
+            if (playAgainSoloBtn) playAgainSoloBtn.style.display = 'none';
+            if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'none';
         }
         if(mobileInfoTabs) mobileInfoTabs.style.display = 'none';
         finishedOverlay.classList.add('show');
