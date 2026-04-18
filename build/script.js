@@ -1,0 +1,1768 @@
+let selectedCell = null;
+let currentPuzzle = [];
+let notesMode = false;
+let socket = null;
+let roomId = null;
+let playerId = localStorage.getItem('sudokuPlayerId');
+if (!playerId) {
+    // Generate persistent anonymous UUID
+    playerId = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : 'p_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('sudokuPlayerId', playerId);
+}
+let isHost = false;
+let isSolo = false;
+let isDailyGame = false;
+let timerInterval = null;
+let elapsedTime = 0;
+let isPaused = false;
+let playersInRoom = [];
+let gameOverModal = null;
+let isReconnecting = false;
+let isMatchmakingRoom = false;
+let playerState = 'playing';
+
+let sudokuProgression = JSON.parse(localStorage.getItem('sudokuDaily')) || {
+    coins: 0,
+    streak: 0,
+    lastClaimDate: null,
+    lastDailyCompleted: null,
+    ownedAvatars: ['😎', '🤠', '👽', '🦄', '🐱', '🐶', '🐼', '🤖']
+};
+
+function saveProgression() {
+    localStorage.setItem('sudokuDaily', JSON.stringify(sudokuProgression));
+    const coinCountSpan = document.getElementById('coin-count');
+    if (coinCountSpan) coinCountSpan.textContent = sudokuProgression.coins;
+}
+let currentNotesBoard = Array(9).fill(0).map(() => Array(9).fill(0).map(() => []));
+let incorrectCells = Array(9).fill(0).map(() => Array(9).fill(false));
+
+let chatPanel = null;
+let chatPanelOriginalParent = null;
+
+const funnyMessages = [
+    "Wow, you're fast! Now, try to look busy.",
+    "You've finished! Time to practice your victory dance.",
+    "Sudoku master! The others are still counting on their fingers.",
+    "You're done! Now you can judge everyone else's moves.",
+    "Finished already? Go grab a coffee, you've earned it.",
+    "They see you solvin', they hatin'.",
+    "You finished so fast, the timer is asking for a recount."
+];
+
+const multiplayerCompletionMessages = [
+    "You've conquered the puzzle! The leaderboard awaits, so hang tight for the grand reveal!",
+    "Sudoku solved! Now, for the moment of truth... the leaderboard is loading!",
+    "Mission accomplished! Your score is in, and the final rankings are just around the corner.",
+    "Puzzle master! Take a breath, the ultimate showdown on the leaderboard is next.",
+    "Done and dusted! Get ready to see where you stand among the best.",
+];
+
+const eliminationMessages = [
+    "Oh no, you've been eliminated! But don't despair, the leaderboard is still coming. Stick around to see the final scores.",
+    "Better luck next time! Your journey ends here, but the game continues. The leaderboard will reveal all!",
+    "Fouled out! It happens to the best of us. Stay tuned for the final results on the leaderboard.",
+    "Game over for you! But the competition rages on. The leaderboard will be worth the wait!",
+    "Eliminated! Take a moment, then prepare for the leaderboard reveal. Your efforts won't be forgotten!",
+];
+
+const soloEliminationMessages = [
+    "Oh no, you've been eliminated!",
+    "Better luck next time!",
+    "Fouled out! It happens to the best of us.",
+    "Game over for you!",
+    "Eliminated! Your efforts won't be forgotten!",
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded fired.');
+    chatPanel = document.getElementById('chat-panel');
+    if (chatPanel) {
+        chatPanelOriginalParent = chatPanel.parentElement;
+    }
+    const roomManagementDiv = document.getElementById('room-management');
+    const waitingRoomDiv = document.getElementById('waiting-room');
+    const playerNameInput = document.getElementById('player-name-input');
+    const playerAvatarSelect = document.getElementById('player-avatar-select');
+    
+    // Load persisted profile into UI
+    const savedName = localStorage.getItem('sudokuPlayerName');
+    const savedAvatar = localStorage.getItem('sudokuPlayerAvatar');
+    if (savedName) playerNameInput.value = savedName;
+    if (savedAvatar) playerAvatarSelect.value = savedAvatar;
+    
+    const difficultySelect = document.getElementById('difficulty-select');
+    const createRoomBtn = document.getElementById('create-room-btn');
+    const roomIdInput = document.getElementById('room-id-input');
+    const joinRoomBtn = document.getElementById('join-room-btn');
+    const playSoloBtn = document.getElementById('play-solo-btn');
+    const quickPlayBtn = document.getElementById('quick-play-btn');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const loadingText = document.getElementById('loading-text');
+    const messageDisplay = document.getElementById('message-display');
+    
+    const coinCountDisplay = document.getElementById('coin-count');
+    const dailyChallengeBtn = document.getElementById('daily-challenge-btn');
+    const dailyBadge = document.getElementById('daily-badge');
+    const claimRewardBtn = document.getElementById('claim-reward-btn');
+    let dailyRewardModalObj = null;
+    if (document.getElementById('dailyRewardModal')) {
+        dailyRewardModalObj = new bootstrap.Modal(document.getElementById('dailyRewardModal'), { backdrop: 'static', keyboard: false });
+    }
+    
+    let isSoundEnabled = true;
+    let isLightMode = false;
+    const soundToggle = document.getElementById('sound-toggle');
+    const themeToggle = document.getElementById('theme-toggle');
+
+    // Phase 3: Global Leaderboard & Achievements
+    const leaderboardBtn = document.getElementById('leaderboard-btn');
+    const achievementsBtn = document.getElementById('achievements-btn');
+    const globalLeaderboardList = document.getElementById('global-leaderboard-list');
+    const achievementsContainer = document.getElementById('achievements-container');
+
+    if (leaderboardBtn) {
+        leaderboardBtn.addEventListener('click', async () => {
+            globalLeaderboardList.innerHTML = '<li class="list-group-item text-center">Loading...</li>';
+            try {
+                const response = await fetch('https://sudoku-multi-backend.onrender.com/leaderboard');
+                const data = await response.json();
+                if (data.leaderboard && data.leaderboard.length > 0) {
+                    globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => `
+                        <li class="list-group-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'bg-primary bg-opacity-25' : ''}">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="fw-bold">${index + 1}.</span>
+                                <span>${item.avatar}</span>
+                                <span>${item.username}</span>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold">${item.score} <small class="text-muted">pts</small></div>
+                                <small class="text-success">${item.wins} Wins</small>
+                            </div>
+                        </li>
+                    `).join('');
+                } else {
+                    globalLeaderboardList.innerHTML = '<li class="list-group-item text-center">No scores yet!</li>';
+                }
+            } catch (err) {
+                globalLeaderboardList.innerHTML = '<li class="list-group-item text-center text-danger">Failed to load leaderboard.</li>';
+            }
+        });
+    }
+
+    const ACHIEVEMENT_DEFS = [
+        { id: 'novice', name: 'Novice', desc: 'Complete 1 Easy Sudoku', icon: 'ach_novice.png' },
+        { id: 'speedster', name: 'Speedster', desc: 'Complete any Sudoku under 3 minutes', icon: 'ach_speedster.png' },
+        { id: 'perfect', name: 'Perfect Game', desc: 'Complete any puzzle with 0 mistakes', icon: 'ach_perfect.png' },
+    ];
+
+    if (achievementsBtn) {
+        achievementsBtn.addEventListener('click', async () => {
+            achievementsContainer.innerHTML = '<div class="col-12 text-center py-3">Loading...</div>';
+            try {
+                const response = await fetch(`https://sudoku-multi-backend.onrender.com/achievements/${playerId}`);
+                const data = await response.json();
+                const unlocked = data.achievements || [];
+
+                achievementsContainer.innerHTML = ACHIEVEMENT_DEFS.map(ach => {
+                    const isUnlocked = unlocked.includes(ach.id);
+                    return `
+                        <div class="col-4 mb-3 position-relative">
+                            <div class="card card-glass text-center p-2 h-100 ${isUnlocked ? 'border-success' : 'border-secondary opacity-50'}" style="transition: transform 0.2s;">
+                                <img src="${ach.icon}" alt="${ach.name}" class="img-fluid mb-2 mx-auto" style="max-width: 60px; filter: ${isUnlocked ? 'none' : 'grayscale(100%) opacity(0.5)'};">
+                                <h6 class="mb-1 text-light" style="font-size: 0.9rem;">${ach.name}</h6>
+                                <p class="text-muted small mb-0 lh-sm" style="font-size: 0.7rem;">${ach.desc}</p>
+                                ${isUnlocked ? '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">UNLOCKED</span>' : '🔒'}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (err) {
+                achievementsContainer.innerHTML = '<div class="col-12 text-center text-danger">Failed to load achievements.</div>';
+            }
+        });
+    }
+    if (localStorage.getItem('sudoku-sound') === 'false') { isSoundEnabled = false; if(soundToggle) soundToggle.checked = false; }
+    if (localStorage.getItem('sudoku-theme') === 'light') { isLightMode = true; if(themeToggle) themeToggle.checked = true; document.body.classList.add('light-mode'); }
+    if(soundToggle) soundToggle.addEventListener('change', (e) => { isSoundEnabled = e.target.checked; localStorage.setItem('sudoku-sound', isSoundEnabled); });
+    if(themeToggle) themeToggle.addEventListener('change', (e) => {
+        isLightMode = e.target.checked; localStorage.setItem('sudoku-theme', isLightMode ? 'light' : 'dark');
+        if (isLightMode) document.body.classList.add('light-mode'); else document.body.classList.remove('light-mode');
+    });
+    
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    function playSound(type) {
+        if (!isSoundEnabled) return;
+        if (!audioCtx) { try { audioCtx = new AudioContextClass(); } catch(e) { return; } }
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        if (type === 'tap') {
+            osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(300, now + 0.1);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'correct') {
+            osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(554, now + 0.1);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'win') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(440, now); osc.frequency.setValueAtTime(659, now + 0.2);
+            gain.gain.setValueAtTime(0.05, now); gain.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(now); osc.stop(now + 0.6);
+        }
+    }
+    
+    function disableMenuButtons(disabled) {
+        if(playSoloBtn) playSoloBtn.disabled = disabled;
+        if(quickPlayBtn) quickPlayBtn.disabled = disabled;
+        if(createRoomBtn) createRoomBtn.disabled = disabled;
+        if(joinRoomBtn) joinRoomBtn.disabled = disabled;
+        if(dailyChallengeBtn && !dailyChallengeBtn.innerHTML.includes('Completed Today')) dailyChallengeBtn.disabled = disabled;
+    }
+    
+    const gameContainer = document.getElementById('game-container');
+    const board = document.getElementById('sudoku-board');
+    const mistakesCounter = document.getElementById('mistakes-counter');
+    const mistakesCounterMobile = document.getElementById('mistakes-counter-mobile');
+    const hintButton = document.getElementById('hint-button');
+    const hintCountSpan = document.getElementById('hint-count');
+    const timerDisplay = document.getElementById('timer');
+    const timerDisplayMobile = document.getElementById('timer-mobile');
+    const pauseButton = document.getElementById('pause-button');
+    const undoButton = document.getElementById('undo-button');
+    const notesModeBtn = document.getElementById('notes-button');
+    const eraserBtn = document.getElementById('eraser-button');
+    const roomIdDisplay = document.getElementById('room-id-display');
+    const difficultyDisplay = document.getElementById('difficulty-display');
+    const playerListUl = document.getElementById('player-list');
+    const waitingPlayerListUl = document.getElementById('waiting-player-list');
+    const matchCountdownContainer = document.getElementById('match-countdown-container');
+    const matchCountdownTimer = document.getElementById('match-countdown-timer');
+    const pauseOverlay = document.getElementById('pause-overlay');
+    const finishedOverlay = document.getElementById('finished-overlay');
+    const gameOverMessage = document.getElementById('gameOverMessage');
+    const backToLobbyBtn = document.getElementById('back-to-lobby-btn');
+    const playAgainSoloBtn = document.getElementById('play-again-solo-btn');
+    const spectateBtn = document.getElementById('spectate-btn');
+    const startGameBtn = document.getElementById('start-game-btn');
+    const roomCodeDisplay = document.querySelector('.room-code-display');
+    const scoreDisplay = document.getElementById('score');
+    const scoreDisplayMobile = document.getElementById('score-mobile');
+    const mobilePauseButton = document.getElementById('mobile-pause-button');
+
+    const backToLobbyBtnSolo = document.getElementById('back-to-lobby-btn-solo');
+    const finishedTitle = document.querySelector('#finished-overlay .finished-title');
+    const completionButtons = document.querySelector('#finished-overlay .completion-buttons');
+    const messageIcon = document.querySelector('#finished-overlay .message-icon');
+    const chatInput = document.getElementById('chat-input');
+    const chatSendBtn = document.getElementById('chat-send-btn');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    const mobileChatPanel = document.getElementById('mobile-chat-panel');
+    const mobileChatToggleBtn = document.getElementById('mobile-chat-toggle-btn');
+    const closeChatBtn = document.getElementById('close-chat-btn');
+    const mobileChatMessages = document.getElementById('mobile-chat-messages-container');
+    const chatNotificationDot = document.getElementById('chat-notification-dot');
+
+    const desktopChatPanel = document.getElementById('desktop-chat-panel');
+    const desktopChatToggleBtn = document.getElementById('desktop-chat-toggle-btn');
+    const closeDesktopChatBtn = document.getElementById('close-desktop-chat-btn');
+    const desktopChatMessages = document.getElementById('desktop-chat-messages-container');
+    const desktopChatNotificationDot = document.getElementById('desktop-chat-notification-dot');
+
+    const mobileInfoTabs = document.getElementById('mobile-info-tabs');
+
+    const presetMessagesContainer = document.getElementById('pre-chat-messages');
+    const presetMessages = ["Good luck!", "Nice move!", "Help!", "I'm stuck!", "Well played!"];
+
+    if (presetMessagesContainer) {
+        presetMessages.forEach(msg => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-secondary m-1 preset-chat-btn';
+            btn.textContent = msg;
+            btn.addEventListener('click', () => {
+                sendChatMessage(msg);
+            });
+            presetMessagesContainer.appendChild(btn);
+        });
+    }
+
+    gameOverModal = new bootstrap.Modal(document.getElementById('gameOverModal'), { backdrop: 'static', keyboard: false });
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    const tooltips = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    });
+
+    function hideTooltips() {
+        tooltips.forEach(tooltip => tooltip.hide());
+    }
+
+    document.querySelectorAll('#room-tab button').forEach(tabButton => {
+        tabButton.addEventListener('shown.bs.tab', hideTooltips);
+    });
+
+    const numberPalette = document.getElementById('number-palette');
+    const mobileNumberPalette = document.getElementById('mobile-number-palette');
+    const actionsContainer = document.getElementById('actions-container');
+    const mobileActionsContainer = document.getElementById('mobile-actions-container');
+
+    const numberButtons = numberPalette.querySelectorAll('.number-button');
+    numberButtons.forEach(button => {
+        const clone = button.cloneNode(true);
+        mobileNumberPalette.appendChild(clone);
+    });
+
+    const actionButtons = actionsContainer.querySelectorAll('button');
+    actionButtons.forEach(button => {
+        const clone = button.cloneNode(true);
+        clone.removeAttribute('data-bs-toggle');
+        clone.removeAttribute('data-bs-placement');
+        clone.removeAttribute('title');
+        
+        if (button.id === 'hint-button') {
+            const mobileHintCount = document.createElement('span');
+            mobileHintCount.className = 'mobile-hint-count';
+            clone.appendChild(mobileHintCount);
+        }
+
+        mobileActionsContainer.appendChild(clone);
+    });
+
+    createRoomBtn.addEventListener('click', handleCreateRoom);
+    joinRoomBtn.addEventListener('click', handleJoinRoom);
+    playSoloBtn.addEventListener('click', handlePlaySolo);
+    if(quickPlayBtn) quickPlayBtn.addEventListener('click', handleQuickPlay);
+    if(dailyChallengeBtn) dailyChallengeBtn.addEventListener('click', handleDailyChallenge);
+    startGameBtn.addEventListener('click', () => socket.emit('start_game', { room_id: roomId, player_id: playerId }));
+    
+    document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', () => socket.emit('hint', { room_id: roomId, player_id: playerId })));
+    document.querySelectorAll('#undo-button').forEach(btn => btn.addEventListener('click', () => socket.emit('undo', { room_id: roomId, player_id: playerId })));
+    document.querySelectorAll('#notes-button').forEach(btn => btn.addEventListener('click', toggleNotesMode));
+    document.querySelectorAll('#eraser-button').forEach(btn => btn.addEventListener('click', handleErase));
+    document.querySelectorAll('.number-button').forEach(button => button.addEventListener('click', handleNumberInput));
+
+    pauseButton.addEventListener('click', togglePause);
+    mobilePauseButton.addEventListener('click', togglePause);
+
+    backToLobbyBtn.addEventListener('click', () => {
+        gameOverModal.hide();
+        transitionToRoomView();
+    });
+
+    if (playAgainSoloBtn) playAgainSoloBtn.addEventListener('click', handlePlayAgainSolo);
+    if (spectateBtn) {
+        spectateBtn.addEventListener('click', () => {
+            hideFinishedOverlay();
+            messageDisplay.innerHTML = `<div class="alert alert-info text-center shadow-lg border-info mb-0">👁️ <strong>SPECTATING</strong>: Waiting for others to finish...</div>`;
+            document.getElementById('board-overlay').style.display = 'block'; // Ensure grid interactions remain blocked
+        });
+    }
+
+    backToLobbyBtnSolo.addEventListener('click', () => {
+        hideFinishedOverlay();
+        transitionToRoomView();
+    });
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    function checkDailyProgression() {
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (coinCountDisplay) coinCountDisplay.textContent = sudokuProgression.coins;
+
+        if (sudokuProgression.lastDailyCompleted === today) {
+            if (dailyChallengeBtn) {
+                dailyChallengeBtn.disabled = true;
+                dailyChallengeBtn.innerHTML = `✅ Completed Today`;
+                dailyChallengeBtn.classList.remove('glow-btn', 'btn-warning');
+                dailyChallengeBtn.classList.add('btn-secondary', 'text-white');
+            }
+        }
+
+        if (sudokuProgression.lastClaimDate !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (sudokuProgression.lastClaimDate !== yesterday.toISOString().split('T')[0] && sudokuProgression.lastClaimDate !== null) {
+                sudokuProgression.streak = 0;
+            }
+
+            const rewardStreakObj = document.getElementById('reward-streak');
+            if (rewardStreakObj) rewardStreakObj.textContent = sudokuProgression.streak + 1;
+            
+            if (dailyRewardModalObj) dailyRewardModalObj.show();
+        }
+    }
+
+    if (claimRewardBtn) {
+        claimRewardBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().split('T')[0];
+            sudokuProgression.lastClaimDate = today;
+            sudokuProgression.streak += 1;
+            sudokuProgression.coins += 100;
+            saveProgression();
+            dailyRewardModalObj.hide();
+            playSound('correct');
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 150, spread: 80, origin: { y: 0.8 } });
+            }
+        });
+    }
+
+    checkDailyProgression();
+
+    function initShop() {
+        if (!sudokuProgression.ownedAvatars) {
+            sudokuProgression.ownedAvatars = ['😎', '🤠', '👽', '🦄', '🐱', '🐶', '🐼', '🤖'];
+            saveProgression();
+        }
+        
+        // Refresh Dropdown
+        const allAvatars = [...new Set(sudokuProgression.ownedAvatars)];
+        if (playerAvatarSelect) {
+            const currentSelected = localStorage.getItem('sudokuPlayerAvatar') || allAvatars[0];
+            playerAvatarSelect.innerHTML = '';
+            allAvatars.forEach(av => {
+                const opt = document.createElement('option');
+                opt.value = av;
+                opt.textContent = av;
+                playerAvatarSelect.appendChild(opt);
+            });
+            playerAvatarSelect.value = currentSelected;
+        }
+
+        // Bind Store Buttons
+        document.querySelectorAll('.buy-avatar-btn').forEach(btn => {
+            const avatar = btn.getAttribute('data-avatar');
+            const price = parseInt(btn.getAttribute('data-price'));
+            
+            if (sudokuProgression.ownedAvatars.includes(avatar)) {
+                btn.textContent = 'Owned';
+                btn.classList.replace('btn-warning', 'btn-success');
+                btn.classList.replace('btn-info', 'btn-success');
+                btn.disabled = true;
+            }
+
+            btn.addEventListener('click', () => {
+                if (sudokuProgression.ownedAvatars.includes(avatar)) return;
+                if (sudokuProgression.coins >= price) {
+                    sudokuProgression.coins -= price;
+                    sudokuProgression.ownedAvatars.push(avatar);
+                    saveProgression();
+                    playSound('correct');
+                    btn.textContent = 'Owned';
+                    btn.classList.replace('btn-warning', 'btn-success');
+                    btn.classList.replace('btn-info', 'btn-success');
+                    btn.disabled = true;
+                    initShop();
+                } else {
+                    playSound('mistake');
+                    alert(`Not enough coins! You need ${price} 🪙.`);
+                }
+            });
+        });
+    }
+    
+    initShop();
+
+    async function handleDailyChallenge() {
+        playSound('tap');
+        const playerName = playerNameInput.value.trim() || 'Guest';
+        const avatar = playerAvatarSelect.value;
+        setLoading(true, 'Loading daily challenge...');
+        disableMenuButtons(true);
+
+        try {
+            const response = await fetch("https://sudoku-multi-backend.onrender.com/start_daily_game", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: playerName, avatar: avatar, player_id: playerId })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                isHost = true;
+                isSolo = true;
+                isDailyGame = true;
+                initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
+            } else {
+                const errorData = await response.json();
+                alert("Error: " + errorData.error);
+                setLoading(false);
+                disableMenuButtons(false);
+            }
+        } catch (err) {
+            alert("Failed to connect to the server.");
+            setLoading(false);
+            disableMenuButtons(false);
+        }
+    }
+
+    function sendChatMessage(message) {
+        const messageToSend = message || chatInput.value.trim();
+        if (messageToSend) {
+            socket.emit('chat_message', { room_id: roomId, player_id: playerId, message: messageToSend });
+            chatInput.value = '';
+        }
+    }
+
+    chatSendBtn.addEventListener('click', () => sendChatMessage());
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendChatMessage();
+        }
+    });
+
+    mobileChatToggleBtn.addEventListener('click', () => {
+        mobileChatPanel.classList.toggle('open');
+        chatNotificationDot.classList.add('d-none');
+    });
+
+    closeChatBtn.addEventListener('click', () => {
+        mobileChatPanel.classList.remove('open');
+    });
+
+    desktopChatToggleBtn.addEventListener('click', () => {
+        desktopChatPanel.classList.toggle('open');
+        desktopChatNotificationDot.classList.add('d-none');
+    });
+
+    closeDesktopChatBtn.addEventListener('click', () => {
+        desktopChatPanel.classList.remove('open');
+    });
+
+    async function handleCreateRoom() {
+        const playerName = playerNameInput.value.trim();
+        const difficulty = difficultySelect.value;
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        if (!playerName) return alert('Please enter your name.');
+
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
+        
+        setLoading(true, 'Creating new room...');
+        disableMenuButtons(true);
+        try {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'multiplayer', avatar: avatar, player_id: playerId }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+            
+            isHost = true;
+            isSolo = false;
+            isMatchmakingRoom = false;
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
+        } catch (error) {
+            alert(`Failed to create room: ${error.message}`);
+            setLoading(false);
+            disableMenuButtons(false);
+        }
+    }
+
+    async function handleJoinRoom() {
+        const playerName = playerNameInput.value.trim();
+        const inputRoomId = roomIdInput.value.trim();
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
+
+        setLoading(true, 'Joining room...');
+        disableMenuButtons(true);
+        try {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/join_room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ room_id: inputRoomId, player_name: playerName, avatar: avatar, player_id: playerId }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+
+            isHost = false;
+            isSolo = false;
+            isMatchmakingRoom = false;
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
+        } catch (error) {
+            alert(`Failed to join room: ${error.message}`);
+            setLoading(false);
+            disableMenuButtons(false);
+        }
+    }
+
+    async function handlePlaySolo() {
+        hideFinishedOverlay();
+        const difficulty = difficultySelect.value;
+        const playerName = playerNameInput.value.trim() || "Solo Player";
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        
+        setLoading(true, 'Initializing solo mode...');
+        disableMenuButtons(true);
+        try {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+            
+            isHost = true;
+            isSolo = true;
+            initializeGame(data.room_id, data.player_id, data.puzzle, difficulty);
+        } catch (error) {
+            console.error('Error creating room:', error);
+            alert(`Failed to create room: ${error.message}`);
+            setLoading(false);
+            disableMenuButtons(false);
+        }
+    }
+
+    async function handlePlayAgainSolo() {
+        isReconnecting = true;
+        const difficulty = difficultyDisplay.textContent.toLowerCase();
+
+        if (!difficulty || difficulty === 'n/a') {
+            console.error("Could not determine difficulty to start new game.");
+            alert("Could not start a new game. Please return to the lobby.");
+            return;
+        }
+
+        resetGameState();
+        setLoading(true, 'Initializing solo mode...');
+
+        try {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ player_name: "Solo Player", difficulty: difficulty, game_mode: 'solo', player_id: playerId }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'Unknown error');
+
+            isHost = true;
+            isSolo = true;
+            initializeGame(data.room_id, data.player_id, data.puzzle, difficulty);
+        } catch (error) {
+            console.error('Error creating room for play again:', error);
+            alert(`Failed to start new game: ${error.message}`);
+            setLoading(false);
+        }
+    }
+
+    function handleQuickPlay() {
+        const playerName = playerNameInput.value.trim();
+        const difficulty = difficultySelect.value;
+        const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        if (!playerName) return alert('Please enter your name.');
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
+        
+        setLoading(true, 'Searching for opponent...');
+        disableMenuButtons(true);
+        
+        if (socket) socket.disconnect();
+        socket = io("https://sudoku-multi-backend.onrender.com", {
+            transports: ['websocket']
+        });
+        
+        socket.once('connect', () => {
+            socket.emit('find_match', { player_name: playerName, avatar: avatar, difficulty: difficulty, player_id: playerId });
+        });
+        
+        socket.on('match_found', (data) => {
+            isHost = false;
+            isSolo = false;
+            isMatchmakingRoom = data.is_matchmaking || false;
+            
+            // Initialize first so resetGameState doesn't wipe our matched players
+            initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty, true);
+            
+            playersInRoom = data.players || [];
+            console.log("DEBUG: match_found event received with players:", playersInRoom.length);
+            updatePlayerList();
+            updateWaitingPlayerList();
+        });
+        
+        socket.on('disconnect', () => {
+             disableMenuButtons(false); 
+        });
+    }
+
+    function initializeGame(newRoomId, newPlayerId, puzzle, difficulty, useExistingSocket = false) {
+        roomId = newRoomId;
+        playerId = newPlayerId;
+        playerState = 'playing'; // Reinitialize interaction status
+        gameStartTime = Date.now();
+        currentPuzzle = puzzle;
+        initialPuzzle = puzzle;
+        
+        renderBoard(initialPuzzle, currentPuzzle, currentNotesBoard);
+        updateGameInfo(roomId, difficulty, isSolo);
+        connectWebSocket(useExistingSocket);
+
+        if (isSolo) {
+            // isSolo is true, waiting for game_started event
+        } else {
+            transitionToWaitingRoom();
+        }
+        chatInput.disabled = false;
+        chatSendBtn.disabled = false;
+    }
+
+    function connectWebSocket(useExistingSocket = false) {
+        console.log("connectWebSocket called. useExistingSocket:", useExistingSocket, "roomId:", roomId, "playerId:", playerId);
+        
+        if (!useExistingSocket && socket) {
+            socket.disconnect();
+            socket = null;
+        }
+
+        if (!socket) {
+            socket = io("https://sudoku-multi-backend.onrender.com", {
+                transports: ['websocket']
+            });
+        }
+
+        // 1. Clear ALL old listeners to prevent duplicates and memory leaks
+        socket.off('connect');
+        socket.off('disconnect');
+        socket.off('game_started');
+        socket.off('game_state_update');
+        socket.off('hint_given');
+        socket.off('eliminated');
+        socket.off('player_eliminated');
+        socket.off('player_finished');
+        socket.off('game_over');
+        socket.off('current_players');
+        socket.off('player_joined');
+        socket.off('player_left');
+        socket.off('chat_message');
+        socket.off('match_countdown');
+        socket.off('match_cancelled');
+        socket.off('error');
+
+        // 2. Define the core Join logic
+        const performJoinRoom = () => {
+            if (roomId && playerId) {
+                console.log("Emitting JOIN event to server. Room:", roomId, "Player:", playerId);
+                socket.emit('join', { room_id: roomId, player_id: playerId });
+                if (isSolo) {
+                    socket.emit('start_game', { room_id: roomId, player_id: playerId });
+                }
+            }
+        };
+
+        // 3. Attach standard status listeners
+        socket.on('connect', () => {
+            console.log("Socket connected/reconnected. Sid:", socket.id);
+            performJoinRoom();
+        });
+
+        socket.on('disconnect', (reason) => {
+            console.log("Socket disconnected. Reason:", reason);
+            if (!isReconnecting && !isSolo && reason !== "io client disconnect") {
+                showLeaderboard([], 'Disconnected from the room.');
+            }
+            isReconnecting = false;
+        });
+
+        socket.on('error', (data) => {
+            console.error("Socket error:", data);
+            alert(`Error: ${data.message}`);
+        });
+
+        // 4. Attach GAME logic listeners
+        socket.on('game_started', (data) => {
+            console.log("CRITICAL: game_started event received!", data);
+            transitionToGameView(isSolo);
+            startTimer(data.start_time);
+            setLoading(false);
+        });
+
+        socket.on('game_state_update', (data) => {
+            currentPuzzle = data.game_state.current_board;
+            currentNotesBoard = data.game_state.notes_board;
+            
+            if (data.last_move) {
+                const { row, col, value, is_correct } = data.last_move;
+                
+                if (parseInt(value) === 0) {
+                    incorrectCells[row][col] = false;
+                } else if (!is_correct) {
+                    incorrectCells[row][col] = true;
+                } else {
+                    incorrectCells[row][col] = false;
+                }
+            }
+            
+            // Backup selection before DOM destruction
+            const sr = selectedCell ? selectedCell.dataset.row : null;
+            const sc = selectedCell ? selectedCell.dataset.col : null;
+
+            renderBoard(initialPuzzle, currentPuzzle, currentNotesBoard);
+            
+            // Reapply animations to the newly rendered DOM targets
+            if (data.last_move) {
+                const { row, col, value, is_correct } = data.last_move;
+                const newCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+                if (newCell && parseInt(value) !== 0) {
+                    if (is_correct) {
+                        newCell.classList.add('correct-flash');
+                        setTimeout(() => newCell.classList.remove('correct-flash'), 500);
+                        playSound('correct');
+                    } else {
+                        newCell.classList.add('wrong');
+                        setTimeout(() => newCell.classList.remove('wrong'), 400);
+                        playSound('error');
+                    }
+                }
+            }
+
+            // Restore selection and recursively highlight freshly rendered matching numbers
+            if (sr !== null && sc !== null) {
+                const restoredCell = document.querySelector(`.cell[data-row='${sr}'][data-col='${sc}']`);
+                if (restoredCell) selectCell(restoredCell, true);
+            }
+
+            updateStats(data.mistakes, data.hints, data.score);
+        });
+
+        socket.on('match_countdown', (data) => {
+            console.log("Match countdown:", data.seconds);
+            if (matchCountdownContainer && matchCountdownTimer) {
+                matchCountdownContainer.style.display = 'block';
+                matchCountdownTimer.textContent = data.seconds;
+                playSound('tap');
+            }
+        });
+
+        socket.on('match_cancelled', (data) => {
+            console.log("Match cancelled:", data.message);
+            alert(data.message);
+            transitionToRoomView();
+        });
+
+        socket.on('hint_given', (data) => {
+            const { row, col, value, hints_used, score } = data;
+            const hintedCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+            if (hintedCell) {
+                hintedCell.textContent = value;
+                hintedCell.classList.add('fixed', 'hint-flash');
+                flashRelatedCells(row, col, value);
+                setTimeout(() => hintedCell.classList.remove('hint-flash'), 1000);
+            }
+            updateStats(null, hints_used, score);
+        });
+
+        socket.on('player_eliminated', (data) => {
+            showTemporaryMessage(`${data.player_name} has been eliminated!`);
+        });
+
+        socket.on('eliminated', (data) => {
+            playerState = 'eliminated';
+            updateUI();
+            showEliminationOverlay(data.message);
+        });
+
+        socket.on('player_finished', (data) => {
+            if (!isSolo) {
+                showTemporaryMessage(`${data.player_name} has finished the puzzle!`);
+            }
+            if (data.player_id === playerId) {
+                stopTimer();
+                playerState = 'finished';
+                updateUI();
+                showFinishedOverlay();
+                playSound('win');
+                if(typeof confetti === 'function') {
+                    const duration = 3000, end = Date.now() + duration, colors = ['#8b5cf6', '#0ea5e9', '#ffffff'];
+                    (function frame(){
+                        confetti({particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: colors});
+                        confetti({particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: colors});
+                        if (Date.now() < end) requestAnimationFrame(frame);
+                    }());
+                }
+
+                if (isDailyGame) {
+                    const today = new Date().toISOString().split('T')[0];
+                    if (sudokuProgression.lastDailyCompleted !== today) {
+                        sudokuProgression.lastDailyCompleted = today;
+                        sudokuProgression.coins += 500;
+                        saveProgression();
+                        setTimeout(() => {
+                           alert(`🎉 DAILY CHALLENGE COMPLETED! 🎉\nYou have been awarded 500 Coins!`);
+                           checkDailyProgression();
+                        }, 1500);
+                    }
+                }
+            }
+        });
+
+        socket.on('game_over', (data) => {
+            stopTimer();
+            playerState = 'game_over';
+            updateUI();
+            if (isSolo) {
+                // Handled in player_finished
+            } else {
+                hideFinishedOverlay();
+                showLeaderboard(data.leaderboard, data.message);
+            }
+        });
+
+        socket.on('current_players', (data) => {
+            playersInRoom = data.players;
+            updatePlayerList();
+            updateWaitingPlayerList();
+            if (isHost && !isSolo) {
+                startGameBtn.disabled = playersInRoom.length < 2;
+            }
+        });
+
+        socket.on('player_left', (data) => {
+            showTemporaryMessage(`${data.player_name} left the room.`);
+        });
+
+        socket.on('chat_message', (data) => {
+            const { player_name, avatar, message } = data;
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('chat-message');
+            if (player_name === getPlayerNameById(playerId)) {
+                messageElement.classList.add('my-message');
+            }
+            messageElement.innerHTML = `<span class="sender">${avatar || '😎'} ${player_name}:</span> <span class="message">${message}</span>`;
+            playSound('tap');
+            
+            const chatMessagesList = document.getElementById('chat-messages');
+            if(chatMessagesList) {
+                chatMessagesList.appendChild(messageElement);
+                chatMessagesList.scrollTop = chatMessagesList.scrollHeight;
+            }
+
+            if (mobileChatPanel && !mobileChatPanel.classList.contains('open')) {
+                chatNotificationDot.classList.remove('d-none');
+            }
+
+            if (desktopChatPanel && !desktopChatPanel.classList.contains('open')) {
+                desktopChatNotificationDot.classList.remove('d-none');
+            }
+        });
+
+        function updateUI() {
+            const gameButtons = document.querySelectorAll('.number-button, #actions-container button, #mobile-controls button');
+            const chatInputs = document.querySelectorAll('#chat-input, #chat-send-btn');
+            const presetChatButtons = document.querySelectorAll('.preset-chat-btn');
+
+            if (playerState === 'playing') {
+                gameButtons.forEach(button => button.disabled = false);
+                chatInputs.forEach(button => button.disabled = false);
+                presetChatButtons.forEach(button => button.disabled = false);
+                document.addEventListener('keydown', handleKeyDown);
+            } else if (playerState === 'finished' || playerState === 'eliminated') {
+                gameButtons.forEach(button => button.disabled = true);
+                chatInputs.forEach(button => button.disabled = false);
+                presetChatButtons.forEach(button => button.disabled = false);
+                document.removeEventListener('keydown', handleKeyDown);
+            } else if (playerState === 'game_over') {
+                gameButtons.forEach(button => button.disabled = true);
+                chatInputs.forEach(button => button.disabled = true);
+                presetChatButtons.forEach(button => button.disabled = true);
+                if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+                if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+                if(mobileChatPanel) mobileChatPanel.classList.remove('open');
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        }
+
+        // 5. If we're already connected (Matchmaking case), trigger the Join sequence immediately
+        if (socket.connected) {
+            console.log("Socket is already connected. Triggering immediate join.");
+            performJoinRoom();
+        }
+    }
+
+    function handleNumberInput(e) {
+        if (playerState !== 'playing' || isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+        
+        const value = parseInt(e.currentTarget.dataset.number);
+        const r = parseInt(selectedCell.dataset.row);
+        const c = parseInt(selectedCell.dataset.col);
+
+        if (notesMode) {
+            toggleNote(selectedCell, value);
+            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
+        } else {
+            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
+        }
+    }
+
+    function isChatFocused() {
+        return document.activeElement === chatInput;
+    }
+
+    function handleKeyDown(e) {
+        if (isChatFocused() || playerState !== 'playing' || isPaused) return;
+
+        let r = selectedCell ? parseInt(selectedCell.dataset.row) : 4;
+        let c = selectedCell ? parseInt(selectedCell.dataset.col) : 4;
+
+        if (e.key === 'ArrowUp') r = Math.max(0, r - 1);
+        else if (e.key === 'ArrowDown') r = Math.min(8, r + 1);
+        else if (e.key === 'ArrowLeft') c = Math.max(0, c - 1);
+        else if (e.key === 'ArrowRight') c = Math.min(8, c + 1);
+
+        if (e.key.startsWith('Arrow')) {
+            const nextCell = document.querySelector(`.cell[data-row='${r}'][data-col='${c}']`);
+            if(nextCell) selectCell(nextCell);
+            e.preventDefault();
+            return;
+        }
+
+        if (!selectedCell || selectedCell.classList.contains('fixed')) return;
+
+        if (e.key >= '1' && e.key <= '9') {
+            const value = parseInt(e.key);
+            if (notesMode) {
+                toggleNote(selectedCell, value);
+                socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: JSON.parse(selectedCell.dataset.notes || '[]') });
+            } else {
+                socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: value });
+            }
+        } else if (e.key === 'Backspace' || e.key === 'Delete') {
+            if (notesMode) {
+                socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: [] });
+            } else {
+                socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: 0 });
+            }
+        } else if (e.key.toLowerCase() === 'u') {
+            socket.emit('undo', { room_id: roomId, player_id: playerId });
+        } else if (e.key.toLowerCase() === 'h') {
+            socket.emit('hint', { room_id: roomId, player_id: playerId });
+        } else if (e.key.toLowerCase() === 'n') {
+            toggleNotesMode();
+        }
+    }
+
+    const renderBoard = (puzzle, currentBoard, notesBoard) => {
+        board.innerHTML = '';
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.row = r;
+                cell.dataset.col = c;
+
+                if (incorrectCells[r][c]) {
+                    cell.classList.add('incorrect');
+                }
+
+                const initialValue = puzzle[r][c];
+                const currentValue = currentBoard[r][c];
+                const cellNotes = notesBoard[r][c];
+
+                if (initialValue !== 0) {
+                    cell.textContent = initialValue;
+                    cell.classList.add('fixed');
+                } else if (currentValue !== 0) {
+                    cell.textContent = currentValue;
+                }
+                else if (cellNotes && cellNotes.length > 0) {
+                    cell.classList.add('has-notes');
+                    renderNotes(cell, cellNotes);
+                }
+
+                cell.addEventListener('click', () => selectCell(cell));
+                board.appendChild(cell);
+            }
+        }
+        updateNumberPalette();
+    };
+
+    const selectCell = (cell, silent = false) => {
+        if (!silent) playSound('tap');
+        if (selectedCell) {
+            selectedCell.classList.remove('selected');
+        }
+        clearHighlights();
+        selectedCell = cell;
+        selectedCell.classList.add('selected');
+        highlightRelatedCells(selectedCell.dataset.row, selectedCell.dataset.col);
+        
+        if (selectedCell.textContent && !selectedCell.classList.contains('has-notes')) {
+            highlightActiveNumbers(parseInt(selectedCell.textContent));
+        }
+        const r = parseInt(selectedCell.dataset.row);
+        const c = parseInt(selectedCell.dataset.col);
+        selectedCell.dataset.notes = JSON.stringify(currentNotesBoard[r][c] || []);
+    };
+
+    const highlightRelatedCells = (row, col) => {
+        document.querySelectorAll('.cell').forEach(cell => {
+            const r = cell.dataset.row;
+            const c = cell.dataset.col;
+            const boxRowStart = Math.floor(row / 3) * 3;
+            const boxColStart = Math.floor(col / 3) * 3;
+
+            if (r == row || c == col || (r >= boxRowStart && r < boxRowStart + 3 && c >= boxColStart && c < boxColStart + 3)) {
+                cell.classList.add('highlight');
+            }
+        });
+    };
+
+    const flashRelatedCells = (row, col, value) => {
+        document.querySelectorAll('.cell').forEach(cell => {
+            const r = cell.dataset.row;
+            const c = cell.dataset.col;
+            const boxRowStart = Math.floor(row / 3) * 3;
+            const boxColStart = Math.floor(col / 3) * 3;
+
+            const inRow = r == row;
+            const inCol = c == col;
+            const inBox = (r >= boxRowStart && r < boxRowStart + 3 && c >= boxColStart && c < boxColStart + 3);
+
+            if (inRow || inCol || inBox) {
+                if (cell.textContent == value) {
+                    cell.classList.add('hint-conflict');
+                    setTimeout(() => cell.classList.remove('hint-conflict'), 1000);
+                } else if (cell.dataset.row != row || cell.dataset.col != col) {
+                    cell.classList.add('hint-flash-related');
+                    setTimeout(() => cell.classList.remove('hint-flash-related'), 1000);
+                }
+            }
+        });
+    };
+
+    const highlightActiveNumbers = (number) => {
+        document.querySelectorAll('.cell').forEach(cell => {
+            if (parseInt(cell.textContent) === number && !cell.classList.contains('has-notes')) {
+                cell.classList.add('highlight-active');
+            }
+        });
+    };
+
+    const clearHighlights = () => {
+        document.querySelectorAll('.cell.highlight, .cell.highlight-active, .cell.wrong, .cell.selected').forEach(cell => {
+            cell.classList.remove('highlight', 'highlight-active', 'wrong', 'selected');
+        });
+    };
+
+    function toggleNotesMode() {
+        notesMode = !notesMode;
+        document.querySelectorAll('#notes-button').forEach(btn => {
+            btn.classList.toggle('active', notesMode);
+        });
+    }
+
+    function handleErase() {
+        if (playerState !== 'playing' || isPaused || !selectedCell || selectedCell.classList.contains('fixed')) return;
+
+        const r = parseInt(selectedCell.dataset.row);
+        const c = parseInt(selectedCell.dataset.col);
+
+        if (currentNotesBoard[r][c] && currentNotesBoard[r][c].length > 0) {
+            socket.emit('notes', { room_id: roomId, player_id: playerId, row: r, col: c, notes: [] });
+        } else if (currentPuzzle[r][c] !== 0) {
+            socket.emit('move', { room_id: roomId, player_id: playerId, row: r, col: c, value: 0 });
+        }
+    }
+
+    const toggleNote = (cell, number) => {
+        cell.classList.add('has-notes');
+        cell.textContent = '';
+        let notes = cell.dataset.notes ? JSON.parse(cell.dataset.notes) : [];
+
+        if (number === 0) {
+            notes = [];
+        } else if (notes.includes(number)) {
+            notes = notes.filter(n => n !== number);
+        } else {
+            notes.push(number);
+        }
+        cell.dataset.notes = JSON.stringify(notes);
+        renderNotes(cell, notes);
+    };
+
+    const renderNotes = (cell, notes) => {
+        cell.innerHTML = '';
+        if (notes.length > 0) {
+            const notesDiv = document.createElement('div');
+            notesDiv.classList.add('notes');
+            notes.sort().forEach(note => {
+                const noteSpan = document.createElement('span');
+                noteSpan.textContent = note;
+                notesDiv.appendChild(noteSpan);
+            });
+            cell.appendChild(notesDiv);
+            cell.classList.add('has-notes');
+        } else {
+            cell.classList.remove('has-notes');
+            cell.dataset.notes = '[]';
+        }
+    };
+
+    const updateNumberPalette = () => {
+        const counts = Array(10).fill(0);
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (currentPuzzle[r][c] !== 0) {
+                    counts[currentPuzzle[r][c]]++;
+                }
+            }
+        }
+        document.querySelectorAll('.number-button').forEach(button => {
+            const number = parseInt(button.dataset.number);
+            if (number > 0) {
+                const isUsed = counts[number] === 9;
+                button.classList.toggle('used', isUsed);
+                const mobileButton = document.querySelector(`#mobile-number-palette .number-button[data-number="${number}"]`);
+                if (mobileButton) {
+                    mobileButton.classList.toggle('used', isUsed);
+                }
+            }
+        });
+    };
+
+    function updatePlayerList() {
+        const playerLists = [document.getElementById('player-list'), document.getElementById('mobile-player-list')];
+        console.log("DEBUG: updatePlayerList called. player-list found:", !!playerLists[0], "mobile-player-list found:", !!playerLists[1]);
+        
+        playerLists.forEach(playerListUl => {
+            if (!playerListUl) return;
+
+            const newPlayersMap = new Map(playersInRoom.map(p => [p.player_id, p]));
+            const existingPlayerIds = new Set(Array.from(playerListUl.children).map(el => el.dataset.playerId));
+
+            existingPlayerIds.forEach(pId => {
+                if (!newPlayersMap.has(pId)) {
+                    const el = playerListUl.querySelector(`[data-player-id="${pId}"]`);
+                    if (el) el.remove();
+                }
+            });
+
+            playersInRoom.forEach((player, index) => {
+                let listItem = playerListUl.querySelector(`[data-player-id="${player.player_id}"]`);
+
+                if (!listItem) {
+                    listItem = document.createElement('li');
+                    listItem.dataset.playerId = player.player_id;
+                    listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+                    const avatar = document.createElement('div');
+                    avatar.className = 'player-avatar';
+                    avatar.textContent = player.player_name.charAt(0).toUpperCase();
+
+                    const playerInfo = document.createElement('div');
+                    playerInfo.className = 'player-info';
+
+                    const playerNameSpan = document.createElement('div');
+                    playerNameSpan.className = 'player-name';
+                    playerInfo.appendChild(playerNameSpan);
+
+                    const playerStatusSpan = document.createElement('div');
+                    playerStatusSpan.className = 'player-status';
+                    playerInfo.appendChild(playerStatusSpan);
+
+                    const playerScoreSpan = document.createElement('span');
+                    playerScoreSpan.className = 'badge bg-primary rounded-pill player-score';
+
+                    listItem.appendChild(avatar);
+                    listItem.appendChild(playerInfo);
+                    listItem.appendChild(playerScoreSpan);
+                    
+                    playerListUl.insertBefore(listItem, playerListUl.children[index]);
+                }
+
+                const playerNameEl = listItem.querySelector('.player-name');
+                playerNameEl.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
+
+                const playerStatusEl = listItem.querySelector('.player-status');
+                playerStatusEl.textContent = '';
+                playerStatusEl.classList.remove('eliminated', 'finished', 'playing');
+
+                if (player.eliminated) {
+                    playerStatusEl.textContent = 'Eliminated';
+                    playerStatusEl.classList.add('eliminated');
+                } else if (player.finished) {
+                    playerStatusEl.textContent = 'Finished';
+                    playerStatusEl.classList.add('finished');
+                }
+                else {
+                    playerStatusEl.textContent = 'Playing';
+                    playerStatusEl.classList.add('playing');
+                }
+
+                listItem.querySelector('.player-score').textContent = player.score;
+                listItem.classList.toggle('eliminated', player.eliminated);
+                listItem.classList.toggle('finished', player.finished);
+
+                if (playerListUl.children[index] !== listItem) {
+                    playerListUl.insertBefore(listItem, playerListUl.children[index]);
+                }
+            });
+        });
+    }
+
+    function updateWaitingPlayerList() {
+        const listUl = document.getElementById('waiting-player-list');
+        if (!listUl) {
+            console.error("DEBUG: updateWaitingPlayerList failed - list UL not found");
+            return;
+        }
+        console.log("DEBUG: updateWaitingPlayerList updating with players:", playersInRoom.length);
+        
+        const newPlayersMap = new Map(playersInRoom.map(p => [p.player_id, p]));
+
+        Array.from(listUl.children).forEach(listItem => {
+            const pId = listItem.dataset.playerId;
+            if (!newPlayersMap.has(pId)) {
+                listItem.remove();
+            }
+        });
+
+        playersInRoom.forEach((player, index) => {
+            let listItem = listUl.querySelector(`[data-player-id="${player.player_id}"]`);
+
+            if (!listItem) {
+                listItem = document.createElement('li');
+                listItem.className = 'list-group-item bg-transparent border-0 d-flex align-items-center mb-2 px-0';
+                listItem.dataset.playerId = player.player_id;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'player-avatar me-3 shadow-sm';
+                avatar.style.width = '40px';
+                avatar.style.height = '40px';
+                avatar.style.fontSize = '1.2rem';
+                avatar.textContent = (player.avatar || '😎');
+                
+                const nameInfo = document.createElement('div');
+                nameInfo.className = 'flex-grow-1';
+                
+                const nameLabel = document.createElement('div');
+                nameLabel.className = 'fw-bold text-white h6 mb-0';
+                nameLabel.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
+                
+                const statusLabel = document.createElement('div');
+                statusLabel.className = 'small text-warning fw-semibold';
+                statusLabel.textContent = (player.player_id === playerId ? 'Ready to play' : 'Ready to challenge you!');
+                
+                nameInfo.appendChild(nameLabel);
+                nameInfo.appendChild(statusLabel);
+                
+                listItem.appendChild(avatar);
+                listItem.appendChild(nameInfo);
+                
+                listUl.insertBefore(listItem, listUl.children[index]);
+                // Force a UI reflow to ensure transparency and borders are correctly rendered on desktop
+                listUl.style.display = 'none';
+                listUl.offsetHeight; 
+                listUl.style.display = 'block';
+            } else {
+                // Update text just in case (e.g. "Ready" status)
+                const nameLabel = listItem.querySelector('.fw-bold');
+                if (nameLabel) nameLabel.textContent = player.player_name + (player.player_id === playerId ? ' (You)' : '');
+            }
+        });
+    }
+
+    function updateStats(mistakes, hints, score) {
+        if (mistakes !== null && mistakes !== undefined) {
+            const mistakeText = `${mistakes} / 3`;
+            if(mistakesCounter) mistakesCounter.textContent = mistakeText;
+            if (mistakesCounterMobile) mistakesCounterMobile.textContent = mistakeText;
+        }
+        if (hints !== null && hints !== undefined) {
+            const hintsLeft = 3 - hints;
+            const desktopHintButton = document.querySelector('#actions-container #hint-button');
+            const mobileHintButton = document.querySelector('#mobile-actions-container #hint-button');
+
+            if (desktopHintButton) {
+                const hintCountSpan = desktopHintButton.querySelector('#hint-count');
+                hintCountSpan.textContent = hintsLeft;
+                hintCountSpan.style.display = hintsLeft > 0 ? 'block' : 'none';
+                desktopHintButton.disabled = hintsLeft <= 0;
+            }
+
+            if (mobileHintButton) {
+                const mobileHintCountSpan = mobileHintButton.querySelector('.mobile-hint-count');
+                if (mobileHintCountSpan) {
+                    mobileHintCountSpan.textContent = hintsLeft;
+                }
+                mobileHintButton.disabled = hintsLeft <= 0;
+            }
+        }
+        if (score !== null && score !== undefined) {
+            if(scoreDisplay) scoreDisplay.textContent = score;
+            if(scoreDisplayMobile) scoreDisplayMobile.textContent = score;
+        }
+    }
+
+    function startTimer(serverStartTime) {
+        if (timerInterval) clearInterval(timerInterval);
+
+        const startTime = isSolo ? Date.now() / 1000 : serverStartTime;
+
+        const updateDisplay = () => {
+            if (!isPaused) {
+                const now = Date.now() / 1000;
+                elapsedTime = Math.max(0, Math.floor(now - startTime));
+                
+                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+                const timeString = `${minutes}:${seconds}`;
+                timerDisplay.textContent = timeString;
+                if (timerDisplayMobile) timerDisplayMobile.textContent = timeString;
+            }
+        };
+
+        updateDisplay();
+        timerInterval = setInterval(updateDisplay, 1000);
+    }
+
+    function stopTimer() {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+
+    function togglePause() {
+        isPaused = !isPaused;
+        const icon = isPaused ? `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393"/></svg>` : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-pause-fill" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5"/></svg>`;
+        
+        if(pauseButton) pauseButton.innerHTML = icon;
+        if(mobilePauseButton) mobilePauseButton.innerHTML = icon;
+
+        if(pauseButton) pauseButton.classList.toggle('btn-light', !isPaused);
+        if(pauseButton) pauseButton.classList.toggle('btn-success', isPaused);
+
+        if(mobilePauseButton) mobilePauseButton.classList.toggle('btn-light', !isPaused);
+        if(mobilePauseButton) mobilePauseButton.classList.toggle('btn-success', isPaused);
+
+        pauseOverlay.classList.toggle('d-none', !isPaused);
+    }
+
+    function transitionToWaitingRoom() {
+        roomManagementDiv.style.display = 'none';
+        gameContainer.style.display = 'none';
+        waitingRoomDiv.style.display = 'flex';
+        roomCodeDisplay.textContent = roomId;
+        
+        if (window.innerWidth < 992) { // Mobile
+            if(mobileChatToggleBtn) mobileChatToggleBtn.classList.remove('d-none');
+            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+            if (chatPanel && chatPanel.parentElement !== mobileChatPanel) {
+                mobileChatPanel.appendChild(chatPanel);
+                chatPanel.classList.add('mobile-chat');
+            }
+            if(chatPanel) chatPanel.style.display = 'block';
+        } else { // Desktop
+            if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.remove('d-none'); // Keep toggle accessible if panel is closed
+            if (chatPanel && chatPanel.parentElement !== desktopChatPanel) {
+                desktopChatPanel.appendChild(chatPanel);
+            }
+            desktopChatPanel.classList.add('open');
+            if(chatPanel) chatPanel.style.display = 'block';
+        }
+        updateStats(0, 0, 0);
+        updateWaitingPlayerList(); // Render the pre-populated player list immediately
+
+        // Countdown handling
+        if (matchCountdownContainer) {
+            // Only show countdown UI for Quick Play matches
+            if (isMatchmakingRoom) {
+                matchCountdownContainer.style.display = 'block';
+                if(startGameBtn) startGameBtn.style.display = 'none';
+                const rcSection = document.getElementById('room-code-section');
+                if(rcSection) rcSection.style.display = 'none';
+            } else {
+                matchCountdownContainer.style.display = 'none';
+                if(startGameBtn) {
+                    startGameBtn.style.display = 'block';
+                    // Enable start button if host and enough players
+                    startGameBtn.disabled = !isHost || (playersInRoom.length < 2 && !isSolo);
+                }
+                const rcSection = document.getElementById('room-code-section');
+                if(rcSection) rcSection.style.display = 'block';
+            }
+        }
+    }
+
+    function transitionToGameView(isSoloParam) {
+        if (desktopChatPanel) {
+            desktopChatPanel.classList.remove('open');
+        }
+        if (mobileChatPanel) {
+            mobileChatPanel.classList.remove('open');
+        }
+        roomManagementDiv.style.display = 'none';
+        waitingRoomDiv.style.display = 'none';
+        gameContainer.style.display = 'block';
+
+        if (window.innerWidth >= 992) { // Desktop: Move chat back to sidebar
+            if (chatPanel && chatPanelOriginalParent) {
+                chatPanelOriginalParent.appendChild(chatPanel);
+                chatPanel.classList.remove('mobile-chat');
+            }
+        }
+
+        document.querySelectorAll('.number-button, #actions-container button, #mobile-controls button').forEach(button => {
+            button.disabled = false;
+        });
+        document.addEventListener('keydown', handleKeyDown);
+
+        const playersPanel = document.getElementById('players-panel');
+        const roomInfoGame = document.getElementById('room-info-game');
+        const mainHeader = document.querySelector('.main-header');
+
+        const playersTab = document.getElementById('players-tab');
+        const statsTab = document.getElementById('stats-tab');
+        const playersPane = document.getElementById('players-pane');
+        const statsPane = document.getElementById('stats-pane');
+
+        if (isSoloParam) {
+            document.body.classList.add('solo-mode');
+            if(playersPanel) playersPanel.style.display = 'none';
+            if(roomInfoGame) roomInfoGame.style.display = 'none';
+            if(mainHeader) mainHeader.style.display = 'none';
+            // Hide all chat elements
+            if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+            if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+            if(chatPanel) chatPanel.style.display = 'none';
+            chatInput.disabled = true;
+            chatSendBtn.disabled = true;
+            if (playersTab) playersTab.parentElement.style.display = 'none';
+            if (statsTab) {
+                statsTab.classList.add('active');
+                statsTab.setAttribute('aria-selected', 'true');
+                if(statsPane) statsPane.classList.add('show', 'active');
+                if(playersPane) playersPane.classList.remove('show', 'active');
+            }
+        } else { // Multiplayer
+            document.body.classList.remove('solo-mode');
+            if(playersPanel) playersPanel.style.display = 'block';
+            if(roomInfoGame) roomInfoGame.style.display = 'flex';
+            if(mobileInfoTabs) mobileInfoTabs.style.display = 'block';
+            if(mainHeader) mainHeader.style.display = 'flex';
+            
+            chatInput.disabled = false;
+            chatSendBtn.disabled = false;
+
+            if (window.innerWidth < 992) { // Mobile
+                if(mobileChatToggleBtn) mobileChatToggleBtn.classList.remove('d-none');
+                if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+                if(chatPanel) chatPanel.style.display = 'block'; // Panel is inside slide-out
+            } else { // Desktop
+                if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+                if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none'); // Hide toggle
+                if(chatPanel) chatPanel.style.display = 'block'; // Show fixed panel
+            }
+
+            if(playersTab) playersTab.parentElement.style.display = 'block';
+            if(statsTab) {
+                statsTab.classList.remove('active');
+                statsTab.setAttribute('aria-selected', 'false');
+                if(statsPane) statsPane.classList.remove('show', 'active');
+            }
+            if(playersTab) {
+                playersTab.classList.add('active');
+                playersTab.setAttribute('aria-selected', 'true');
+                if(playersPane) playersPane.classList.add('show', 'active');
+            }
+        }
+        updateStats(0, 0, 0);
+    }
+
+    function transitionToRoomView() {
+        console.log('transitionToRoomView called.');
+        if (socket) {
+            socket.disconnect();
+            socket = null;
+        }
+        gameContainer.style.display = 'none';
+        waitingRoomDiv.style.display = 'none';
+        roomManagementDiv.style.display = 'block';
+        // Hide all chat elements
+        if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
+        if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
+        if(mobileChatPanel) mobileChatPanel.classList.remove('open');
+        if(desktopChatPanel) desktopChatPanel.classList.remove('open');
+
+        if (chatPanel && chatPanelOriginalParent) {
+            chatPanelOriginalParent.appendChild(chatPanel);
+            chatPanel.style.display = 'none';
+        }
+        stopTimer();
+        resetGameState();
+        disableMenuButtons(false);
+    }
+
+    function resetGameState() {
+        elapsedTime = 0;
+        currentPuzzle = [];
+        initialPuzzle = [];
+        notesMode = false;
+        isPaused = false;
+        isDailyGame = false;
+        isGameActive = true;
+        if (pauseOverlay.classList.contains('d-none') === false) togglePause();
+        playersInRoom = [];
+        selectedCell = null;
+        incorrectCells = Array(9).fill(0).map(() => Array(9).fill(false));
+        updatePlayerList();
+        updateWaitingPlayerList();
+        updateStats(0, 0, 0);
+        timerDisplay.textContent = '00:00';
+        if (timerDisplayMobile) timerDisplayMobile.textContent = '00:00';
+        board.innerHTML = '';
+        if (matchCountdownContainer) matchCountdownContainer.style.display = 'none';
+        hideFinishedOverlay();
+    }
+    
+    function updateGameInfo(roomId, difficulty, isSoloParam) {
+        const mobileDifficultyDisplay = document.getElementById('mobile-difficulty-display');
+        if (isSoloParam) {
+            roomIdDisplay.parentElement.style.display = 'none';
+        }
+        else {
+            roomIdDisplay.parentElement.style.display = 'flex';
+            roomIdDisplay.textContent = roomId;
+        }
+        difficultyDisplay.textContent = difficulty;
+        if(mobileDifficultyDisplay) mobileDifficultyDisplay.textContent = difficulty;
+    }
+
+    function setLoading(isLoading, message = 'Loading...') {
+        loadingIndicator.style.display = isLoading ? 'flex' : 'none';
+        if (loadingText) loadingText.textContent = message;
+    }
+
+    function showTemporaryMessage(text) {
+        messageDisplay.textContent = text;
+        messageDisplay.style.display = 'block';
+        setTimeout(() => {
+            messageDisplay.style.display = 'none';
+        }, 4000);
+    }
+
+    function showFinishedOverlay() {
+        finishedTitle.textContent = 'Puzzle Solved!';
+        completionButtons.style.display = 'flex';
+        messageIcon.classList.remove('eliminated');
+        messageIcon.classList.add('success');
+        if (isSolo) {
+            const message = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+            gameOverMessage.textContent = message;
+            messageIcon.innerHTML = '&#10003;';
+            if (spectateBtn) spectateBtn.style.display = 'none';
+            if (playAgainSoloBtn) playAgainSoloBtn.style.display = 'block';
+            if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'block';
+        } else {
+            const message = multiplayerCompletionMessages[Math.floor(Math.random() * multiplayerCompletionMessages.length)];
+            gameOverMessage.textContent = message;
+            messageIcon.innerHTML = '&#127942;';
+            if (spectateBtn) spectateBtn.style.display = 'block';
+            if (playAgainSoloBtn) playAgainSoloBtn.style.display = 'none';
+            if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'none';
+        }
+        if(mobileInfoTabs) mobileInfoTabs.style.display = 'none';
+        finishedOverlay.classList.add('show');
+    }
+
+    function showEliminationOverlay(message) {
+        stopTimer();
+        finishedTitle.textContent = 'Game Over!';
+        messageIcon.classList.remove('success');
+        messageIcon.classList.add('eliminated');
+        messageIcon.innerHTML = '&#10060;';
+        const messageArray = isSolo ? soloEliminationMessages : eliminationMessages;
+        const randomEliminationMessage = messageArray[Math.floor(Math.random() * messageArray.length)];
+        gameOverMessage.textContent = randomEliminationMessage;
+        completionButtons.style.display = 'none';
+        if(mobileInfoTabs) mobileInfoTabs.style.display = 'none';
+        finishedOverlay.classList.add('show');
+    }
+
+    function hideFinishedOverlay() {
+        if (finishedOverlay) {
+            finishedOverlay.classList.remove('show');
+        }
+        if(mobileInfoTabs) mobileInfoTabs.style.display = 'block';
+    }
+
+    function showLeaderboard(leaderboard, message) {
+        document.getElementById('gameOverModalMessage').textContent = message;
+        document.getElementById('leaderboard-podium').style.display = 'flex';
+        document.getElementById('leaderboard-rest').style.display = 'block';
+
+        const podiumContainer = document.getElementById('leaderboard-podium');
+        const listContainer = document.getElementById('leaderboard-list');
+        podiumContainer.innerHTML = '';
+        listContainer.innerHTML = '';
+
+        const topThree = leaderboard.slice(0, 3);
+        const rest = leaderboard.slice(3);
+
+        topThree.forEach((player, index) => {
+            const place = index + 1;
+            const wrapperEl = document.createElement('div');
+            wrapperEl.className = `podium-wrapper`;
+            wrapperEl.style.display = 'flex';
+            wrapperEl.style.flexDirection = 'column';
+            wrapperEl.style.alignItems = 'center';
+            // Mimic the CSS order property so the wrapper aligns properly horizontally
+            if (place === 1) wrapperEl.style.order = '2';
+            else if (place === 2) wrapperEl.style.order = '1';
+            else if (place === 3) wrapperEl.style.order = '3';
+
+            const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
+            const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
+
+            wrapperEl.innerHTML = `
+                <div class="podium-player-info text-center mb-2" style="order: 0; width: 100%;">
+                    <div class="podium-name text-truncate fw-bold mb-1" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${player.player_name}</div>
+                    <div class="badge bg-primary fs-6 shadow-sm mb-1">${player.score} pts</div>
+                </div>
+                <div class="podium-place podium-${place} d-flex align-items-center justify-content-center" style="order: 1 !important; margin-bottom: 8px; width: 100%;">
+                    <div class="podium-rank text-white" style="font-size: 3.5rem; opacity: 0.9; text-shadow: 0 4px 10px rgba(0,0,0,0.3); margin: 0;">${place}</div>
+                </div>
+                <div class="text-center w-100" style="order: 2; margin-bottom: -15px;">
+                    <div class="small fw-bold text-warning" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">⏱️ ${timeStr}</div>
+                    <div class="small fw-bold text-success" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">🎯 ${accuracy}%</div>
+                </div>
+            `;
+            podiumContainer.appendChild(wrapperEl);
+        });
+
+        rest.forEach((player, index) => {
+            const rank = index + 4;
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
+            const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
+            listItem.innerHTML = `
+                <span class="fw-bold">#${rank} <span class="ms-2 fw-normal">${player.player_name}</span></span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark">⏱️ ${timeStr}</span>
+                    <span class="badge bg-success">🎯 ${accuracy}%</span>
+                    <span class="badge bg-primary ms-1">${player.score} pts</span>
+                </div>
+            `;
+            listContainer.appendChild(listItem);
+        });
+
+        gameOverModal.show();
+    }
+
+});
+
+function getPlayerNameById(playerId) {
+    const player = playersInRoom.find(p => p.player_id === playerId);
+    return player ? player.name : 'Unknown';
+}

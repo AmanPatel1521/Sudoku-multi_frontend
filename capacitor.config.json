@@ -1,0 +1,6 @@
+{
+  "appId": "com.amanpatel.sudokumulti",
+  "appName": "Sudoku Multiplayer",
+  "webDir": "build",
+  "bundledWebRuntime": false
+}
