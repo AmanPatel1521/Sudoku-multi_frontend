@@ -1556,3 +1556,16 @@ button:disabled, .btn:disabled {
     font-variant-numeric: tabular-nums;
     text-shadow: 0 0 20px rgba(255, 193, 7, 0.4);
 }
+
+/* Hard-Boundary Chat Display Overrides */
+@media (max-width: 991.98px) {
+    #desktop-chat-panel, #desktop-chat-toggle-btn {
+        display: none !important;
+    }
+}
+
+@media (min-width: 992px) {
+    #mobile-chat-panel, #mobile-chat-toggle-btn {
+        display: none !important;
+    }
+}

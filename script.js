@@ -1711,18 +1711,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         topThree.forEach((player, index) => {
             const place = index + 1;
-            const podiumEl = document.createElement('div');
-            podiumEl.className = `podium-place podium-${place}`;
+            const wrapperEl = document.createElement('div');
+            wrapperEl.className = `podium-wrapper`;
+            wrapperEl.style.display = 'flex';
+            wrapperEl.style.flexDirection = 'column';
+            wrapperEl.style.alignItems = 'center';
+            // Mimic the CSS order property so the wrapper aligns properly horizontally
+            if (place === 1) wrapperEl.style.order = '2';
+            else if (place === 2) wrapperEl.style.order = '1';
+            else if (place === 3) wrapperEl.style.order = '3';
+
             const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
             const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
-            podiumEl.innerHTML = `
-                <div class="podium-rank">${place}</div>
-                <div class="podium-name">${player.player_name}</div>
-                <div class="podium-score mb-2">${player.score} pts</div>
-                <div class="small fw-bold text-warning">⏱️ ${timeStr}</div>
-                <div class="small fw-bold text-success">🎯 ${accuracy}%</div>
+
+            wrapperEl.innerHTML = `
+                <div class="podium-player-info text-center mb-2" style="order: 0; width: 100%;">
+                    <div class="podium-name text-truncate fw-bold mb-1" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">${player.player_name}</div>
+                    <div class="badge bg-primary fs-6 shadow-sm mb-1">${player.score} pts</div>
+                </div>
+                <div class="podium-place podium-${place} d-flex align-items-center justify-content-center" style="order: 1 !important; margin-bottom: 8px; width: 100%;">
+                    <div class="podium-rank text-white" style="font-size: 3.5rem; opacity: 0.9; text-shadow: 0 4px 10px rgba(0,0,0,0.3); margin: 0;">${place}</div>
+                </div>
+                <div class="text-center w-100" style="order: 2; margin-bottom: -15px;">
+                    <div class="small fw-bold text-warning" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">⏱️ ${timeStr}</div>
+                    <div class="small fw-bold text-success" style="text-shadow: 0 1px 3px rgba(0,0,0,0.6);">🎯 ${accuracy}%</div>
+                </div>
             `;
-            podiumContainer.appendChild(podiumEl);
+            podiumContainer.appendChild(wrapperEl);
         });
 
         rest.forEach((player, index) => {
