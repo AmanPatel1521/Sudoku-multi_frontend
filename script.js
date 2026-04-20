@@ -76,6 +76,10 @@ const soloEliminationMessages = [
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired.');
+
+    // Initialize App Monetization (Web AdSense vs Android AdMob)
+    initMonetization();
+
     chatPanel = document.getElementById('chat-panel');
     if (chatPanel) {
         chatPanelOriginalParent = chatPanel.parentElement;
@@ -1765,4 +1769,45 @@ document.addEventListener('DOMContentLoaded', () => {
 function getPlayerNameById(playerId) {
     const player = playersInRoom.find(p => p.player_id === playerId);
     return player ? player.name : 'Unknown';
+}
+
+// --- PLATFORM MONETIZATION LOGIC (AdSense vs AdMob) ---
+async function initMonetization() {
+    try {
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            console.log("[Monetization] Native Android Environment Detected. Initializing AdMob.");
+            const { AdMob } = window.Capacitor.Plugins;
+            if (!AdMob) {
+                console.warn("[Monetization] AdMob plugin not injected properly.");
+                return;
+            }
+            // Initialize AdMob Engine
+            await AdMob.initialize({
+                requestTrackingAuthorization: true,
+                testingDevices: [],
+                initializeForTesting: false,
+            });
+
+            // Prepare Banner Options
+            const options = {
+                // Official Google AdMob Test ID for Banners. Replace with real ID for production!
+                adId: "ca-app-pub-3940256099942544/6300978111", 
+                adSize: 'BANNER',
+                position: 'BOTTOM_CENTER',
+                margin: 0,
+                isTesting: true // Enforce testing to prevent invalid click bans during dev!
+            };
+
+            // Request Banner
+            await AdMob.showBanner(options);
+            console.log("[Monetization] AdMob Banner requested successfully.");
+        } else {
+            console.log("[Monetization] Standard Web Environment Detected. AdSense handles Auto-Ads automatically.");
+            // Advanced Notice: In Web mode, no further JS logic is needed because the <script async src="...">
+            // tag natively injected into index.html automatically detects the page layout and parses dynamic ads 
+            // once Google approves the active domain.
+        }
+    } catch (error) {
+        console.error("[Monetization] Failed to initialize ads layer:", error);
+    }
 }

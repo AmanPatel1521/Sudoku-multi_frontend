@@ -19,9 +19,9 @@
   },
   "homepage": "https://github.com/AmanPatel1521/Sudoku-multi_frontend#readme",
   "dependencies": {
+    "@capacitor-community/admob": "^8.0.0",
     "@capacitor/android": "^8.3.1",
     "@capacitor/cli": "^8.3.1",
-    "@capacitor/core": "^8.3.1",
-    "@capacitor-community/admob": "^8.0.0"
+    "@capacitor/core": "^8.3.1"
   }
 }
