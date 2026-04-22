@@ -5,7 +5,7 @@
   "display": "standalone",
   "background_color": "#f0f2f5",
   "theme_color": "#5a67d8",
-  "description": "A web-based multiplayer Sudoku game.",
+  "description": "Play free Multiplayer Sudoku online! Challenge friends in real-time competitive logic puzzles, climb the global leaderboards, or practice in solo mode.",
   "icons": [
     {
       "src": "images/icons/icon.svg",
