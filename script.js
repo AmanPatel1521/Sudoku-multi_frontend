@@ -1508,6 +1508,9 @@ document.addEventListener('DOMContentLoaded', () => {
         roomManagementDiv.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         gameContainer.style.display = 'block';
+        
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.classList.add('d-none');
 
         if (window.innerWidth >= 992) { // Desktop: Move chat back to sidebar
             if (chatPanel && chatPanelOriginalParent) {
@@ -1592,6 +1595,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         roomManagementDiv.style.display = 'block';
+
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.classList.remove('d-none');
+        
         // Hide all chat elements
         if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
         if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
