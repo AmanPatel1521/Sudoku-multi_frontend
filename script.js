@@ -1457,6 +1457,9 @@ document.addEventListener('DOMContentLoaded', () => {
         waitingRoomDiv.style.display = 'flex';
         roomCodeDisplay.textContent = roomId;
         
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.style.display = 'none';
+        
         if (window.innerWidth < 992) { // Mobile
             if(mobileChatToggleBtn) mobileChatToggleBtn.classList.remove('d-none');
             if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
@@ -1510,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.style.display = 'block';
         
         const seoFooter = document.getElementById('seo-footer');
-        if (seoFooter) seoFooter.classList.add('d-none');
+        if (seoFooter) seoFooter.style.display = 'none';
 
         if (window.innerWidth >= 992) { // Desktop: Move chat back to sidebar
             if (chatPanel && chatPanelOriginalParent) {
@@ -1597,7 +1600,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roomManagementDiv.style.display = 'block';
 
         const seoFooter = document.getElementById('seo-footer');
-        if (seoFooter) seoFooter.classList.remove('d-none');
+        if (seoFooter) seoFooter.style.display = 'block';
         
         // Hide all chat elements
         if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
