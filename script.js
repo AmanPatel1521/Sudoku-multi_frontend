@@ -604,8 +604,12 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handlePlaySolo() {
         hideFinishedOverlay();
         const difficulty = difficultySelect.value;
-        const playerName = playerNameInput.value.trim() || "Solo Player";
+        const playerName = playerNameInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        
+        if (!playerName) return alert('Please enter your display name to start the game!');
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         
         setLoading(true, 'Initializing solo mode...');
         disableMenuButtons(true);
@@ -642,11 +646,14 @@ document.addEventListener('DOMContentLoaded', () => {
         resetGameState();
         setLoading(true, 'Initializing solo mode...');
 
+        const playerName = localStorage.getItem('sudokuPlayerName') || playerNameInput.value.trim();
+        const avatar = localStorage.getItem('sudokuPlayerAvatar') || (playerAvatarSelect ? playerAvatarSelect.value : '😎');
+        
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: "Solo Player", difficulty: difficulty, game_mode: 'solo', player_id: playerId }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
