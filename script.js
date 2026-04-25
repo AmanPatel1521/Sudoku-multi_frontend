@@ -133,16 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => `
-                        <li class="list-group-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'bg-primary bg-opacity-25' : ''}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold">${index + 1}.</span>
-                                <span>${item.avatar}</span>
-                                <span>${item.username}</span>
+                        <li class="list-group-item custom-list-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'current-player-highlight fw-bold' : ''}">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fs-4 fw-bold highlight-text" style="width: 30px;">#${index + 1}</span>
+                                <div class="fs-3">${item.avatar || '😎'}</div>
+                                <div>
+                                    <div class="fw-bold" style="color: var(--text-color);">${item.username || 'Anonymous'}</div>
+                                    <small class="text-muted-custom">${item.wins} Wins</small>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <div class="fw-bold">${item.score} <small class="text-muted">pts</small></div>
-                                <small class="text-success">${item.wins} Wins</small>
-                            </div>
+                            <div class="fs-4 fw-bold" style="color: var(--accent-color);">${item.score} <span class="fs-6 fw-normal text-muted-custom">pts</span></div>
                         </li>
                     `).join('');
                 } else {
