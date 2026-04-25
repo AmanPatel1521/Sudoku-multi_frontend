@@ -24,9 +24,6 @@ body {
     background-attachment: fixed;
     color: var(--text-color);
     transition: background-color 0.4s ease, color 0.4s ease;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
 }
 
 body.light-mode {
@@ -104,9 +101,6 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 
 #main-container.container-fluid {
     transition: filter 0.3s ease-in-out;
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
 }
 
 .main-header {
@@ -118,13 +112,6 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 
 .main-header h1 {
     margin: 0;
-}
-
-#room-management {
-    margin-top: auto !important;
-    margin-bottom: auto !important;
-    width: 100%;
-    max-width: 500px; /* Keep it from stretching too wide on 25% zoom */
 }
 
 #main-container.pre-game {
@@ -1090,7 +1077,10 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 @media screen and (min-width: 1024px) {
-    /* No longer need absolute min-height 100vh since body is flex */
+#main-container{
+    min-height:100vh;
+    overflow-y:auto;
+}
 }
 
 @media screen and (max-width: 1024px) {
