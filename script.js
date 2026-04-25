@@ -476,8 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleDailyChallenge() {
         playSound('tap');
-        const playerName = playerNameInput.value.trim() || 'Guest';
+        if (!(await ensurePlayerName())) return;
+        const playerName = playerNameInput.value.trim();
         const avatar = playerAvatarSelect.value;
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         setLoading(true, 'Loading daily challenge...');
         disableMenuButtons(true);
 
@@ -540,7 +543,49 @@ document.addEventListener('DOMContentLoaded', () => {
         desktopChatPanel.classList.remove('open');
     });
 
+    async function ensurePlayerName() {
+        let playerName = playerNameInput.value.trim() || localStorage.getItem('sudokuPlayerName');
+        if (playerName) {
+            playerNameInput.value = playerName;
+            localStorage.setItem('sudokuPlayerName', playerName);
+            return true;
+        }
+
+        return new Promise((resolve) => {
+            const modalElement = document.getElementById('namePromptModal');
+            const namePromptModal = new bootstrap.Modal(modalElement);
+            const modalInput = document.getElementById('modal-player-name');
+            const saveBtn = document.getElementById('save-name-btn');
+            
+            modalInput.value = '';
+            modalInput.classList.remove('is-invalid');
+            
+            const saveHandler = () => {
+                const newName = modalInput.value.trim();
+                if (newName) {
+                    playerNameInput.value = newName;
+                    localStorage.setItem('sudokuPlayerName', newName);
+                    saveBtn.removeEventListener('click', saveHandler);
+                    namePromptModal.hide();
+                    resolve(true);
+                } else {
+                    modalInput.classList.add('is-invalid');
+                }
+            };
+            
+            saveBtn.addEventListener('click', saveHandler);
+            namePromptModal.show();
+            
+            modalElement.addEventListener('hidden.bs.modal', function onHidden() {
+                saveBtn.removeEventListener('click', saveHandler);
+                modalElement.removeEventListener('hidden.bs.modal', onHidden);
+                if (!playerNameInput.value.trim()) resolve(false);
+            });
+        });
+    }
+
     async function handleCreateRoom() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
@@ -572,10 +617,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleJoinRoom() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const inputRoomId = roomIdInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
-        if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
+        if (!inputRoomId) return alert('Please enter your Room ID.');
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
 
@@ -603,11 +649,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handlePlaySolo() {
         hideFinishedOverlay();
+        if (!(await ensurePlayerName())) return;
         const difficulty = difficultySelect.value;
         const playerName = playerNameInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
-        
-        if (!playerName) return alert('Please enter your display name to start the game!');
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
         
@@ -646,6 +691,8 @@ document.addEventListener('DOMContentLoaded', () => {
         resetGameState();
         setLoading(true, 'Initializing solo mode...');
 
+        if (!(await ensurePlayerName())) return;
+        
         const playerName = localStorage.getItem('sudokuPlayerName') || playerNameInput.value.trim();
         const avatar = localStorage.getItem('sudokuPlayerAvatar') || (playerAvatarSelect ? playerAvatarSelect.value : '😎');
         
@@ -668,11 +715,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function handleQuickPlay() {
+    async function handleQuickPlay() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
-        if (!playerName) return alert('Please enter your name.');
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
         

@@ -76,6 +76,10 @@ const soloEliminationMessages = [
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired.');
+
+    // Initialize App Monetization (Web AdSense vs Android AdMob)
+    initMonetization();
+
     chatPanel = document.getElementById('chat-panel');
     if (chatPanel) {
         chatPanelOriginalParent = chatPanel.parentElement;
@@ -129,16 +133,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => `
-                        <li class="list-group-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'bg-primary bg-opacity-25' : ''}">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold">${index + 1}.</span>
-                                <span>${item.avatar}</span>
-                                <span>${item.username}</span>
+                        <li class="list-group-item custom-list-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'current-player-highlight fw-bold' : ''}">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="fs-4 fw-bold highlight-text" style="width: 30px;">#${index + 1}</span>
+                                <div class="fs-3">${item.avatar || '😎'}</div>
+                                <div>
+                                    <div class="fw-bold" style="color: var(--text-color);">${item.username || 'Anonymous'}</div>
+                                    <small class="text-muted-custom">${item.wins} Wins</small>
+                                </div>
                             </div>
-                            <div class="text-end">
-                                <div class="fw-bold">${item.score} <small class="text-muted">pts</small></div>
-                                <small class="text-success">${item.wins} Wins</small>
-                            </div>
+                            <div class="fs-4 fw-bold" style="color: var(--accent-color);">${item.score} <span class="fs-6 fw-normal text-muted-custom">pts</span></div>
                         </li>
                     `).join('');
                 } else {
@@ -472,8 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleDailyChallenge() {
         playSound('tap');
-        const playerName = playerNameInput.value.trim() || 'Guest';
+        if (!(await ensurePlayerName())) return;
+        const playerName = playerNameInput.value.trim();
         const avatar = playerAvatarSelect.value;
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         setLoading(true, 'Loading daily challenge...');
         disableMenuButtons(true);
 
@@ -536,7 +543,49 @@ document.addEventListener('DOMContentLoaded', () => {
         desktopChatPanel.classList.remove('open');
     });
 
+    async function ensurePlayerName() {
+        let playerName = playerNameInput.value.trim() || localStorage.getItem('sudokuPlayerName');
+        if (playerName) {
+            playerNameInput.value = playerName;
+            localStorage.setItem('sudokuPlayerName', playerName);
+            return true;
+        }
+
+        return new Promise((resolve) => {
+            const modalElement = document.getElementById('namePromptModal');
+            const namePromptModal = new bootstrap.Modal(modalElement);
+            const modalInput = document.getElementById('modal-player-name');
+            const saveBtn = document.getElementById('save-name-btn');
+            
+            modalInput.value = '';
+            modalInput.classList.remove('is-invalid');
+            
+            const saveHandler = () => {
+                const newName = modalInput.value.trim();
+                if (newName) {
+                    playerNameInput.value = newName;
+                    localStorage.setItem('sudokuPlayerName', newName);
+                    saveBtn.removeEventListener('click', saveHandler);
+                    namePromptModal.hide();
+                    resolve(true);
+                } else {
+                    modalInput.classList.add('is-invalid');
+                }
+            };
+            
+            saveBtn.addEventListener('click', saveHandler);
+            namePromptModal.show();
+            
+            modalElement.addEventListener('hidden.bs.modal', function onHidden() {
+                saveBtn.removeEventListener('click', saveHandler);
+                modalElement.removeEventListener('hidden.bs.modal', onHidden);
+                if (!playerNameInput.value.trim()) resolve(false);
+            });
+        });
+    }
+
     async function handleCreateRoom() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
@@ -568,10 +617,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleJoinRoom() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const inputRoomId = roomIdInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
-        if (!playerName || !inputRoomId) return alert('Please enter your name and Room ID.');
+        if (!inputRoomId) return alert('Please enter your Room ID.');
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
 
@@ -599,9 +649,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handlePlaySolo() {
         hideFinishedOverlay();
+        if (!(await ensurePlayerName())) return;
         const difficulty = difficultySelect.value;
-        const playerName = playerNameInput.value.trim() || "Solo Player";
+        const playerName = playerNameInput.value.trim();
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
+        localStorage.setItem('sudokuPlayerName', playerName);
+        localStorage.setItem('sudokuPlayerAvatar', avatar);
         
         setLoading(true, 'Initializing solo mode...');
         disableMenuButtons(true);
@@ -638,11 +691,16 @@ document.addEventListener('DOMContentLoaded', () => {
         resetGameState();
         setLoading(true, 'Initializing solo mode...');
 
+        if (!(await ensurePlayerName())) return;
+        
+        const playerName = localStorage.getItem('sudokuPlayerName') || playerNameInput.value.trim();
+        const avatar = localStorage.getItem('sudokuPlayerAvatar') || (playerAvatarSelect ? playerAvatarSelect.value : '😎');
+        
         try {
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: "Solo Player", difficulty: difficulty, game_mode: 'solo', player_id: playerId }),
+                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId }),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
@@ -657,11 +715,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function handleQuickPlay() {
+    async function handleQuickPlay() {
+        if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();
         const difficulty = difficultySelect.value;
         const avatar = playerAvatarSelect ? playerAvatarSelect.value : '😎';
-        if (!playerName) return alert('Please enter your name.');
         localStorage.setItem('sudokuPlayerName', playerName);
         localStorage.setItem('sudokuPlayerAvatar', avatar);
         
@@ -1453,6 +1511,9 @@ document.addEventListener('DOMContentLoaded', () => {
         waitingRoomDiv.style.display = 'flex';
         roomCodeDisplay.textContent = roomId;
         
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.style.display = 'none';
+        
         if (window.innerWidth < 992) { // Mobile
             if(mobileChatToggleBtn) mobileChatToggleBtn.classList.remove('d-none');
             if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
@@ -1504,6 +1565,9 @@ document.addEventListener('DOMContentLoaded', () => {
         roomManagementDiv.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         gameContainer.style.display = 'block';
+        
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.style.display = 'none';
 
         if (window.innerWidth >= 992) { // Desktop: Move chat back to sidebar
             if (chatPanel && chatPanelOriginalParent) {
@@ -1588,6 +1652,10 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         roomManagementDiv.style.display = 'block';
+
+        const seoFooter = document.getElementById('seo-footer');
+        if (seoFooter) seoFooter.style.display = 'block';
+        
         // Hide all chat elements
         if(mobileChatToggleBtn) mobileChatToggleBtn.classList.add('d-none');
         if(desktopChatToggleBtn) desktopChatToggleBtn.classList.add('d-none');
@@ -1765,4 +1833,45 @@ document.addEventListener('DOMContentLoaded', () => {
 function getPlayerNameById(playerId) {
     const player = playersInRoom.find(p => p.player_id === playerId);
     return player ? player.name : 'Unknown';
+}
+
+// --- PLATFORM MONETIZATION LOGIC (AdSense vs AdMob) ---
+async function initMonetization() {
+    try {
+        if (window.Capacitor && window.Capacitor.isNativePlatform()) {
+            console.log("[Monetization] Native Android Environment Detected. Initializing AdMob.");
+            const { AdMob } = window.Capacitor.Plugins;
+            if (!AdMob) {
+                console.warn("[Monetization] AdMob plugin not injected properly.");
+                return;
+            }
+            // Initialize AdMob Engine
+            await AdMob.initialize({
+                requestTrackingAuthorization: true,
+                testingDevices: [],
+                initializeForTesting: false,
+            });
+
+            // Prepare Banner Options
+            const options = {
+                // Official Google AdMob Test ID for Banners. Replace with real ID for production!
+                adId: "ca-app-pub-3940256099942544/6300978111", 
+                adSize: 'BANNER',
+                position: 'BOTTOM_CENTER',
+                margin: 0,
+                isTesting: true // Enforce testing to prevent invalid click bans during dev!
+            };
+
+            // Request Banner
+            await AdMob.showBanner(options);
+            console.log("[Monetization] AdMob Banner requested successfully.");
+        } else {
+            console.log("[Monetization] Standard Web Environment Detected. AdSense handles Auto-Ads automatically.");
+            // Advanced Notice: In Web mode, no further JS logic is needed because the <script async src="...">
+            // tag natively injected into index.html automatically detects the page layout and parses dynamic ads 
+            // once Google approves the active domain.
+        }
+    } catch (error) {
+        console.error("[Monetization] Failed to initialize ads layer:", error);
+    }
 }

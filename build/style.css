@@ -1253,6 +1253,16 @@ body.solo-mode #chat-tab {
     color: white;
 }
 
+.modal-content.card-glass {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+}
+
+body.light-mode .modal-content.card-glass {
+    background: rgba(255, 255, 255, 0.95);
+}
+
 #mobile-player-list .list-group-item {
     background-color: transparent;
     border: none;
