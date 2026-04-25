@@ -132,19 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch('https://sudoku-multi-backend.onrender.com/leaderboard');
                 const data = await response.json();
                 if (data.leaderboard && data.leaderboard.length > 0) {
-                    globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => `
-                        <li class="list-group-item custom-list-item d-flex justify-content-between align-items-center ${item.player_id === playerId ? 'current-player-highlight fw-bold' : ''}">
+                    globalLeaderboardList.innerHTML = data.leaderboard.map((item, index) => {
+                        const isCurrentPlayer = item.player_id === playerId;
+                        const bgColor = isCurrentPlayer ? 'rgba(139, 92, 246, 0.4)' : 'rgba(0, 0, 0, 0.2)';
+                        const borderStyle = isCurrentPlayer ? 'border: 1px solid #8b5cf6;' : 'border-bottom: 1px solid rgba(255,255,255,0.1);';
+                        
+                        return `
+                        <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: ${bgColor} !important; ${borderStyle} border-radius: 8px; margin-bottom: 8px; backdrop-filter: blur(5px);">
                             <div class="d-flex align-items-center gap-3">
-                                <span class="fs-4 fw-bold highlight-text" style="width: 30px;">#${index + 1}</span>
+                                <span class="fs-4 fw-bold" style="width: 30px; color: #8b5cf6; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">#${index + 1}</span>
                                 <div class="fs-3">${item.avatar || '😎'}</div>
                                 <div>
-                                    <div class="fw-bold" style="color: var(--text-color);">${item.username || 'Anonymous'}</div>
-                                    <small class="text-muted-custom">${item.wins} Wins</small>
+                                    <div class="fw-bold" style="color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 1.1rem;">${item.username || 'Anonymous'}</div>
+                                    <small style="color: #94a3b8; font-weight: 600;">${item.wins} Wins</small>
                                 </div>
                             </div>
-                            <div class="fs-4 fw-bold" style="color: var(--accent-color);">${item.score} <span class="fs-6 fw-normal text-muted-custom">pts</span></div>
+                            <div class="fs-4 fw-bold" style="color: #0ea5e9; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${item.score} <span class="fs-6 fw-normal" style="color: #94a3b8;">pts</span></div>
                         </li>
-                    `).join('');
+                        `;
+                    }).join('');
                 } else {
                     globalLeaderboardList.innerHTML = '<li class="list-group-item text-center">No scores yet!</li>';
                 }
@@ -1811,15 +1817,18 @@ document.addEventListener('DOMContentLoaded', () => {
         rest.forEach((player, index) => {
             const rank = index + 4;
             const listItem = document.createElement('li');
-            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center mb-2';
+            listItem.style.backgroundColor = 'rgba(0, 0, 0, 0.2)';
+            listItem.style.border = '1px solid rgba(255,255,255,0.1)';
+            listItem.style.borderRadius = '8px';
             const accuracy = player.correct_cells ? Math.round((player.correct_cells / (player.correct_cells + player.mistakes)) * 100) : 0;
             const timeStr = player.match_duration ? `${Math.floor(player.match_duration / 60)}m ${Math.floor(player.match_duration % 60)}s` : 'N/A';
             listItem.innerHTML = `
-                <span class="fw-bold">#${rank} <span class="ms-2 fw-normal">${player.player_name}</span></span>
+                <span class="fw-bold" style="color: #8b5cf6;">#${rank} <span class="ms-2 fw-bold" style="color: #ffffff; text-shadow: 0 1px 2px rgba(0,0,0,0.8);">${player.player_name}</span></span>
                 <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-warning text-dark">⏱️ ${timeStr}</span>
-                    <span class="badge bg-success">🎯 ${accuracy}%</span>
-                    <span class="badge bg-primary ms-1">${player.score} pts</span>
+                    <span class="badge bg-warning text-dark shadow-sm">⏱️ ${timeStr}</span>
+                    <span class="badge bg-success shadow-sm">🎯 ${accuracy}%</span>
+                    <span class="badge bg-primary ms-1 shadow-sm fs-6">${player.score} pts</span>
                 </div>
             `;
             listContainer.appendChild(listItem);
