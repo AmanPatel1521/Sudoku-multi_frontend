@@ -85,6 +85,8 @@ body.light-mode input.form-control::placeholder, body.light-mode select.form-sel
 body.light-mode input.form-control:focus, body.light-mode select.form-select:focus {
     background-color: #ffffff !important;
     box-shadow: 0 0 0 0.25rem rgba(109, 40, 217, 0.25) !important;
+}
+
 .btn, button {
     cursor: pointer !important;
     touch-action: manipulation !important;
