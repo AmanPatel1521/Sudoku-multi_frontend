@@ -98,10 +98,14 @@ body.light-mode input.form-control:focus, body.light-mode select.form-select:foc
 }
 
 /* Fix for Google AdSense Auto-Ads invisible overlay bug */
+body > ins.adsbygoogle:not([data-ad-slot]), 
+body > div[id^="aswift_"], 
+body > div[id^="google_ads_"],
 .adsbygoogle-noablate {
     pointer-events: none !important;
     z-index: -1 !important;
 }
+ins.adsbygoogle[data-ad-slot] iframe,
 .adsbygoogle-noablate iframe {
     pointer-events: auto !important;
 }
