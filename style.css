@@ -723,6 +723,11 @@ ins.adsbygoogle[data-ad-slot] iframe,
     margin-top: 2rem;
 }
 
+.completion-buttons .btn {
+    flex: 1;
+    white-space: nowrap;
+}
+
 /* Styles for the temporary message display */
 #message-display {
     position: fixed;
