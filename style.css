@@ -129,6 +129,12 @@ ins.adsbygoogle[data-ad-slot] iframe,
     box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4) !important;
 }
 
+/* Force buttons to be on top of any invisible overlays */
+#daily-challenge-btn, #play-solo-btn, #quick-play-btn {
+    position: relative !important;
+    z-index: 2147483647 !important;
+}
+
 #main-container.container-fluid {
     transition: filter 0.3s ease-in-out;
 }
