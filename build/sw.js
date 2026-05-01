@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sudoku-multiplayer-v2';
+const CACHE_NAME = 'sudoku-multiplayer-v3';
 const urlsToCache = [
   'index.html',
   'style.css',
@@ -15,6 +15,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  self.skipWaiting(); // Force new service worker to take over immediately
 });
 
 self.addEventListener('activate', event => {
@@ -30,6 +31,7 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  self.clients.claim(); // Take control of all open pages immediately
 });
 
 self.addEventListener('fetch', event => {
