@@ -1350,15 +1350,15 @@ body.light-mode .modal-content.card-glass {
     height: 100%;
     background-color: var(--background-color);
     box-shadow: -5px 0 15px rgba(0,0,0,0.2);
-    transform: translateX(120vw);
-    transition: transform 0.3s ease-in-out;
+    right: -400px;
+    transition: right 0.3s ease-in-out;
     z-index: 9990; /* Higher than the overlay */
     display: flex;
     flex-direction: column;
 }
 
 #mobile-chat-panel.open {
-    transform: translateX(0);
+    right: 0;
 }
 
 #mobile-chat-header {
