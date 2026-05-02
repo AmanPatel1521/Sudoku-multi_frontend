@@ -23,13 +23,13 @@
         <div class="row">
             <div class="col-lg-10 mx-auto">
                 <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p>Welcome to the most comprehensive guide on how to play <a href="/" class="text-info fw-bold text-decoration-none">Sudoku</a> on the internet. Whether you are staring at your very first 9x9 grid or you are a seasoned player looking to break through a plateau and learn master-level techniques like the X-Wing, this 2,000-word guide has everything you need.</p>
-                    
-                    <p>Sudoku is a beautiful game of pure logic. There is absolutely no math required, no guesswork needed, and every single puzzle has exactly one unique solution. By the end of this guide, you will understand the fundamental rules, the beginner strategies to get you started, and the advanced frameworks used by grandmasters to solve puzzles in record time.</p>
+                    <p>Sudoku is one of the most popular logic-based puzzle games in the world. While the rules are simple, mastering Sudoku requires structured thinking, pattern recognition, and consistent practice. This 2,000-word guide will walk you through everything—from basic rules to advanced strategies—with real examples to help you understand clearly.</p>
 
                     <div class="p-3 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25 my-4 text-center">
                         <p class="mb-0 text-info fw-bold small">✨ Note: This guide is updated regularly with new puzzles and strategies to help you stay sharp!</p>
                     </div>
+
+                    <p>Sudoku is a beautiful game of pure logic. There is absolutely no math required, no guesswork needed, and every single puzzle has exactly one unique solution. By the end of this guide, you will understand the fundamental rules, the beginner strategies to get you started, and the advanced frameworks used by grandmasters to solve puzzles in record time.</p>
 
                     <hr class="border-secondary opacity-25 my-5">
 
@@ -68,21 +68,43 @@
 </div>
 
                     <h3 class="text-white fw-bold mt-4 mb-3">The Three Golden Rules</h3>
-                    <p>Every single strategy in Sudoku revolves around three unbreakable rules. Your goal is to fill every single one of the 81 cells with a number from 1 to 9 such that:</p>
-                    <ol>
-                        <li><strong>The Row Rule:</strong> Every horizontal row (9 cells wide) must contain the numbers 1 through 9 exactly once. No duplicates are allowed in any row.</li>
-                        <li><strong>The Column Rule:</strong> Every vertical column (9 cells tall) must contain the numbers 1 through 9 exactly once. No duplicates are allowed in any column.</li>
-                        <li><strong>The Box Rule:</strong> Every 3x3 box (9 cells total) must contain the numbers 1 through 9 exactly once. No duplicates are allowed within the heavy borders of a box.</li>
-                    </ol>
-                    <p>If you place a number and it violates any of these three rules, the puzzle becomes unsolvable. That is why <strong>guessing is the ultimate sin in Sudoku</strong>. Every move must be deduced through logical elimination.</p>
+                    <p>The objective is to fill the grid with numbers from 1 to 9 while following three simple rules:</p>
+                    <ul class="mb-4">
+                        <li><strong>Each row</strong> must contain numbers 1–9 without repetition</li>
+                        <li><strong>Each column</strong> must contain numbers 1–9 without repetition</li>
+                        <li><strong>Each 3×3 box</strong> must contain numbers 1–9 without repetition</li>
+                    </ul>
+                    <p>That’s it. No math required—just pure logic. If you place a number and it violates any of these three rules, the puzzle becomes unsolvable. Every move must be deduced through logical elimination.</p>
+
+                    <hr class="border-secondary opacity-25 my-5">
+
+                    <h2 class="text-white fw-bold mb-4">Step-by-Step Example (Beginner Level)</h2>
+                    <p>Let’s understand how Sudoku works with a real example.</p>
+                    <div class="p-4 bg-dark bg-opacity-25 rounded-4 mb-4 text-white font-monospace">
+                        1 2 3 _ _ 7 8 9 _
+                    </div>
+                    <p>In this example row, the missing numbers are: <strong>4, 5, 6</strong></p>
+                    <p>Now check each empty cell by looking at the intersecting columns:</p>
+                    <ul>
+                        <li>If Column 4 already has a 4 → you cannot place 4 in that cell.</li>
+                        <li>If Column 5 already has a 5 → you cannot place 5 in that cell.</li>
+                    </ul>
+                    <p>👉 <strong>Result:</strong> By logically checking the columns, you might find that one cell must be 6, leaving only 4 and 5 for the remaining cells. This is called the <strong>elimination method</strong>, and it is the foundation of all Sudoku solving.</p>
 
                     <hr class="border-secondary opacity-25 my-5">
 
                     <h2 class="text-white fw-bold mb-4">Part 2: Beginner Step-by-Step Strategies</h2>
-                    <p>When you start a new puzzle, the board is partially filled with "givens" (the starting numbers). Your first goal is to pick the low-hanging fruit. Here is the exact step-by-step process you should follow when starting a fresh board.</p>
+                    
+                    <h3 class="text-white fw-bold mt-4 mb-3">Step 1: Scan the Grid</h3>
+                    <p>Before placing any number, scan the grid carefully. Look for areas that give you <strong>quick wins</strong>:</p>
+                    <ul class="mb-4">
+                        <li>Rows with many filled numbers</li>
+                        <li>Columns with fewer empty cells</li>
+                        <li>Boxes that are nearly complete</li>
+                    </ul>
 
-                    <h3 class="text-white fw-bold mt-4 mb-3">Step 1: Visual Scanning and Cross-Hatching</h3>
-                    <p>Cross-hatching is the most fundamental technique in Sudoku. It involves taking a single number (let's say, 1) and scanning the entire board to see how the existing 1s interact with the empty boxes.</p>
+                    <h3 class="text-white fw-bold mt-4 mb-3">Step 2: Cross-Hatching (The Power Move)</h3>
+                    <p>Cross-hatching is the most fundamental technique. Choose a specific number (e.g., 7) and scan the board to see how the existing 7s interact with the empty boxes.</p>
                     
                     <p><strong>Example Scenario:</strong></p>
                     <ul>
@@ -130,7 +152,7 @@
 </svg>
 </div>
 
-                    <h3 class="text-white fw-bold mt-4 mb-3">Step 2: Finding "Naked Singles"</h3>
+                    <h3 class="text-white fw-bold mt-4 mb-3">Step 3: Finding "Naked Singles"</h3>
                     <p>Sometimes, a cell is so surrounded by other numbers that it can only possibly be one digit. If you look at a specific empty cell and realize that its row, column, and box collectively contain 1, 2, 3, 4, 5, 6, 8, and 9... then that cell MUST be a 7. This is called a Naked Single. To find these quickly, look for rows, columns, or boxes that are already 80% full.</p>
 
                     <hr class="border-secondary opacity-25 my-5">
@@ -250,6 +272,35 @@
                     <h3 class="text-white fw-bold mt-4 mb-3">Mistake #2: Ghost Pencil Marks</h3>
                     <p><strong>The Scenario:</strong> You successfully place a large number on the board, but you forget to erase its corresponding pencil marks from the same row, column, and box.</p>
                     <p><strong>The Breakdown:</strong> This leads to false pairs and false X-Wings. You will execute a master-level strategy based on a pencil mark that shouldn't even be there, instantly destroying the puzzle. Always clean up your notes!</p>
+
+                    <h2 class="text-white fw-bold mb-4">Step 7: How to Solve Sudoku Faster</h2>
+                    <ul class="mb-4">
+                        <li><strong>Start with easy sections:</strong> Focus on boxes or lines that are 70% complete.</li>
+                        <li><strong>Use elimination quickly:</strong> Don't linger on a cell for more than 5 seconds.</li>
+                        <li><strong>Practice pattern recognition:</strong> Over time, your brain will "see" X-Wings and pairs without trying.</li>
+                        <li><strong>Stay consistent:</strong> A structured approach always beats a random search.</li>
+                    </ul>
+
+                    <hr class="border-secondary opacity-25 my-5">
+
+                    <h2 class="text-white fw-bold mb-4">Why Sudoku is Good for Your Brain</h2>
+                    <p>Regular Sudoku practice is more than just a game; it is a mental workout. Studies show it helps:</p>
+                    <ul class="mb-4">
+                        <li><strong>Improve memory:</strong> You must remember candidates across multiple cells.</li>
+                        <li><strong>Enhance concentration:</strong> It requires deep focus to navigate complex logic.</li>
+                        <li><strong>Boost logical thinking:</strong> It trains the brain to follow deductive pathways.</li>
+                        <li><strong>Reduce stress:</strong> The rhythmic logic of Sudoku provides a meditative flow.</li>
+                    </ul>
+
+                    <hr class="border-secondary opacity-25 my-5">
+
+                    <h2 class="text-white fw-bold mb-4">Practice Routine to Improve</h2>
+                    <ul>
+                        <li>Solve at least 1 puzzle daily.</li>
+                        <li>Try different difficulty levels to challenge your limits.</li>
+                        <li>Review mistakes after each game to understand the "why."</li>
+                        <li>Challenge real players in <a href="/" class="text-info fw-bold text-decoration-none">Multiplayer Sudoku</a> to test your speed.</li>
+                    </ul>
 
                     <hr class="border-secondary opacity-25 my-5">
 
