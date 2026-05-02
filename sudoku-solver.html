@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sudoku Solver Tool – Instantly Solve Any Puzzle - Multiplayer Sudoku</title>
+    <meta name="description" content="Stuck on a difficult Sudoku puzzle? Use our free online Sudoku Solver Tool to find the correct solution instantly and learn advanced strategies.">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=15">
+    
+    <style>
+        #solver-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        .solver-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 1px solid #e2e8f0;
+            background: transparent;
+            color: #0f172a;
+            padding: 0;
+        }
+        .solver-cell:focus {
+            outline: none;
+            background: #e0f2fe;
+        }
+        .solver-cell.solved-cell {
+            color: var(--success-color);
+            background: #f0fdf4;
+        }
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            #solver-board {
+                background: rgba(15, 23, 42, 0.8);
+            }
+            .solver-cell {
+                color: white;
+                border-color: rgba(255,255,255,0.1);
+            }
+            .solver-cell.solved-cell {
+                color: #4ade80;
+                background: rgba(74, 222, 128, 0.1);
+            }
+            .solver-cell:focus {
+                background: rgba(56, 189, 248, 0.2);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="main-container" class="container py-4">
+        <header class="main-header mb-5">
+            <div class="mt-2 mb-4">
+                <a href="/" class="text-decoration-none text-info fw-bold">⬅ Back to Home</a>
+            </div>
+            <h1 class="display-4 fw-bold text-white mb-3">Sudoku Solver Tool</h1>
+            <p class="lead text-white-50">Instantly solve any puzzle.</p>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-lg card-glass p-5 fs-5 lh-lg" style="color: rgba(255,255,255,0.85);">
+                    <p>Stuck on a difficult <a href="/" class="text-info fw-bold text-decoration-none">Sudoku</a> puzzle? Use our <strong>Sudoku Solver Tool</strong> to find the correct solution instantly and understand how the puzzle works.</p>
+
+                    <!-- Solver Tool UI -->
+                    <div class="my-5 p-4 bg-dark bg-opacity-25 rounded-4 shadow-sm text-center">
+                        <div id="solver-board" class="shadow-lg mb-4"></div>
+                        <div class="d-flex justify-content-center gap-3">
+                            <button id="solve-btn" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow">Solve Puzzle</button>
+                            <button id="clear-btn" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold shadow">Clear Grid</button>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-white fw-bold mt-5 mb-3">How to Use the Solver</h2>
+                    <ol>
+                        <li>Enter the known numbers from your puzzle</li>
+                        <li>Leave empty cells blank</li>
+                        <li>Click “Solve”</li>
+                        <li>Get the complete solution instantly</li>
+                    </ol>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">When Should You Use a Solver?</h2>
+                    <p>A Sudoku solver is helpful when:</p>
+                    <ul>
+                        <li>You are completely stuck</li>
+                        <li>You want to verify your solution</li>
+                        <li>You are learning advanced strategies</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">Learn While Solving</h2>
+                    <p>Instead of just copying answers, try to:</p>
+                    <ul>
+                        <li>Compare your approach with the solution</li>
+                        <li>Understand where you made mistakes</li>
+                        <li>Learn new solving patterns</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">Benefits of Using a Solver</h2>
+                    <ul>
+                        <li>Saves time on difficult puzzles</li>
+                        <li>Helps you learn faster</li>
+                        <li>Improves accuracy</li>
+                        <li>Builds confidence</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">Important Tip</h2>
+                    <p>Use the solver as a <strong>learning tool</strong>, not a shortcut. Try solving the puzzle yourself first, then use the solver to check your work.</p>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">Practice with Multiplayer Sudoku</h2>
+                    <p>After using the solver, test your skills in our <a href="/" class="text-info fw-bold text-decoration-none">multiplayer Sudoku game</a> and apply what you’ve learned in real-time competition.</p>
+
+                    <div class="text-center mt-5">
+                        <p class="fs-4 fw-bold">Start solving smarter today!</p>
+                        <a href="/" class="btn btn-info text-white btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg mt-2">Play Now 🚀</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('solver-board');
+            let cells = [];
+
+            // Create 9x9 grid
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = document.createElement('input');
+                    cell.type = 'text';
+                    cell.maxLength = 1;
+                    cell.className = 'solver-cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    // Add grid borders (thick borders for 3x3 boxes)
+                    if (c % 3 === 2 && c !== 8) cell.style.borderRight = '2px solid var(--primary-color)';
+                    if (r % 3 === 2 && r !== 8) cell.style.borderBottom = '2px solid var(--primary-color)';
+
+                    // Only allow numbers 1-9
+                    cell.addEventListener('input', function(e) {
+                        this.classList.remove('solved-cell');
+                        if (!/^[1-9]$/.test(this.value)) {
+                            this.value = '';
+                        }
+                    });
+
+                    // Arrow key navigation
+                    cell.addEventListener('keydown', function(e) {
+                        const row = parseInt(this.dataset.row);
+                        const col = parseInt(this.dataset.col);
+                        let nextRow = row;
+                        let nextCol = col;
+
+                        if (e.key === 'ArrowRight') nextCol++;
+                        else if (e.key === 'ArrowLeft') nextCol--;
+                        else if (e.key === 'ArrowDown') nextRow++;
+                        else if (e.key === 'ArrowUp') nextRow--;
+
+                        if (nextRow >= 0 && nextRow < 9 && nextCol >= 0 && nextCol < 9) {
+                            cells[nextRow * 9 + nextCol].focus();
+                        }
+                    });
+
+                    board.appendChild(cell);
+                    cells.push(cell);
+                }
+            }
+
+            function getGrid() {
+                let grid = [];
+                for (let r = 0; r < 9; r++) {
+                    grid[r] = [];
+                    for (let c = 0; c < 9; c++) {
+                        let val = cells[r * 9 + c].value;
+                        grid[r][c] = val === '' ? 0 : parseInt(val);
+                    }
+                }
+                return grid;
+            }
+
+            function setGrid(grid) {
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        if (cells[r * 9 + c].value === '') {
+                            cells[r * 9 + c].value = grid[r][c];
+                            cells[r * 9 + c].classList.add('solved-cell');
+                        }
+                    }
+                }
+            }
+
+            function isValid(grid, row, col, num) {
+                for (let i = 0; i < 9; i++) {
+                    if (grid[row][i] === num) return false;
+                    if (grid[i][col] === num) return false;
+                }
+                let startRow = Math.floor(row / 3) * 3;
+                let startCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (grid[startRow + i][startCol + j] === num) return false;
+                    }
+                }
+                return true;
+            }
+
+            function solve(grid) {
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        if (grid[row][col] === 0) {
+                            for (let num = 1; num <= 9; num++) {
+                                if (isValid(grid, row, col, num)) {
+                                    grid[row][col] = num;
+                                    if (solve(grid)) return true;
+                                    grid[row][col] = 0;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            document.getElementById('solve-btn').addEventListener('click', () => {
+                let grid = getGrid();
+                
+                // Basic validation for initial grid state
+                let initialValid = true;
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        if (grid[r][c] !== 0) {
+                            let temp = grid[r][c];
+                            grid[r][c] = 0;
+                            if (!isValid(grid, r, c, temp)) {
+                                initialValid = false;
+                                break;
+                            }
+                            grid[r][c] = temp;
+                        }
+                    }
+                }
+
+                if (!initialValid) {
+                    alert('The puzzle you entered is invalid (contains conflicting numbers). Please check your inputs.');
+                    return;
+                }
+
+                if (solve(grid)) {
+                    setGrid(grid);
+                } else {
+                    alert('No solution exists for this Sudoku configuration!');
+                }
+            });
+
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                cells.forEach(cell => {
+                    cell.value = '';
+                    cell.classList.remove('solved-cell');
+                });
+                cells[0].focus();
+            });
+        });
+    </script>
+</body>
+</html>
