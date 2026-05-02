@@ -1624,3 +1624,49 @@ button:disabled, .btn:disabled {
         display: none !important;
     }
 }
+
+/* Mobile Optimization for Info Pages (Blogs, About, Terms, etc.) */
+@media (max-width: 767.98px) {
+    /* Reduce excessive padding inside cards */
+    .card-glass.p-5 {
+        padding: 1.5rem !important; /* from 3rem */
+    }
+    
+    .card-glass.p-4 {
+        padding: 1.25rem !important; /* from 1.5rem */
+    }
+    
+    /* Reduce font size and line height for long text */
+    .card-glass.fs-5 {
+        font-size: 1rem !important; /* fs-6 equivalent */
+        line-height: 1.6 !important;
+    }
+    
+    /* Scale down large headers */
+    .display-4 {
+        font-size: 2.25rem !important;
+    }
+    
+    /* Reduce top/bottom padding on the main container */
+    #main-container.py-5, #main-container.py-4 {
+        padding-top: 1.5rem !important;
+        padding-bottom: 1.5rem !important;
+    }
+
+    /* Add space between paragraphs to make reading easier */
+    .card-glass p {
+        margin-bottom: 1.25rem;
+    }
+
+    /* Adjust header spacing */
+    .main-header.mb-5 {
+        margin-bottom: 2rem !important;
+    }
+    
+    /* Make h2 headers inside content slightly smaller and well-spaced */
+    .card-glass h2 {
+        font-size: 1.5rem !important;
+        margin-top: 2rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
