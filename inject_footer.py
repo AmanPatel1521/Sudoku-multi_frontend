@@ -1,41 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Multiplayer Sudoku</title>
-    <meta name="description" content="Contact the developers of Multiplayer Sudoku for support, business inquiries, or bug reports.">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=16">
-</head>
-<body>
-    <div id="main-container" class="container py-5">
-        <header class="main-header mb-5 text-center">
-            <h1 class="display-5 fw-bold text-white mb-3">Contact Us</h1>
-            <p class="lead text-white-50">We would love to hear from you!</p>
-            <div class="mt-4">
-                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
-            </div>
-        </header>
+import os
 
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p class="mb-4">If you have any questions, bug reports, feature suggestions, or business inquiries regarding <strong>Multiplayer Sudoku</strong>, our development team is standing by.</p>
-
-                    <h2 class="text-white fw-bold mt-4 mb-3">Submit a Request</h2>
-                    <p class="mb-5">To protect against spam and ensure your message reaches the right department immediately, we process all inquiries through our official Google form. Please click the button below to submit your secure message.</p>
-
-                    <div class="mb-4">
-                        <a href="https://forms.gle/1DfX8s37ebkoVY6s8" target="_blank" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Open Secure Contact Form ✉️</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+standard_footer = """
     <footer class="mt-5 pb-5">
         <div class="container text-center">
             <div class="mb-4 d-flex flex-wrap justify-content-center gap-2 gap-md-3">
@@ -64,6 +29,27 @@
             </div>
         </div>
     </footer>
+"""
 
-</body>
-</html>
+for filename in os.listdir('.'):
+    if filename.endswith('.html') and filename != 'daily-sudoku-challenge.html':
+        with open(filename, 'r') as f:
+            content = f.read()
+        
+        # Check if footer already exists (even partially)
+        if '<footer' in content:
+            # We already updated index.html, let's make sure it's correct
+            if '/daily-sudoku-challenge.html' not in content:
+                 # Logic to replace old footer with new one
+                 import re
+                 new_content = re.sub(r'<footer.*?</footer>', standard_footer, content, flags=re.DOTALL)
+                 with open(filename, 'w') as f:
+                     f.write(new_content)
+                 print(f"Updated existing footer in {filename}")
+        else:
+            # Inject before </body>
+            new_content = content.replace('</body>', standard_footer + '\n</body>')
+            with open(filename, 'w') as f:
+                f.write(new_content)
+            print(f"Injected new footer in {filename}")
+

@@ -95,6 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const savedAvatar = localStorage.getItem('sudokuPlayerAvatar');
     if (savedName) playerNameInput.value = savedName;
     if (savedAvatar) playerAvatarSelect.value = savedAvatar;
+
+    // Check for daily challenge mode in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('mode') === 'daily') {
+        // Short delay to ensure everything is loaded
+        setTimeout(() => {
+            handleDailyChallenge();
+        }, 500);
+    }
     
     const difficultySelect = document.getElementById('difficulty-select');
     const createRoomBtn = document.getElementById('create-room-btn');
