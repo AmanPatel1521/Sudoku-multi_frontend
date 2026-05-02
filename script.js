@@ -99,6 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check for daily challenge mode in URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'daily') {
+        // Clear the query parameter so it doesn't re-trigger on refresh
+        const newUrl = window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+
         // Short delay to ensure everything is loaded
         setTimeout(() => {
             handleDailyChallenge();
