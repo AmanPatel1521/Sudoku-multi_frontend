@@ -32,9 +32,36 @@
                     <h2 class="text-white fw-bold mb-4">Part 1: The Absolute Basics & Rules</h2>
                     <p>Before diving into strategy, we must understand the battlefield. The Sudoku board is a 9x9 grid, which means there are 81 individual cells in total. This massive grid is further divided into nine smaller 3x3 grids, commonly referred to as "boxes", "blocks", or "regions".</p>
                     
-                    <div class="p-4 bg-dark bg-opacity-25 rounded-4 border border-secondary border-opacity-25 my-4 text-center">
-                        <p class="text-muted fst-italic mb-0">[Image Placeholder: A blank Sudoku grid highlighting Rows, Columns, and 3x3 Boxes]</p>
-                    </div>
+                    <div class="my-4 text-center">
+<svg viewBox="0 0 360 360" style="width: 100%; max-width: 360px; height: auto; border-radius: 8px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1);" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="80" width="360" height="40" fill="#3b82f6" opacity="0.3"/>
+  <rect x="160" y="0" width="40" height="360" fill="#ef4444" opacity="0.3"/>
+  <rect x="240" y="240" width="120" height="120" fill="#10b981" opacity="0.3"/>
+  <line x1="0" y1="0" x2="0" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="0" x2="360" y2="0" stroke="#1e293b" stroke-width="3"/>
+  <line x1="40" y1="0" x2="40" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="40" x2="360" y2="40" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="80" y1="0" x2="80" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="80" x2="360" y2="80" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="120" y1="0" x2="120" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="120" x2="360" y2="120" stroke="#1e293b" stroke-width="3"/>
+  <line x1="160" y1="0" x2="160" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="160" x2="360" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="200" x2="360" y2="200" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="240" y1="0" x2="240" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="240" x2="360" y2="240" stroke="#1e293b" stroke-width="3"/>
+  <line x1="280" y1="0" x2="280" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="280" x2="360" y2="280" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="320" y1="0" x2="320" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="320" x2="360" y2="320" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="360" y1="0" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="360" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <text x="200.0" y="108" font-family="Outfit, sans-serif" font-size="18" font-weight="bold" fill="#1e40af" text-anchor="middle">Row</text>
+  <text x="180" y="208.0" font-family="Outfit, sans-serif" font-size="18" font-weight="bold" fill="#991b1b" text-anchor="middle">Col</text>
+  <text x="320.0" y="328.0" font-family="Outfit, sans-serif" font-size="18" font-weight="bold" fill="#065f46" text-anchor="middle">Box</text>
+</svg>
+</div>
 
                     <h3 class="text-white fw-bold mt-4 mb-3">The Three Golden Rules</h3>
                     <p>Every single strategy in Sudoku revolves around three unbreakable rules. Your goal is to fill every single one of the 81 cells with a number from 1 to 9 such that:</p>
@@ -61,9 +88,43 @@
                         <li>By elimination, the 5 must go in the only remaining empty cell in the bottom row of that box.</li>
                     </ul>
 
-                    <div class="p-4 bg-dark bg-opacity-25 rounded-4 border border-secondary border-opacity-25 my-4 text-center">
-                        <p class="text-muted fst-italic mb-0">[Image Placeholder: Visual diagram showing red lines projecting from existing 5s, highlighting a single safe cell for the new 5]</p>
-                    </div>
+                    <div class="my-4 text-center">
+<svg viewBox="0 0 360 360" style="width: 100%; max-width: 360px; height: auto; border-radius: 8px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1);" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="120" height="120" fill="#fef08a" opacity="0.3"/>
+  <rect x="80" y="80" width="40" height="40" fill="#4ade80" opacity="0.3"/>
+  <line x1="0" y1="0" x2="0" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="0" x2="360" y2="0" stroke="#1e293b" stroke-width="3"/>
+  <line x1="40" y1="0" x2="40" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="40" x2="360" y2="40" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="80" y1="0" x2="80" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="80" x2="360" y2="80" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="120" y1="0" x2="120" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="120" x2="360" y2="120" stroke="#1e293b" stroke-width="3"/>
+  <line x1="160" y1="0" x2="160" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="160" x2="360" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="200" x2="360" y2="200" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="240" y1="0" x2="240" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="240" x2="360" y2="240" stroke="#1e293b" stroke-width="3"/>
+  <line x1="280" y1="0" x2="280" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="280" x2="360" y2="280" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="320" y1="0" x2="320" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="320" x2="360" y2="320" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="360" y1="0" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="360" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <text x="340" y="28" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#0f172a" text-anchor="middle">5</text>
+  <text x="220" y="68" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#0f172a" text-anchor="middle">5</text>
+  <line x1="340" y1="20" x2="20" y2="20" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5"/>
+  <line x1="220" y1="60" x2="20" y2="60" stroke="#ef4444" stroke-width="3" stroke-dasharray="5,5"/>
+  <text x="100" y="108" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#166534" text-anchor="middle">5</text>
+  <text x="20" y="28" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="60" y="28" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="100" y="28" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="20" y="68" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="60" y="68" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="100" y="68" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+</svg>
+</div>
 
                     <h3 class="text-white fw-bold mt-4 mb-3">Step 2: Finding "Naked Singles"</h3>
                     <p>Sometimes, a cell is so surrounded by other numbers that it can only possibly be one digit. If you look at a specific empty cell and realize that its row, column, and box collectively contain 1, 2, 3, 4, 5, 6, 8, and 9... then that cell MUST be a 7. This is called a Naked Single. To find these quickly, look for rows, columns, or boxes that are already 80% full.</p>
@@ -78,9 +139,38 @@
                     <h3 class="text-white fw-bold mt-4 mb-3">Naked Pairs</h3>
                     <p>If you have two cells in the same row, column, or box that both contain EXACTLY the same two pencil marks (e.g., [3,7] and [3,7]), you have found a Naked Pair. Because those two cells claim the 3 and the 7, no other cell in that row, column, or box can possibly be a 3 or a 7. You can safely erase 3s and 7s from all other pencil marks in that region, which often reveals a new Naked Single!</p>
 
-                    <div class="p-4 bg-dark bg-opacity-25 rounded-4 border border-secondary border-opacity-25 my-4 text-center">
-                        <p class="text-muted fst-italic mb-0">[Image Placeholder: Screenshot showing a Naked Pair of 3 and 7, with arrows showing the elimination of 3s and 7s from adjacent cells]</p>
-                    </div>
+                    <div class="my-4 text-center">
+<svg viewBox="0 0 360 360" style="width: 100%; max-width: 360px; height: auto; border-radius: 8px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1);" xmlns="http://www.w3.org/2000/svg">
+  <rect x="40" y="40" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <rect x="40" y="160" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <line x1="0" y1="0" x2="0" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="0" x2="360" y2="0" stroke="#1e293b" stroke-width="3"/>
+  <line x1="40" y1="0" x2="40" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="40" x2="360" y2="40" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="80" y1="0" x2="80" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="80" x2="360" y2="80" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="120" y1="0" x2="120" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="120" x2="360" y2="120" stroke="#1e293b" stroke-width="3"/>
+  <line x1="160" y1="0" x2="160" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="160" x2="360" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="200" x2="360" y2="200" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="240" y1="0" x2="240" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="240" x2="360" y2="240" stroke="#1e293b" stroke-width="3"/>
+  <line x1="280" y1="0" x2="280" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="280" x2="360" y2="280" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="320" y1="0" x2="320" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="320" x2="360" y2="320" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="360" y1="0" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="360" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <text x="60" y="268" font-family="Outfit, sans-serif" font-size="24" font-weight="normal" fill="#94a3b8" text-anchor="middle">3,8</text>
+  <text x="60" y="348" font-family="Outfit, sans-serif" font-size="24" font-weight="normal" fill="#94a3b8" text-anchor="middle">7,9</text>
+  <text x="60" y="68" font-family="Outfit, sans-serif" font-size="14" font-weight="bold" fill="#2563eb" text-anchor="middle">3,7</text>
+  <text x="60" y="188" font-family="Outfit, sans-serif" font-size="14" font-weight="bold" fill="#2563eb" text-anchor="middle">3,7</text>
+  <text x="60" y="268" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="60" y="348" font-family="Outfit, sans-serif" font-size="20" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+</svg>
+</div>
 
                     <h3 class="text-white fw-bold mt-4 mb-3">Hidden Pairs</h3>
                     <p>Hidden pairs are the sneaky cousins of Naked Pairs. Sometimes, a row has many pencil marks, but the numbers 4 and 9 ONLY appear as possibilities in two specific cells. Even if those cells also have pencil marks for 1, 2, and 5, the fact that 4 and 9 must go in those two cells means you can eliminate all other pencil marks from them.</p>
@@ -100,9 +190,43 @@
                         <li>Conclusion: Columns 3 and 8 are absolutely guaranteed to get their 4s from Rows 2 and 6. Therefore, you can eliminate the pencil mark '4' from EVERY OTHER cell in Column 3 and Column 8!</li>
                     </ul>
 
-                    <div class="p-4 bg-dark bg-opacity-25 rounded-4 border border-secondary border-opacity-25 my-4 text-center">
-                        <p class="text-muted fst-italic mb-0">[Image Placeholder: A grid highlighting an X-Wing pattern in blue, with red X's showing the eliminated candidates in the columns]</p>
-                    </div>
+                    <div class="my-4 text-center">
+<svg viewBox="0 0 360 360" style="width: 100%; max-width: 360px; height: auto; border-radius: 8px; background: rgba(255,255,255,0.95); box-shadow: 0 4px 6px rgba(0,0,0,0.1);" xmlns="http://www.w3.org/2000/svg">
+  <rect x="80" y="40" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <rect x="280" y="40" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <rect x="80" y="200" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <rect x="280" y="200" width="40" height="40" fill="#bfdbfe" opacity="0.3"/>
+  <line x1="0" y1="0" x2="0" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="0" x2="360" y2="0" stroke="#1e293b" stroke-width="3"/>
+  <line x1="40" y1="0" x2="40" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="40" x2="360" y2="40" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="80" y1="0" x2="80" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="80" x2="360" y2="80" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="120" y1="0" x2="120" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="120" x2="360" y2="120" stroke="#1e293b" stroke-width="3"/>
+  <line x1="160" y1="0" x2="160" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="160" x2="360" y2="160" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="200" y1="0" x2="200" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="200" x2="360" y2="200" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="240" y1="0" x2="240" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="240" x2="360" y2="240" stroke="#1e293b" stroke-width="3"/>
+  <line x1="280" y1="0" x2="280" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="280" x2="360" y2="280" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="320" y1="0" x2="320" y2="360" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="0" y1="320" x2="360" y2="320" stroke="#94a3b8" stroke-width="1"/>
+  <line x1="360" y1="0" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="0" y1="360" x2="360" y2="360" stroke="#1e293b" stroke-width="3"/>
+  <line x1="100" y1="60" x2="300" y2="60" stroke="#3b82f6" stroke-width="3" />
+  <line x1="100" y1="220" x2="300" y2="220" stroke="#3b82f6" stroke-width="3" />
+  <text x="100" y="68" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#2563eb" text-anchor="middle">4</text>
+  <text x="300" y="68" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#2563eb" text-anchor="middle">4</text>
+  <text x="100" y="228" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#2563eb" text-anchor="middle">4</text>
+  <text x="300" y="228" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#2563eb" text-anchor="middle">4</text>
+  <text x="100" y="148" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="100" y="308" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+  <text x="300" y="348" font-family="Outfit, sans-serif" font-size="24" font-weight="bold" fill="#ef4444" text-anchor="middle">X</text>
+</svg>
+</div>
 
                     <h3 class="text-white fw-bold mt-4 mb-3">The Swordfish</h3>
                     <p>The Swordfish is an extension of the X-Wing, but it spans across three rows and three columns instead of two. If a candidate is restricted to the same three columns across three different rows, you can eliminate that candidate from the rest of those columns. It is incredibly hard to spot visually without meticulous pencil marks.</p>
