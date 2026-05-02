@@ -1,7 +1,7 @@
-const CACHE_NAME = 'sudoku-multiplayer-v4';
+const CACHE_NAME = 'sudoku-multiplayer-v5';
 const urlsToCache = [
   'index.html',
-  'style.css?v=15',
+  'style.css?v=16',
   'script.js',
   'manifest.json',
   'images/icons/icon.svg'
