@@ -1,0 +1,16 @@
+config:
+  target: "https://multiplayersudoku.in"
+  phases:
+    - duration: 60
+      arrivalCount: 5
+      name: "initial_smoke_test"
+  engines:
+    playwright:
+      launchOptions:
+        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+  processor: "./playwright-processor.js"
+
+scenarios:
+  - name: "User Journey: Lobby to Active Solo Match"
+    engine: "playwright"
+    testFunction: "playSudokuTest"
