@@ -1,9 +1,9 @@
 config:
   target: "https://multiplayersudoku.in"
   phases:
-    - duration: 60
-      arrivalCount: 50
-      name: "sustained_load_test"
+    - duration: 30
+      arrivalCount: 500
+      name: "stress_test_500_users"
   engines:
     playwright:
       launchOptions:
