@@ -37,7 +37,15 @@ footer {
     flex-shrink: 0;
     margin-top: auto !important;
     margin-bottom: 0 !important;
-    padding-bottom: 1.5rem !important; /* Standardized tight padding */
+    padding-bottom: 1rem !important; /* Extremely tight footer */
+}
+
+/* Hard reset for bottom spacing */
+#main-container, 
+#game-container, 
+#room-management {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 body {
@@ -47,7 +55,17 @@ body {
     background-attachment: fixed;
     color: var(--text-color);
     transition: background-color 0.4s ease, color 0.4s ease;
-    overflow-x: hidden; /* Prevent horizontal scroll bleed from mobile chat */
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Hide any empty auto-generated AdSense containers at the bottom */
+ins.adsbygoogle:empty {
+    display: none !important;
 }
 
 body.light-mode {
