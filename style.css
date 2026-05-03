@@ -18,6 +18,26 @@
 }
 html, body {
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ensure main content pushes footer to the bottom */
+#main-container, 
+#game-container, 
+#room-management,
+main {
+    flex: 1 0 auto;
+}
+
+footer {
+    flex-shrink: 0;
+    margin-top: auto !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 1.5rem !important; /* Standardized tight padding */
 }
 
 body {
