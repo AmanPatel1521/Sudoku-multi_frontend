@@ -2,8 +2,12 @@ config:
   target: "https://multiplayersudoku.in"
   phases:
     - duration: 60
-      arrivalCount: 5
+      arrivalCount: 50
+<<<<<<< HEAD
+      name: "sustained_load_test"
+=======
       name: "initial_smoke_test"
+>>>>>>> 82cab52377aa607d2bc701874c6677856c4cae3d
   engines:
     playwright:
       launchOptions:
