@@ -80,6 +80,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
 
+    // Pre-warm the backend (Render free tier cold start mitigation)
+    fetch("https://sudoku-multi-backend.onrender.com/health").catch(() => {});
+
     chatPanel = document.getElementById('chat-panel');
     if (chatPanel) {
         chatPanelOriginalParent = chatPanel.parentElement;
