@@ -99,6 +99,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedName) playerNameInput.value = savedName;
     if (savedAvatar) playerAvatarSelect.value = savedAvatar;
 
+    // Persist changes immediately when the user types or selects
+    playerNameInput.addEventListener('input', () => {
+        localStorage.setItem('sudokuPlayerName', playerNameInput.value);
+    });
+    playerAvatarSelect.addEventListener('change', () => {
+        localStorage.setItem('sudokuPlayerAvatar', playerAvatarSelect.value);
+    });
+
     // Check for daily challenge mode in URL
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('mode') === 'daily') {
