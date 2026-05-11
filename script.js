@@ -958,6 +958,14 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('eliminated', (data) => {
             playerState = 'eliminated';
             updateUI();
+            
+            if (isDailyGame) {
+                const today = new Date().toISOString().split('T')[0];
+                sudokuProgression.lastDailyCompleted = today;
+                saveProgression();
+                checkDailyProgression();
+            }
+            
             showEliminationOverlay(data.message);
         });
 
