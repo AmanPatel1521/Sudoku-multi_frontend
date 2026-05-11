@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=16">
+<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>
 </head>
 <body>
     <div id="main-container" class="container py-5">
@@ -36,22 +37,30 @@
         </div>
     </div>
 
-    <footer class="mt-5 pb-5">
+        <footer id="seo-footer" class="pt-4 pb-2 footer-container">
         <div class="container text-center">
-            <div class="mb-4 d-flex flex-wrap justify-content-center gap-2 gap-md-3">
-                <a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Blogs</a>
+            <div class="row mb-3 text-center">
+                <div class="col-md-8 offset-md-2">
+                    <h5 class="text-white">About Multiplayer Sudoku</h5>
+                    <p class="small text-white-50">Multiplayer Sudoku is a completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally. Fill the 9x9 grid so that each column, row, and 3x3 box contains all digits from 1 to 9. Play solo to practice, or join a room to challenge friends.</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
+                <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Home</a>
+                <span class="text-white-50">|</span>
+                <a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Blog</a>
+                <span class="text-white-50">|</span>
+                <a href="/sudoku-difficulty-levels.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Difficulty Levels</a>
+                <span class="text-white-50">|</span>
+                <a href="/common-sudoku-mistakes.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Common Mistakes</a>
+                <span class="text-white-50">|</span>
+                <a href="/multiplayer-sudoku-strategy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Strategy Guide</a>
+                <span class="text-white-50">|</span>
+                <a href="/sudoku-solver.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Sudoku Solver</a>
                 <span class="text-white-50">|</span>
                 <a href="/about.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">About Us</a>
                 <span class="text-white-50">|</span>
                 <a href="/daily-sudoku-challenge.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Daily Challenge</a>
-                <span class="text-white-50">|</span>
-                <a href="/difficulty-levels.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Difficulty Levels</a>
-                <span class="text-white-50">|</span>
-                <a href="/common-mistakes.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Common Mistakes</a>
-                <span class="text-white-50">|</span>
-                <a href="/strategy-guide.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Strategy Guide</a>
-                <span class="text-white-50">|</span>
-                <a href="/sudoku-solver.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Sudoku Solver</a>
                 <span class="text-white-50">|</span>
                 <a href="/privacy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Privacy Policy</a>
                 <span class="text-white-50">|</span>
@@ -59,7 +68,7 @@
                 <span class="text-white-50">|</span>
                 <a href="/contact.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Contact Us</a>
             </div>
-            <div class="small text-white-50">
+            <div class="small text-white-50 mt-2">
                 &copy; 2026 Multiplayer Sudoku. All rights reserved.
             </div>
         </div>

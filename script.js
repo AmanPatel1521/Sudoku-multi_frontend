@@ -506,6 +506,16 @@ document.addEventListener('DOMContentLoaded', () => {
     initShop();
 
     async function handleDailyChallenge() {
+        const today = new Date().toISOString().split('T')[0];
+        if (sudokuProgression.lastDailyCompleted === today) {
+            alert("You have already completed or failed the daily challenge today. Come back tomorrow!");
+            // Redirect to home if they came directly via URL
+            if (window.location.search.includes('mode=daily')) {
+                window.location.href = '/';
+            }
+            return;
+        }
+
         playSound('tap');
         if (!(await ensurePlayerName())) return;
         const playerName = playerNameInput.value.trim();

@@ -1,43 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact Us - Multiplayer Sudoku</title>
-    <meta name="description" content="Contact the developers of Multiplayer Sudoku for support, business inquiries, or bug reports.">
-    
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=16">
-<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>
-</head>
-<body>
-    <div id="main-container" class="container py-5">
-        <header class="main-header mb-5 text-center">
-            <h1 class="display-5 fw-bold text-white mb-3">Contact Us</h1>
-            <p class="lead text-white-50">We would love to hear from you!</p>
-            <div class="mt-4">
-                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
-            </div>
-        </header>
+import os
+import re
 
-        <div class="row">
-            <div class="col-lg-8 mx-auto text-center">
-                <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p class="mb-4">If you have any questions, bug reports, feature suggestions, or business inquiries regarding <strong>Multiplayer Sudoku</strong>, our development team is standing by.</p>
-
-                    <h2 class="text-white fw-bold mt-4 mb-3">Submit a Request</h2>
-                    <p class="mb-5">To protect against spam and ensure your message reaches the right department immediately, we process all inquiries through our official Google form. Please click the button below to submit your secure message.</p>
-
-                    <div class="mb-4">
-                        <a href="https://forms.gle/1DfX8s37ebkoVY6s8" target="_blank" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Open Secure Contact Form ✉️</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-        <footer id="seo-footer" class="pt-4 pb-2 footer-container">
+standard_footer = """    <footer id="seo-footer" class="pt-4 pb-2 footer-container">
         <div class="container text-center">
             <div class="row mb-3 text-center">
                 <div class="col-md-8 offset-md-2">
@@ -72,7 +36,29 @@
                 &copy; 2026 Multiplayer Sudoku. All rights reserved.
             </div>
         </div>
-    </footer>
+    </footer>"""
 
-</body>
-</html>
+theme_script = """<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>"""
+
+for root, dirs, files in os.walk('.'):
+    # skip node_modules and build if they exist, but actually it's fine just .
+    if 'node_modules' in root: continue
+    for filename in files:
+        if filename.endswith('.html'):
+            filepath = os.path.join(root, filename)
+            with open(filepath, 'r', encoding='utf-8') as f:
+                content = f.read()
+            
+            # Replace footer
+            # This regex finds <footer ... > ... </footer>
+            new_content = re.sub(r'<footer[^>]*>.*?</footer>', standard_footer, content, flags=re.DOTALL)
+            
+            # Inject theme script if not present
+            if "sudoku-theme" not in new_content:
+                # Add before </head>
+                new_content = new_content.replace('</head>', f'{theme_script}\n</head>')
+            
+            if new_content != content:
+                with open(filepath, 'w', encoding='utf-8') as f:
+                    f.write(new_content)
+                print(f"Updated {filepath}")

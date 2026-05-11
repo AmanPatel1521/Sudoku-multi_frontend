@@ -57,6 +57,7 @@
     <meta name="theme-color" content="#5a67d8">
     <!-- Google AdSense Auto-Ads (TEMPORARILY COMMENTED OUT FOR DEBUGGING) -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821792173458370" crossorigin="anonymous"></script> -->
+<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>
 </head>
 <body>
     <div id="main-container" class="container-fluid pt-3 pb-0">
@@ -693,18 +694,16 @@
     </div>
 
     <!-- SEO & Legal Footer (Critical for AdSense Approval) -->
-    <footer id="seo-footer" class="pt-4 pb-2" style="background-color: rgba(26, 37, 64, 0.5); border-top: 1px solid rgba(255,255,255,0.1);">
+        <footer id="seo-footer" class="pt-4 pb-2 footer-container">
         <div class="container text-center">
-            <div class="row text-white-50 mb-3 text-center">
+            <div class="row mb-3 text-center">
                 <div class="col-md-8 offset-md-2">
                     <h5 class="text-white">About Multiplayer Sudoku</h5>
-                    <p class="small">Multiplayer Sudoku is a completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally. Fill the 9x9 grid so that each column, row, and 3x3 box contains all digits from 1 to 9. Play solo to practice, or join a room to challenge friends.</p>
+                    <p class="small text-white-50">Multiplayer Sudoku is a completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally. Fill the 9x9 grid so that each column, row, and 3x3 box contains all digits from 1 to 9. Play solo to practice, or join a room to challenge friends.</p>
                 </div>
             </div>
             <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
                 <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Home</a>
-                <span class="text-white-50">|</span>
-                <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Play Game</a>
                 <span class="text-white-50">|</span>
                 <a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Blog</a>
                 <span class="text-white-50">|</span>
@@ -726,7 +725,7 @@
                 <span class="text-white-50">|</span>
                 <a href="/contact.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Contact Us</a>
             </div>
-            <div class="small text-white-50">
+            <div class="small text-white-50 mt-2">
                 &copy; 2026 Multiplayer Sudoku. All rights reserved.
             </div>
         </div>

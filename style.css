@@ -1716,3 +1716,22 @@ button:disabled, .btn:disabled {
         margin-bottom: 1rem !important;
     }
 }
+
+/* Footer Styles */
+#seo-footer.footer-container {
+    background-color: rgba(26, 37, 64, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.light-mode #seo-footer.footer-container {
+    background-color: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+body.light-mode #seo-footer h5,
+body.light-mode #seo-footer p,
+body.light-mode #seo-footer a,
+body.light-mode #seo-footer span,
+body.light-mode #seo-footer div {
+    color: #333 !important;
+}
