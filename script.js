@@ -1764,7 +1764,9 @@ document.addEventListener('DOMContentLoaded', () => {
             gameOverMessage.textContent = message;
             messageIcon.innerHTML = '&#10003;';
             if (spectateBtn) spectateBtn.style.display = 'none';
-            if (playAgainSoloBtn) playAgainSoloBtn.style.display = 'block';
+            if (playAgainSoloBtn) {
+                playAgainSoloBtn.style.display = isDailyGame ? 'none' : 'block';
+            }
             if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'block';
         } else {
             const message = multiplayerCompletionMessages[Math.floor(Math.random() * multiplayerCompletionMessages.length)];
@@ -1787,7 +1789,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageArray = isSolo ? soloEliminationMessages : eliminationMessages;
         const randomEliminationMessage = messageArray[Math.floor(Math.random() * messageArray.length)];
         gameOverMessage.textContent = randomEliminationMessage;
-        completionButtons.style.display = 'none';
+        
+        if (isSolo) {
+            completionButtons.style.display = 'flex';
+            if (spectateBtn) spectateBtn.style.display = 'none';
+            if (playAgainSoloBtn) {
+                playAgainSoloBtn.style.display = isDailyGame ? 'none' : 'block';
+            }
+            if (backToLobbyBtnSolo) backToLobbyBtnSolo.style.display = 'block';
+        } else {
+            completionButtons.style.display = 'none';
+        }
+        
         if(mobileInfoTabs) mobileInfoTabs.style.display = 'none';
         finishedOverlay.classList.add('show');
     }
