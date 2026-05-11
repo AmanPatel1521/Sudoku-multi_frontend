@@ -57,7 +57,13 @@
     <meta name="theme-color" content="#5a67d8">
     <!-- Google AdSense Auto-Ads (TEMPORARILY COMMENTED OUT FOR DEBUGGING) -->
     <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821792173458370" crossorigin="anonymous"></script> -->
-<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
 </head>
 <body>
     <div id="main-container" class="container-fluid pt-3 pb-0">

@@ -1735,3 +1735,40 @@ body.light-mode #seo-footer span,
 body.light-mode #seo-footer div {
     color: #333 !important;
 }
+
+/* Force light mode text colors on elements with hardcoded inline styles */
+body.light-mode [style*="color: rgba(255,255,255"],
+body.light-mode [style*="color: rgb(255, 255, 255"],
+body.light-mode [style*="color: white"] {
+    color: var(--text-color) !important;
+}
+
+body.light-mode hr.border-secondary {
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    opacity: 1 !important;
+}
+
+body.light-mode .btn-outline-light {
+    color: #0f172a !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+}
+body.light-mode .btn-outline-light:hover {
+    background-color: #0f172a !important;
+    color: #fff !important;
+}
+
+body.light-mode .card-glass {
+    background: rgba(255, 255, 255, 0.85) !important;
+    color: #0f172a !important;
+}
+
+body.light-mode .card-glass * {
+    color: inherit;
+}
+
+body.light-mode .text-white {
+    color: #0f172a !important;
+}
+body.light-mode .text-white-50 {
+    color: #475569 !important;
+}

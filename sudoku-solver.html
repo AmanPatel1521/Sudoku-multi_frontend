@@ -60,7 +60,13 @@
             }
         }
     </style>
-<script>if(localStorage.getItem('sudoku-theme')==='light')document.body.classList.add('light-mode');</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
 </head>
 <body>
     <div id="main-container" class="container py-4">
