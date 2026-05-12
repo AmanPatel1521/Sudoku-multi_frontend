@@ -1351,7 +1351,8 @@ body.solo-mode #chat-tab {
 }
 
 body.light-mode .modal-content.card-glass {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: #0f172a !important;
 }
 
 #mobile-player-list .list-group-item {
