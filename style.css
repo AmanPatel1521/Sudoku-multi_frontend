@@ -1758,7 +1758,7 @@ body.light-mode .btn-outline-light:hover {
 }
 
 body.light-mode .card-glass {
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
     color: #0f172a !important;
 }
 
@@ -1778,4 +1778,16 @@ body.light-mode .text-white-50 {
 }
 body.light-mode .text-warning {
     color: #d97706 !important;
+}
+body.light-mode .border-warning {
+    border-color: #d97706 !important;
+}
+body.light-mode .modal-title {
+    background: linear-gradient(135deg, #0f172a 0%, #8b5cf6 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+body.light-mode .card-glass [style*="text-shadow"] {
+    text-shadow: none !important;
 }
