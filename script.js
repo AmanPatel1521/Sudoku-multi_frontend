@@ -176,14 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         return `
                         <li class="list-group-item d-flex justify-content-between align-items-center" style="background-color: ${bgColor} !important; ${borderStyle} border-radius: 8px; margin-bottom: 8px; backdrop-filter: blur(5px);">
                             <div class="d-flex align-items-center gap-3">
-                                <span class="fs-4 fw-bold" style="width: 30px; color: #8b5cf6; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">#${index + 1}</span>
+                                <span class="fs-4 fw-bold text-primary" style="width: 30px; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">#${index + 1}</span>
                                 <div class="fs-3">${item.avatar || '😎'}</div>
                                 <div>
-                                    <div class="fw-bold" style="color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 1.1rem;">${item.username || 'Anonymous'}</div>
-                                    <small style="color: #94a3b8; font-weight: 600;">${item.wins} Wins</small>
+                                    <div class="fw-bold text-white" style="text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-size: 1.1rem;">${item.username || 'Anonymous'}</div>
+                                    <small class="text-white-50" style="font-weight: 600;">${item.wins} Wins</small>
                                 </div>
                             </div>
-                            <div class="fs-4 fw-bold" style="color: #0ea5e9; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${item.score} <span class="fs-6 fw-normal" style="color: #94a3b8;">pts</span></div>
+                            <div class="fs-4 fw-bold text-info" style="text-shadow: 0 1px 2px rgba(0,0,0,0.5);">${item.score} <span class="fs-6 fw-normal text-white-50">pts</span></div>
                         </li>
                         `;
                     }).join('');
@@ -216,8 +216,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="col-4 mb-3 position-relative">
                             <div class="card card-glass text-center p-2 h-100 ${isUnlocked ? 'border-success' : 'border-secondary opacity-50'}" style="transition: transform 0.2s;">
                                 <img src="${ach.icon}" alt="${ach.name}" class="img-fluid mb-2 mx-auto" style="max-width: 60px; filter: ${isUnlocked ? 'none' : 'grayscale(100%) opacity(0.5)'};">
-                                <h6 class="mb-1 text-light" style="font-size: 0.9rem;">${ach.name}</h6>
-                                <p class="text-muted small mb-0 lh-sm" style="font-size: 0.7rem;">${ach.desc}</p>
+                                <h6 class="mb-1 text-white" style="font-size: 0.9rem;">${ach.name}</h6>
+                                <p class="text-white-50 small mb-0 lh-sm" style="font-size: 0.7rem;">${ach.desc}</p>
                                 ${isUnlocked ? '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">UNLOCKED</span>' : '🔒'}
                             </div>
                         </div>

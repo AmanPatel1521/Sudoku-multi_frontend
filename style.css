@@ -1766,9 +1766,16 @@ body.light-mode .card-glass * {
     color: inherit;
 }
 
+body.light-mode .btn-close-white {
+    filter: none !important;
+}
+
 body.light-mode .text-white {
     color: #0f172a !important;
 }
 body.light-mode .text-white-50 {
     color: #475569 !important;
+}
+body.light-mode .text-warning {
+    color: #d97706 !important;
 }
