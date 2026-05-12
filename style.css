@@ -1783,6 +1783,12 @@ body.light-mode .text-warning {
 body.light-mode .border-warning {
     border-color: #d97706 !important;
 }
+body.light-mode .text-info {
+    color: var(--accent-color) !important;
+}
+body.light-mode .text-primary {
+    color: var(--primary-color) !important;
+}
 body.light-mode .modal-title {
     background: linear-gradient(135deg, #0f172a 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
