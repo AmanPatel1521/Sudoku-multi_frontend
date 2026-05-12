@@ -139,6 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
         dailyRewardModalObj = new bootstrap.Modal(document.getElementById('dailyRewardModal'), { backdrop: 'static', keyboard: false });
     }
     
+    let alertModalObj = null;
+    if (document.getElementById('alertModal')) {
+        alertModalObj = new bootstrap.Modal(document.getElementById('alertModal'));
+    }
+    
+    function showAlertModal(title, message) {
+        if (!alertModalObj) return alert(message);
+        document.getElementById('alertModalTitle').textContent = title;
+        document.getElementById('alertModalMessage').innerHTML = message.replace(/\n/g, '<br>');
+        alertModalObj.show();
+    }
     let isSoundEnabled = true;
     let isLightMode = false;
     const soundToggle = document.getElementById('sound-toggle');
@@ -508,7 +519,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleDailyChallenge() {
         const today = new Date().toISOString().split('T')[0];
         if (sudokuProgression.lastDailyCompleted === today) {
-            alert("You have already completed or failed the daily challenge today. Come back tomorrow!");
+            showAlertModal('Notice', "You have already completed or failed the daily challenge today. Come back tomorrow!");
             // Redirect to home if they came directly via URL
             if (window.location.search.includes('mode=daily')) {
                 window.location.href = '/';
@@ -682,7 +693,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isMatchmakingRoom = false;
             initializeGame(data.room_id, data.player_id, data.puzzle, data.difficulty);
         } catch (error) {
-            alert(`Failed to join room: ${error.message}`);
+            showAlertModal('Notice', `Failed to join room: ${error.message}`);
             setLoading(false);
             disableMenuButtons(false);
         }
@@ -1005,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         sudokuProgression.coins += 500;
                         saveProgression();
                         setTimeout(() => {
-                           alert(`🎉 DAILY CHALLENGE COMPLETED! 🎉\nYou have been awarded 500 Coins!`);
+                           showAlertModal('Reward', `🎉 DAILY CHALLENGE COMPLETED! 🎉\nYou have been awarded 500 Coins!`);
                            checkDailyProgression();
                         }, 1500);
                     }
