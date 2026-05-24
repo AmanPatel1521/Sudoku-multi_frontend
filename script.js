@@ -910,6 +910,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     incorrectCells[row][col] = true;
                 } else {
                     incorrectCells[row][col] = false;
+                    
+                    // Auto-cleanup notes in the same row, column, and block
+                    const numVal = parseInt(value);
+                    let changedNotes = [];
+                    
+                    // Row & Column
+                    for (let i = 0; i < 9; i++) {
+                        if (currentNotesBoard[row][i] && currentNotesBoard[row][i].includes(numVal)) {
+                            currentNotesBoard[row][i] = currentNotesBoard[row][i].filter(n => n !== numVal);
+                            changedNotes.push({r: row, c: i, n: currentNotesBoard[row][i]});
+                        }
+                        if (currentNotesBoard[i][col] && currentNotesBoard[i][col].includes(numVal)) {
+                            currentNotesBoard[i][col] = currentNotesBoard[i][col].filter(n => n !== numVal);
+                            changedNotes.push({r: i, c: col, n: currentNotesBoard[i][col]});
+                        }
+                    }
+                    
+                    // 3x3 Block
+                    const boxR = Math.floor(row / 3) * 3;
+                    const boxC = Math.floor(col / 3) * 3;
+                    for (let i = boxR; i < boxR + 3; i++) {
+                        for (let j = boxC; j < boxC + 3; j++) {
+                            if (currentNotesBoard[i][j] && currentNotesBoard[i][j].includes(numVal)) {
+                                currentNotesBoard[i][j] = currentNotesBoard[i][j].filter(n => n !== numVal);
+                                changedNotes.push({r: i, c: j, n: currentNotesBoard[i][j]});
+                            }
+                        }
+                    }
+                    
+                    // Sync cleaned-up notes back to the server if they were changed client-side
+                    changedNotes.forEach(noteUpdate => {
+                        socket.emit('notes', { room_id: roomId, player_id: playerId, row: noteUpdate.r, col: noteUpdate.c, notes: noteUpdate.n });
+                    });
                 }
             }
             
