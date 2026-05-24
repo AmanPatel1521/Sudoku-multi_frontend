@@ -31,42 +31,35 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p>Even experienced players make mistakes in <a href="/" class="text-info fw-bold text-decoration-none">Sudoku</a>. Identifying and avoiding these errors can significantly improve your performance.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">1. Guessing Too Early</h2>
-                    <p>Many players guess when stuck, leading to incorrect solutions.</p>
-                    <p>👉 <strong>Solution:</strong> Use logic and elimination instead.</p>
+                    <p class="lead">We've all experienced that soul-crushing moment. You've spent 20 minutes meticulously filling out a <a href="/" class="text-info fw-bold text-decoration-none">Sudoku grid</a>. You're down to the last three squares. You confidently place a '7', and suddenly realize there's already a '7' in that column. The entire puzzle is ruined. Here are the most common Sudoku mistakes and how to eradicate them from your gameplay.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">2. Ignoring Simple Numbers</h2>
-                    <p>Players often overlook easy placements.</p>
-                    <p>👉 <strong>Solution:</strong> Always scan the grid carefully before moving on.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">1. The "Educated" Guess (Bifurcation)</h2>
+                    <p><strong>The Mistake:</strong> You’re stuck. You see a square that could be a 3 or an 8. You think, "I'll just guess it's a 3 and see what happens."</p>
+                    <p><strong>The Fix:</strong> Never, ever guess. A properly crafted Sudoku always has a logical path forward. Guessing might seem to work for a few moves, but it creates a fragile house of cards that will inevitably collapse, forcing you to erase half the board. If you're stuck, step back and look for a pattern you missed.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">3. Not Checking Rows and Columns</h2>
-                    <p>Mistakes happen when players focus only on one area.</p>
-                    <p>👉 <strong>Solution:</strong> Cross-check rows, columns, and boxes.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">2. Sloppy Pencil Marking</h2>
+                    <p><strong>The Mistake:</strong> Writing down too many tiny numbers in the corners of cells, and then forgetting to erase them when you actually solve a number nearby.</p>
+                    <p><strong>The Fix:</strong> Housekeeping is essential. Every single time you place a final, confirmed number on the board, you must immediately scan its row, column, and 3x3 block to erase that number from your pencil marks. Leaving outdated pencil marks is the #1 cause of fatal logical errors.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">4. Overcomplicating the Puzzle</h2>
-                    <p>Sometimes players use advanced techniques unnecessarily.</p>
-                    <p>👉 <strong>Solution:</strong> Stick to basics when possible.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">3. Tunnel Vision</h2>
+                    <p><strong>The Mistake:</strong> Staring intensely at one specific 3x3 block for five minutes because you are determined to figure out where the '9' goes.</p>
+                    <p><strong>The Fix:</strong> Keep your eyes moving. If a block isn't yielding answers within 30 seconds, move on. Often, solving a completely unrelated cell on the opposite side of the board will magically open up the block you were stuck on.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">5. Lack of Patience</h2>
-                    <p>Rushing leads to errors.</p>
-                    <p>👉 <strong>Solution:</strong> Stay calm and solve step by step.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">4. Ignoring the Extremes</h2>
+                    <p><strong>The Mistake:</strong> Forgetting that numbers 1 and 9 exist. Studies of eye-tracking during Sudoku show that players naturally focus on the middle digits (3, 4, 5, 6, 7) and often entirely overlook the edges.</p>
+                    <p><strong>The Fix:</strong> Make a conscious habit of doing a dedicated sweep for 1s and 9s when you hit a roadblock.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">How to Improve</h2>
-                    <ul>
-                        <li>Practice daily</li>
-                        <li>Review mistakes</li>
-                        <li>Learn from each puzzle</li>
-                    </ul>
+                    <h2 class="text-white fw-bold mt-5 mb-3">5. Rushing the Early Game</h2>
+                    <p><strong>The Mistake:</strong> Flying through the easy givens so fast that you place a number without double-checking the intersecting column.</p>
+                    <p><strong>The Fix:</strong> Especially in Multiplayer Sudoku where mistakes cost you -20 points and a Strike, taking an extra 1.5 seconds to visually trace the row and column before clicking will save you from catastrophic early eliminations.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Apply These Lessons in Multiplayer</h2>
-                    <p>Avoiding these mistakes can give you a huge advantage in multiplayer Sudoku, where speed and accuracy both matter.</p>
-                    
-                    <p>Play smarter and improve faster!</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">6. Over-complicating It</h2>
+                    <p><strong>The Mistake:</strong> Trying to look for complex "X-Wings" when there is literally a naked single sitting right in front of you.</p>
+                    <p><strong>The Fix:</strong> Always start simple. Run through the basic cross-hatching sweeps before you start looking for advanced chained patterns. The simplest logic is almost always the intended path.</p>
 
                     <div class="text-center mt-5">
-                        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Test Your Skills Now 🚀</a>
+                        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Test Your Skills Without Mistakes 🚀</a>
                     </div>
                 </div>
             </div>

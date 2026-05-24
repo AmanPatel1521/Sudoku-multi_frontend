@@ -31,67 +31,30 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p>Not all <a href="/" class="text-info fw-bold text-decoration-none">Sudoku</a> puzzles are the same. Understanding difficulty levels can help you choose the right challenge and improve your skills efficiently.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Easy Sudoku</h2>
-                    <ul>
-                        <li>Many numbers already filled</li>
-                        <li>Simple logic required</li>
-                        <li>Best for beginners</li>
-                    </ul>
-                    <p><strong>Focus:</strong> Learning rules and basic techniques</p>
+                    <p class="lead">Have you ever breezed through a "Medium" Sudoku only to be completely crushed by a "Hard" one? The leap between <a href="/" class="text-info fw-bold text-decoration-none">Sudoku difficulty levels</a> can feel baffling. How exactly are these difficulties determined? It’s not about how many numbers are missing—it’s about the logical techniques required to find them.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Medium Sudoku</h2>
-                    <ul>
-                        <li>Fewer starting numbers</li>
-                        <li>Requires basic strategies</li>
-                        <li>Slightly more challenging</li>
-                    </ul>
-                    <p><strong>Focus:</strong> Pattern recognition and elimination</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">Easy: The "Scan and Fill" Stage</h2>
+                    <p>Easy puzzles are designed to make you feel good. They typically start with over 35 "givens" (pre-filled numbers). But more importantly, every single missing number can be found using the most basic technique: <strong>Scanning</strong>.</p>
+                    <p>If you just look at the rows, columns, and 3x3 boxes, you will immediately spot empty cells that have only one possible candidate. No complex notation or deep thinking is required. You can solve these by simply moving your eyes across the board.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Hard Sudoku</h2>
-                    <ul>
-                        <li>Minimal clues</li>
-                        <li>Requires advanced techniques</li>
-                        <li>Needs careful thinking</li>
-                    </ul>
-                    <p><strong>Focus:</strong> Logical deduction and planning</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">Medium: Enter Pencil Marks</h2>
+                    <p>Medium puzzles reduce the givens to around 28-32, but the real shift is in the logic. Scanning alone will get you stuck about halfway through. To proceed, you must start using <strong>Pencil Marks</strong> (notating possible candidates in empty cells).</p>
+                    <p>You will need to understand "Naked Pairs" (two cells in a block that can only be two specific numbers) to eliminate candidates and reveal the hidden singles. Medium puzzles require you to look at the relationships between cells, rather than just single cells in isolation.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Expert Sudoku</h2>
-                    <ul>
-                        <li>Very few clues</li>
-                        <li>Complex solving strategies</li>
-                        <li>Time-consuming puzzles</li>
-                    </ul>
-                    <p><strong>Focus:</strong> Master-level techniques</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">Hard: The Wall of Deduction</h2>
+                    <p>This is where casual players usually hit a brick wall. Hard puzzles (around 24-28 givens) are designed so that at multiple points in the game, there are absolutely no obvious moves. You cannot progress without knowing advanced techniques.</p>
+                    <p>You will encounter situations requiring "Pointing Pairs" (where a number must exist in a specific row of a block, eliminating it from the rest of the board's row) and "X-Wings." Hard puzzles require you to hold hypothetical situations in your mind: <em>"If this is a 4, then that must be a 7, which breaks this row..."</em></p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">How to Choose the Right Level</h2>
-                    <ul>
-                        <li>Beginners → Start with Easy</li>
-                        <li>Intermediate → Move to Medium</li>
-                        <li>Advanced → Try Hard and Expert</li>
-                    </ul>
+                    <h2 class="text-white fw-bold mt-5 mb-3">Expert / Extreme: The Math Degree</h2>
+                    <p>Expert puzzles (often 20-23 givens) are brutal. The grid is frighteningly empty. To crack these, you need a deep arsenal of obscure strategies with intimidating names like <em>Swordfish</em>, <em>Jellyfish</em>, <em>XY-Wings</em>, and <em>Forcing Chains</em>.</p>
+                    <p>In these puzzles, you aren't looking for numbers; you are hunting for complex logical contradictions across the entire board. Solving an Expert puzzle is a marathon of intense concentration, often taking anywhere from 30 minutes to over an hour.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Why Difficulty Levels Matter</h2>
-                    <p>Choosing the right level helps:</p>
-                    <ul>
-                        <li>Avoid frustration</li>
-                        <li>Improve gradually</li>
-                        <li>Build confidence</li>
-                    </ul>
-
-                    <h2 class="text-white fw-bold mt-5 mb-3">Improve Faster with Multiplayer</h2>
-                    <p>Playing multiplayer Sudoku at different difficulty levels helps you:</p>
-                    <ul>
-                        <li>Adapt quickly</li>
-                        <li>Improve under pressure</li>
-                        <li>Learn from competition</li>
-                    </ul>
-
-                    <p>Challenge yourself with the right difficulty and keep progressing!</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">The "17-Clue" Myth</h2>
+                    <p>A fun fact: Mathematicians have proven that 17 is the absolute minimum number of givens a Sudoku puzzle can have and still have exactly one unique solution. However, a 17-clue puzzle isn't automatically the hardest; sometimes a 22-clue puzzle can be logically much more difficult to crack.</p>
 
                     <div class="text-center mt-5">
-                        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Choose Your Difficulty 🚀</a>
+                        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Choose Your Difficulty & Play 🚀</a>
                     </div>
                 </div>
             </div>

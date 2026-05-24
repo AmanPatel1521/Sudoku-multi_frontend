@@ -31,55 +31,53 @@ document.addEventListener("DOMContentLoaded", function() {
         <div class="row">
             <div class="col-lg-8 mx-auto">
                 <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
-                    <p>If you want to solve <a href="/" class="text-info fw-bold text-decoration-none">Sudoku puzzles</a> quickly, you need more than basic knowledge. These proven techniques will help you improve speed and accuracy.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">1. Start with Easy Numbers</h2>
-                    <p>Always begin with rows or columns that are almost complete.</p>
+                    <p class="lead">If you’ve ever stared at a Sudoku grid for twenty minutes only to realize you’re completely stuck, you aren't alone. We’ve all been there. But what if I told you that shaving minutes off your solve time isn’t about being a math genius? It’s about recognizing patterns. Here are 15 actionable, human-tested tricks to help you solve <a href="/" class="text-info fw-bold text-decoration-none">Sudoku puzzles</a> faster.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">2. Use Elimination Method</h2>
-                    <p>Eliminate impossible numbers to find the correct one.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">1. The "Low-Hanging Fruit" Scan</h2>
+                    <p>Don't just dive into the first empty square you see. Take 10 seconds to scan the entire board for rows, columns, or 3x3 blocks that already have 5 or 6 numbers filled in. These are your easy wins. Fill them first to build momentum.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">3. Scan Rows and Columns</h2>
-                    <p>Quick scanning helps identify missing numbers faster.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">2. Master Cross-Hatching</h2>
+                    <p>This is the bread and butter of speed solving. Pick a number (let's say 1) and scan every 3x3 block. Use the 1s already on the board to draw imaginary horizontal and vertical lines. If a 3x3 block only has one empty square that isn't crossed by your imaginary lines, you've found your 1!</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">4. Focus on 3×3 Boxes</h2>
-                    <p>Sometimes boxes reveal answers quicker than rows.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">3. Naked Singles</h2>
+                    <p>Sometimes, a single cell is surrounded by so many numbers in its row, column, and block that there is literally only one number left in the universe that can fit there. Train your eyes to spot crowded intersections.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">5. Avoid Guessing</h2>
-                    <p>Guessing slows you down and leads to mistakes.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">4. Pencil Marking (But Sparingly)</h2>
+                    <p>Pencil marking (or "notating") is crucial, but doing it too early clutters your board and slows you down. Only start marking when you've exhausted all your cross-hatching options.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">6. Use Pencil Marks</h2>
-                    <p>Write small possible numbers to track options.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">5. The "Snyder Notation" Method</h2>
+                    <p>Invented by Sudoku champion Thomas Snyder, this rule states you should only pencil mark a number if it can go in exactly <em>two</em> spots within a 3x3 block. This keeps your grid incredibly clean and makes pairs obvious.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">7. Look for Singles</h2>
-                    <p>Cells with only one possible number are easy wins.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">6. Naked Pairs</h2>
+                    <p>If you have two cells in the same row/column/block that can only contain the numbers 3 and 7, you know for a fact that 3 and 7 belong in those two cells. You can safely eliminate 3 and 7 from every other cell in that house.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">8. Use Cross-Hatching</h2>
-                    <p>Check intersections of rows and columns.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">7. Hidden Pairs</h2>
+                    <p>Similar to naked pairs, but sneakier. If the numbers 4 and 9 can only appear in two specific cells within a block, even if those cells have other pencil marks, those other marks are false. Erase them!</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">9. Practice Pattern Recognition</h2>
-                    <p>Over time, you will recognize common patterns.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">8. Never Guess (The "Bifurcation" Trap)</h2>
+                    <p>Guessing is a desperate move. In a standard, properly generated Sudoku, logic will always prevail. Guessing inevitably leads to a contradiction 15 moves later, forcing you to erase half the board. Just don't do it.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">10. Stay Organized</h2>
-                    <p>Keep your solving method consistent.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">9. Look for Pointing Pairs</h2>
+                    <p>If the number 5 can only appear in the top row of a specific 3x3 block, you know the 5 for that block <em>must</em> be in that row. Therefore, you can eliminate 5 from the rest of that entire horizontal row across the board.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">11. Work Systematically</h2>
-                    <p>Don’t jump randomly across the grid.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">10. The X-Wing Technique</h2>
+                    <p>This is where things get advanced. Look for a specific number that can only appear in two cells in a row, and identically in another row. This forms a rectangle (or X-Wing). You can eliminate that number from the corresponding columns.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">12. Learn Advanced Techniques</h2>
-                    <p>Master strategies like X-Wing and Swordfish.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">11. Slice and Dice</h2>
+                    <p>Break the 9x9 grid into three horizontal "chutes" and three vertical "bands". Evaluating the board in these larger chunks can sometimes reveal numbers that are missing from a specific band.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">13. Stay Calm</h2>
-                    <p>Rushing leads to errors.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">12. Focus on the Extremes</h2>
+                    <p>Numbers 1 and 9 are psychologically harder to spot for some reason. If you're stuck, do a dedicated scan specifically looking for the highest and lowest digits.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">14. Play Daily</h2>
-                    <p>Consistency improves speed.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">13. The Swordfish Pattern</h2>
+                    <p>An extension of the X-Wing involving three rows and three columns. It's rare, but spotting a Swordfish is incredibly satisfying and usually blows the puzzle wide open.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">15. Try Multiplayer Sudoku</h2>
-                    <p>Competing with others improves performance under pressure.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">14. Step Away for a Minute</h2>
+                    <p>Have you ever stared at a puzzle, given up, come back an hour later, and immediately spotted the obvious move? Your brain suffers from "tunnel vision." Taking a 60-second break resets your visual processing.</p>
 
-                    <h2 class="text-white fw-bold mt-5 mb-3">Conclusion</h2>
-                    <p>Using these tricks consistently will significantly improve your Sudoku-solving speed.</p>
+                    <h2 class="text-white fw-bold mt-5 mb-3">15. Play Under Pressure</h2>
+                    <p>Nothing forces you to learn patterns faster than a ticking clock. Playing against real people in a multiplayer setting forces your brain to abandon slow counting and rely on instinctual pattern recognition.</p>
 
                     <div class="text-center mt-5">
                         <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Test Your Speed Now 🚀</a>
