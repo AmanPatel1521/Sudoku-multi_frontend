@@ -1798,6 +1798,45 @@ body.light-mode .modal-title {
 body.light-mode .card-glass [style*="text-shadow"] {
     text-shadow: none !important;
 }
+body.light-mode #waiting-room-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+    color: #1a2540;
+}
+body.light-mode #waiting-room-card h2,
+body.light-mode #waiting-room-card h3 {
+    color: #1a2540;
+}
+body.light-mode #waiting-room-card p {
+    color: rgba(26, 37, 64, 0.7);
+}
+body.light-mode #waiting-room-card hr {
+    border-color: rgba(0, 0, 0, 0.1);
+}
+body.light-mode #waiting-player-list li {
+    background: #f8fafc !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    color: #1a2540 !important;
+}
+body.light-mode .room-code-display {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: rgba(139, 92, 246, 0.3);
+    color: #6d28d9 !important;
+}
+body.light-mode .room-code-display:hover {
+    background: rgba(139, 92, 246, 0.2);
+}
+body.light-mode #match-countdown-timer {
+    color: #b45309;
+    text-shadow: none;
+}
+body.light-mode .starting-label {
+    color: rgba(0, 0, 0, 0.6);
+}
+body.light-mode .match-found-label {
+    color: #d97706;
+}
 
 /* Brand Logo Styles */
 .brand-logo-container {
