@@ -1,0 +1,58 @@
+Project: Multiplayer Sudoku
+
+Website:
+https://multiplayersudoku.in
+
+Description:
+Multiplayer Sudoku is a real-time competitive Sudoku platform where players compete against each other online.
+
+Features:
+- Real-time multiplayer matches
+- Global leaderboards
+- Daily challenges
+- Ranked gameplay
+- Multiple difficulty levels
+- Browser based
+- Mobile friendly
+- Free to play
+
+Pricing Model:
+Completely Free to Play
+
+Documentation:
+https://multiplayersudoku.in/docs
+
+FAQs:
+https://multiplayersudoku.in/#faq
+
+
+## Markdown Documentation Mirrors
+The following files are clean markdown versions of our core pages, optimized for AI consumption:
+- [daily-sudoku-challenge.html](https://multiplayersudoku.in/md_mirrors/daily-sudoku-challenge.md)
+- [play-multiplayer-sudoku-online.html](https://multiplayersudoku.in/md_mirrors/play-multiplayer-sudoku-online.md)
+- [blog.html](https://multiplayersudoku.in/md_mirrors/blog.md)
+- [how-to-improve-at-sudoku.html](https://multiplayersudoku.in/md_mirrors/how-to-improve-at-sudoku.md)
+- [sudoku-solver.html](https://multiplayersudoku.in/md_mirrors/sudoku-solver.md)
+- [common-sudoku-mistakes.html](https://multiplayersudoku.in/md_mirrors/common-sudoku-mistakes.md)
+- [index.html](https://multiplayersudoku.in/md_mirrors/index.md)
+- [about.html](https://multiplayersudoku.in/md_mirrors/about.md)
+- [contact.html](https://multiplayersudoku.in/md_mirrors/contact.md)
+- [2-player-sudoku-guide.html](https://multiplayersudoku.in/md_mirrors/2-player-sudoku-guide.md)
+- [sudoku-tricks-faster.html](https://multiplayersudoku.in/md_mirrors/sudoku-tricks-faster.md)
+- [terms.html](https://multiplayersudoku.in/md_mirrors/terms.md)
+- [how-to-play-sudoku.html](https://multiplayersudoku.in/md_mirrors/how-to-play-sudoku.md)
+- [ranked-sudoku-tips.html](https://multiplayersudoku.in/md_mirrors/ranked-sudoku-tips.md)
+- [sudoku-strategies.html](https://multiplayersudoku.in/md_mirrors/sudoku-strategies.md)
+- [leaderboard.html](https://multiplayersudoku.in/md_mirrors/leaderboard.md)
+- [multiplayer-sudoku-online.html](https://multiplayersudoku.in/md_mirrors/multiplayer-sudoku-online.md)
+- [how-multiplayer-matches-work.html](https://multiplayersudoku.in/md_mirrors/how-multiplayer-matches-work.md)
+- [scoring-system.html](https://multiplayersudoku.in/md_mirrors/scoring-system.md)
+- [sudoku-difficulty-levels.html](https://multiplayersudoku.in/md_mirrors/sudoku-difficulty-levels.md)
+- [daily-challenges.html](https://multiplayersudoku.in/md_mirrors/daily-challenges.md)
+- [beginner-sudoku-guide.html](https://multiplayersudoku.in/md_mirrors/beginner-sudoku-guide.md)
+- [best-free-online-puzzle-games.html](https://multiplayersudoku.in/md_mirrors/best-free-online-puzzle-games.md)
+- [privacy.html](https://multiplayersudoku.in/md_mirrors/privacy.md)
+- [leaderboards.html](https://multiplayersudoku.in/md_mirrors/leaderboards.md)
+- [multiplayer-sudoku-strategy.html](https://multiplayersudoku.in/md_mirrors/multiplayer-sudoku-strategy.md)
+- [ranking-system.html](https://multiplayersudoku.in/md_mirrors/ranking-system.md)
+- [benefits-of-sudoku.html](https://multiplayersudoku.in/md_mirrors/benefits-of-sudoku.md)

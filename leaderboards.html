@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Leaderboards - Multiplayer Sudoku Documentation</title>
+    <meta name="description" content="Learn how the Multiplayer Sudoku global leaderboards work. Discover how to rank up, track your win streaks, and compare your stats against the best players.">
+    <link rel="canonical" href="https://multiplayersudoku.in/leaderboards.html">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=16">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Understanding the Multiplayer Sudoku Global Leaderboards",
+          "description": "Complete documentation on how the leaderboards are calculated, updated, and how you can track your competitive Sudoku ranking.",
+          "author": {
+            "@type": "Organization",
+            "name": "Multiplayer Sudoku"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://multiplayersudoku.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Documentation",
+              "item": "https://multiplayersudoku.in/leaderboards.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
+</head>
+<body>
+    <div id="main-container" class="container py-4">
+        <header class="main-header mb-5 text-center">
+            <h1 class="display-4 fw-bold text-white mb-3">Global Leaderboards</h1>
+            <p class="lead text-white-50">How to track your progress and compare against the world.</p>
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-lg card-glass p-4 p-md-5 fs-5 lh-lg" style="color: rgba(255,255,255,0.9);">
+                    
+                    <h2 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">Overview of the Leaderboards</h2>
+                    <p>The <strong>Global Leaderboard</strong> is the ultimate proving ground for Multiplayer Sudoku players. It is a live, constantly updating registry of the most skilled, dedicated, and accurate puzzle solvers on the platform.</p>
+                    <p>To ensure that different types of players are recognized for their unique achievements, our leaderboard system is broken down into several distinct categories.</p>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Leaderboard Categories</h2>
+                    <ul>
+                        <li><strong>Top Rated (Elo):</strong> This is the most prestigious list. It ranks players based entirely on their Elo matchmaking rating. Reaching the top of this board requires consistently beating other highly-ranked players without suffering severe losses.</li>
+                        <li><strong>Most Wins:</strong> A testament to dedication. This board tracks the raw, total number of multiplayer matches a player has won across their entire account history, regardless of their current Elo rating.</li>
+                        <li><strong>Highest Win Streak:</strong> This board highlights consistency and accuracy under pressure. It records the maximum number of consecutive Ranked matches a player has won without suffering a single loss or elimination.</li>
+                        <li><strong>Fastest Daily Challenge:</strong> A rotating, 24-hour leaderboard dedicated entirely to the current day's specific puzzle.</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Update Frequency & Seasons</h2>
+                    <p>To maintain a dynamic competitive environment, the leaderboards are managed in real-time. The moment a match concludes, the server recalculates the Elo ratings and instantly pushes the new rankings to the global database.</p>
+                    <p><strong>Competitive Seasons:</strong> While the "All-Time" leaderboards remain permanent, we occasionally host timed "Seasons." At the end of a season, the top-ranking players on the Elo board are permanently immortalized in the Hall of Fame, and ratings are softly reset to ensure a fresh, fair race for the next season.</p>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">How to Get on the Leaderboard</h2>
+                    <p>Getting your name on the board requires a registered account. While you can play Multiplayer Sudoku as a Guest, guest statistics are ephemeral and are not tracked on the permanent global leaderboards.</p>
+                    <p>To start climbing:</p>
+                    <ol>
+                        <li>Create a free account or log in.</li>
+                        <li>Navigate to the homepage and select "Quick Play" to enter Ranked Matchmaking.</li>
+                        <li>Win your placement matches to establish your initial Elo rating.</li>
+                        <li>Continue winning to climb through the Bronze, Silver, Gold, Platinum, and Diamond tiers until you reach Master status.</li>
+                    </ol>
+                    
+                    <div class="text-center mt-5 mb-3">
+                        <a href="/ranking-system.html" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Learn about Elo Rankings 📈</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="seo-footer" class="pt-4 pb-2 footer-container mt-5">
+        <div class="container text-center">
+            <div class="row mb-3 text-center">
+                <div class="col-md-8 offset-md-2">
+                    <h5 class="text-white">About Multiplayer Sudoku</h5>
+                    <p class="small text-white-50">Multiplayer Sudoku is a completely free, real-time competitive logic puzzle game.</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
+                <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Home</a>
+                <span class="text-white-50">|</span>
+                <a href="/leaderboards.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Leaderboards</a>
+            </div>
+            <div class="small text-white-50 mt-2">
+                &copy; 2026 Multiplayer Sudoku. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

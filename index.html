@@ -32,19 +32,116 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "VideoGame",
-      "name": "Multiplayer Sudoku",
-      "url": "https://multiplayersudoku.in",
-      "description": "A free, real-time multiplayer Sudoku game. Challenge friends, climb leaderboards, and solve logic puzzles.",
-      "genre": ["Puzzle", "Logic", "Strategy"],
-      "playMode": ["SinglePlayer", "MultiPlayer"],
-      "applicationCategory": "GameApplication",
-      "operatingSystem": "Web Browser",
-      "offers": {
-        "@type": "Offer",
-        "price": "0",
-        "priceCurrency": "USD"
-      }
+      "@graph": [
+        {
+          "@type": "Organization",
+          "name": "Multiplayer Sudoku",
+          "url": "https://multiplayersudoku.in"
+        },
+        {
+          "@type": "WebSite",
+          "name": "Multiplayer Sudoku",
+          "url": "https://multiplayersudoku.in",
+          "description": "A free, real-time multiplayer Sudoku game."
+        },
+        {
+          "@type": "VideoGame",
+          "name": "Multiplayer Sudoku",
+          "url": "https://multiplayersudoku.in",
+          "description": "A free, real-time multiplayer Sudoku game. Challenge friends, climb leaderboards, and solve logic puzzles.",
+          "genre": ["Puzzle", "Logic", "Strategy"],
+          "playMode": ["SinglePlayer", "MultiPlayer"],
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web Browser",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "name": "Multiplayer Sudoku",
+          "url": "https://multiplayersudoku.in",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web Browser",
+          "description": "A free, real-time competitive logic puzzle game.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Is Multiplayer Sudoku free to play?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! Multiplayer Sudoku is completely free to play. There are no hidden fees, paywalls, or subscriptions required to enjoy unlimited puzzles."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does multiplayer mode work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "You can create a private room and share the code with friends, or join Quick Play for automatic matchmaking. The first player to correctly solve the puzzle wins!"
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Can I play with friends?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Absolutely! Use the Create Room feature to get a unique Room ID, then share it with your friends so they can join you directly."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is Multiplayer Sudoku available on mobile?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, our web application is fully responsive and optimized for both desktop and mobile browsers."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How does ranking work?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "When you win ranked matchmaking games, you earn points that increase your rank on our global leaderboards. Losing games will decrease your rating."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Do I need an account?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No account is required to start playing! You can jump straight into a game as a guest. Accounts are optional for saving long-term stats."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are there daily challenges?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes! We feature a unique Daily Challenge puzzle every day. Compete against the rest of the world to see who can solve it the fastest."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "How are winners determined?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "The winner is the first player to successfully fill the entire 9x9 grid with the correct numbers. If a player makes 3 mistakes, they are eliminated."
+              }
+            }
+          ]
+        }
+      ]
     }
     </script>
 
@@ -712,6 +809,120 @@ document.addEventListener("DOMContentLoaded", function() {
                 <p>Stuck on a puzzle? Need a hint? Check out our brand new <a href="/sudoku-solver.html" class="text-info fw-bold text-decoration-none">Interactive Sudoku Solver</a>. Enter any Sudoku puzzle into our smart grid and watch it solve the board instantly. Perfect for learning new strategies or getting unstuck!</p>
             </div>
         </div>
+
+        <!-- FAQ Section for SEO and AI Context -->
+        <div class="row mt-5 mb-4" id="faq">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="text-white fw-bold mb-4 text-center">Frequently Asked Questions</h2>
+                <div class="accordion" id="sudokuFAQ">
+                    <!-- FAQ 1 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                Is Multiplayer Sudoku free to play?
+                            </button>
+                        </h3>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                Yes! Multiplayer Sudoku is completely free to play. There are no hidden fees, paywalls, or subscriptions required to enjoy unlimited puzzles.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 2 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                How does multiplayer mode work?
+                            </button>
+                        </h3>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                You can create a private room and share the code with friends, or join Quick Play for automatic matchmaking. The first player to correctly solve the puzzle wins!
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 3 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Can I play with friends?
+                            </button>
+                        </h3>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                Absolutely! Use the Create Room feature to get a unique Room ID, then share it with your friends so they can join you directly.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 4 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Is Multiplayer Sudoku available on mobile?
+                            </button>
+                        </h3>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                Yes, our web application is fully responsive and optimized for both desktop and mobile browsers.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 5 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                How does ranking work?
+                            </button>
+                        </h3>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                When you win ranked matchmaking games, you earn points that increase your rank on our global leaderboards. Losing games will decrease your rating.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 6 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                Do I need an account?
+                            </button>
+                        </h3>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                No account is required to start playing! You can jump straight into a game as a guest. Accounts are optional for saving long-term stats.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 7 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingSeven">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                Are there daily challenges?
+                            </button>
+                        </h3>
+                        <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                Yes! We feature a unique Daily Challenge puzzle every day. Compete against the rest of the world to see who can solve it the fastest.
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FAQ 8 -->
+                    <div class="accordion-item bg-dark bg-opacity-50 border-secondary mb-2" style="border-radius: 8px; overflow: hidden;">
+                        <h3 class="accordion-header" id="headingEight">
+                            <button class="accordion-button collapsed bg-transparent text-white fw-bold shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                How are winners determined?
+                            </button>
+                        </h3>
+                        <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#sudokuFAQ">
+                            <div class="accordion-body text-white-50">
+                                The winner is the first player to successfully fill the entire 9x9 grid with the correct numbers. If a player makes 3 mistakes, they are eliminated.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- SEO & Legal Footer (Critical for AdSense Approval) -->
@@ -725,6 +936,8 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
             <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
                 <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Home</a>
+                <span class="text-white-50">|</span>
+                <a href="/play-multiplayer-sudoku-online.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Play Online</a>
                 <span class="text-white-50">|</span>
                 <a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Blog</a>
                 <span class="text-white-50">|</span>

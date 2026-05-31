@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoring System & Penalties - Multiplayer Sudoku Documentation</title>
+    <meta name="description" content="Detailed breakdown of the Multiplayer Sudoku scoring system. Understand how points are awarded, time bonuses, and the penalty system for incorrect guesses.">
+    <link rel="canonical" href="https://multiplayersudoku.in/scoring-system.html">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=16">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Multiplayer Sudoku Scoring System & Penalties",
+          "description": "An in-depth look at how scoring works in Multiplayer Sudoku, including point calculations, speed metrics, and strike penalties.",
+          "author": {
+            "@type": "Organization",
+            "name": "Multiplayer Sudoku"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://multiplayersudoku.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Documentation",
+              "item": "https://multiplayersudoku.in/scoring-system.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
+</head>
+<body>
+    <div id="main-container" class="container py-4">
+        <header class="main-header mb-5 text-center">
+            <h1 class="display-4 fw-bold text-white mb-3">Scoring System</h1>
+            <p class="lead text-white-50">Understanding points, time bonuses, and error penalties.</p>
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-lg card-glass p-4 p-md-5 fs-5 lh-lg" style="color: rgba(255,255,255,0.9);">
+                    
+                    <h2 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">The Goal: Speed and Accuracy</h2>
+                    <p>In traditional Sudoku, the only metric that matters is whether you eventually solve the puzzle. In <strong>Multiplayer Sudoku</strong>, scoring is determined by two critical factors: how fast you solve, and how accurately you place your numbers.</p>
+                    <p>The scoring system is designed to reward deliberate, logical play while harshly punishing random guessing.</p>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Match Points (In-Game Scoring)</h2>
+                    <p>During an active multiplayer match, you and your opponent are racing to reach a score of 100%. The progression is strictly based on the number of correct cells filled.</p>
+                    <ul>
+                        <li><strong>Correct Placement:</strong> When you successfully deduce and place a correct digit, your progress bar increments. The exact percentage depends on the number of empty cells at the start of the match.</li>
+                        <li><strong>Note Placements:</strong> Placing pencil marks (notes) does not impact your score. Notes are purely for personal organization and strategy.</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">The Penalty System (Strikes)</h2>
+                    <p>The most important element of our scoring engine is the Penalty System. To prevent players from spamming numbers until one works, we enforce severe consequences for guessing.</p>
+                    <div class="alert alert-danger bg-danger bg-opacity-25 border-danger text-white mb-4">
+                        <strong>The 3-Strike Rule:</strong> You are allowed a maximum of two mistakes per match. If you submit a third incorrect number, you instantly lose the match.
+                    </div>
+                    <ul>
+                        <li><strong>Strike 1:</strong> Visual warning. Your opponent gains a psychological advantage as they see your mistake register.</li>
+                        <li><strong>Strike 2:</strong> Final warning. You must now play flawlessly for the remainder of the match.</li>
+                        <li><strong>Strike 3:</strong> Immediate Elimination. The match ends, your opponent is declared the winner, and you lose Elo rating points (if playing Ranked).</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Time and Speed Metrics</h2>
+                    <p>While the primary win condition is finishing first, the system tracks your total solve time down to the millisecond. This data is used to calculate your average solve speed across different difficulty levels.</p>
+                    <p>In the event of a highly improbable simultaneous finish (where both players submit the final correct digit within the same server tick), the server will calculate the overall average time between correct placements (APM - Actions Per Minute) to determine the absolute winner.</p>
+                    
+                    <div class="text-center mt-5 mb-3">
+                        <a href="/ranking-system.html" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Learn about Elo Rankings 📈</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="seo-footer" class="pt-4 pb-2 footer-container mt-5">
+        <div class="container text-center">
+            <div class="row mb-3 text-center">
+                <div class="col-md-8 offset-md-2">
+                    <h5 class="text-white">About Multiplayer Sudoku</h5>
+                    <p class="small text-white-50">Multiplayer Sudoku is a completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally. Fill the 9x9 grid so that each column, row, and 3x3 box contains all digits from 1 to 9. Play solo to practice, or join a room to challenge friends.</p>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center flex-wrap gap-3 mb-2">
+                <a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Home</a>
+                <span class="text-white-50">|</span>
+                <a href="/ranking-system.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Ranking System</a>
+                <span class="text-white-50">|</span>
+                <a href="/scoring-system.html" class="text-decoration-none text-white opacity-75 hover-opacity-100 fw-bold">Scoring System</a>
+            </div>
+            <div class="small text-white-50 mt-2">
+                &copy; 2026 Multiplayer Sudoku. All rights reserved.
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
