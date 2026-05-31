@@ -116,7 +116,7 @@
                     document.getElementById('stat-win-rate').textContent = `${winRate}%`;
 
                     // Best Time
-                    if (stats.best_time) {
+                    if (stats.best_time !== null && stats.best_time > 0) {
                         const bestMins = Math.floor(stats.best_time / 60);
                         const bestSecs = stats.best_time % 60;
                         document.getElementById('stat-best-time').textContent = `${bestMins}m ${bestSecs}s`;
@@ -124,8 +124,8 @@
                         document.getElementById('stat-best-time').textContent = '--';
                     }
 
-                    // Avg Accuracy
-                    document.getElementById('stat-avg-accuracy').textContent = `${Math.round(stats.average_accuracy || 0)}%`;
+                    // Avg Accuracy (Backend returns 0.0 to 1.0)
+                    document.getElementById('stat-avg-accuracy').textContent = `${Math.round((stats.average_accuracy || 0) * 100)}%`;
 
                     // Elo
                     document.getElementById('stat-elo').textContent = stats.elo_rating || 0;
