@@ -35,7 +35,20 @@
                     </div>
 
                     <div id="stats-content" style="display: none;">
-                        <h3 class="text-center text-white mb-4 fw-bold border-bottom border-secondary pb-3">Lifetime Overview</h3>
+                        <ul class="nav nav-pills justify-content-center mb-4" id="stats-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-overall" data-bs-toggle="pill" data-mode="overall" type="button" role="tab">Overall</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-solo" data-bs-toggle="pill" data-mode="solo" type="button" role="tab">Solo</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-daily" data-bs-toggle="pill" data-mode="daily" type="button" role="tab">Daily</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-multiplayer" data-bs-toggle="pill" data-mode="multiplayer" type="button" role="tab">Multiplayer</button>
+                            </li>
+                        </ul>
                         
                         <div class="row g-4 text-center">
                             <div class="col-6 col-md-4">
@@ -56,28 +69,22 @@
                                     <h3 id="stat-win-rate" class="fw-bold text-success mb-0">0%</h3>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4">
+                            <div class="col-6 col-md-6 offset-md-0 col-12">
                                 <div class="p-3 bg-dark bg-opacity-50 rounded border border-secondary h-100">
                                     <div class="text-white-50 small text-uppercase mb-2">Best Time</div>
                                     <h3 id="stat-best-time" class="fw-bold text-danger mb-0">--</h3>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4">
+                            <div class="col-6 col-md-6 offset-md-0 col-12">
                                 <div class="p-3 bg-dark bg-opacity-50 rounded border border-secondary h-100">
                                     <div class="text-white-50 small text-uppercase mb-2">Avg Accuracy</div>
                                     <h3 id="stat-avg-accuracy" class="fw-bold text-primary mb-0">0%</h3>
                                 </div>
                             </div>
-                            <div class="col-6 col-md-4">
-                                <div class="p-3 bg-dark bg-opacity-50 rounded border border-secondary h-100">
-                                    <div class="text-white-50 small text-uppercase mb-2">Current Elo</div>
-                                    <h3 id="stat-elo" class="fw-bold text-light mb-0">0</h3>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="text-center mt-5">
-                            <p class="text-white-50 small">Statistics are updated dynamically at the end of each match. Guest match data is not tracked.</p>
+                            <p class="text-white-50 small">Statistics are updated dynamically at the end of each match. Legacy/Guest data is grouped into Overall.</p>
                         </div>
                     </div>
                     
@@ -86,49 +93,65 @@
         </div>
     </div>
 
+    <!-- Bootstrap Bundle with Popper for tabs -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
             const playerId = localStorage.getItem('sudokuPlayerId');
             const loadingDiv = document.getElementById('loading-stats');
             const contentDiv = document.getElementById('stats-content');
+            let fullStatsData = null;
 
             if (!playerId) {
                 loadingDiv.innerHTML = '<h4 class="text-danger">No player data found. Please play a game first!</h4>';
                 return;
             }
 
+            function updateUIForMode(mode) {
+                if (!fullStatsData || !fullStatsData[mode]) return;
+                const stats = fullStatsData[mode];
+                
+                // Format Time Spent
+                const totalSeconds = stats.total_time_spent || 0;
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                document.getElementById('stat-time-spent').textContent = `${hours}h ${minutes}m`;
+
+                // Matches
+                document.getElementById('stat-matches-total').textContent = stats.matches_played || 0;
+                
+                // Win Rate
+                const winRate = stats.matches_played > 0 ? Math.round(((stats.matches_won || 0) / stats.matches_played) * 100) : 0;
+                document.getElementById('stat-win-rate').textContent = `${winRate}%`;
+
+                // Best Time
+                if (stats.best_time !== null && stats.best_time > 0) {
+                    const bestMins = Math.floor(stats.best_time / 60);
+                    const bestSecs = stats.best_time % 60;
+                    document.getElementById('stat-best-time').textContent = `${bestMins}m ${bestSecs}s`;
+                } else {
+                    document.getElementById('stat-best-time').textContent = '--';
+                }
+
+                // Avg Accuracy (Backend returns 0.0 to 1.0)
+                document.getElementById('stat-avg-accuracy').textContent = `${Math.round((stats.average_accuracy || 0) * 100)}%`;
+            }
+
+            // Bind tab clicks
+            document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(tabBtn => {
+                tabBtn.addEventListener('shown.bs.tab', (e) => {
+                    const mode = e.target.getAttribute('data-mode');
+                    updateUIForMode(mode);
+                });
+            });
+
             try {
+                // Fetch stats from local backend during dev
                 const response = await fetch(`https://sudoku-multi-backend.onrender.com/player/${playerId}/detailed_stats`);
                 if (response.ok) {
-                    const stats = await response.json();
+                    fullStatsData = await response.json();
                     
-                    // Format Time Spent
-                    const totalSeconds = stats.total_time_spent || 0;
-                    const hours = Math.floor(totalSeconds / 3600);
-                    const minutes = Math.floor((totalSeconds % 3600) / 60);
-                    document.getElementById('stat-time-spent').textContent = `${hours}h ${minutes}m`;
-
-                    // Matches
-                    document.getElementById('stat-matches-total').textContent = stats.matches_played || 0;
-                    
-                    // Win Rate
-                    const winRate = stats.matches_played > 0 ? Math.round(((stats.matches_won || 0) / stats.matches_played) * 100) : 0;
-                    document.getElementById('stat-win-rate').textContent = `${winRate}%`;
-
-                    // Best Time
-                    if (stats.best_time !== null && stats.best_time > 0) {
-                        const bestMins = Math.floor(stats.best_time / 60);
-                        const bestSecs = stats.best_time % 60;
-                        document.getElementById('stat-best-time').textContent = `${bestMins}m ${bestSecs}s`;
-                    } else {
-                        document.getElementById('stat-best-time').textContent = '--';
-                    }
-
-                    // Avg Accuracy (Backend returns 0.0 to 1.0)
-                    document.getElementById('stat-avg-accuracy').textContent = `${Math.round((stats.average_accuracy || 0) * 100)}%`;
-
-                    // Elo
-                    document.getElementById('stat-elo').textContent = stats.elo_rating || 0;
+                    updateUIForMode('overall'); // default
 
                     loadingDiv.style.display = 'none';
                     contentDiv.style.display = 'block';
