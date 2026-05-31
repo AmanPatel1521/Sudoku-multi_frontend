@@ -727,6 +727,7 @@ ins.adsbygoogle[data-ad-slot] iframe,
     align-items: center;
     border-radius: 0.75rem;
     backdrop-filter: blur(5px);
+    z-index: 20;
 }
 
 #finished-overlay {
