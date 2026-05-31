@@ -1798,3 +1798,29 @@ body.light-mode .modal-title {
 body.light-mode .card-glass [style*="text-shadow"] {
     text-shadow: none !important;
 }
+
+/* Brand Logo Styles */
+.brand-logo-container {
+    transition: transform 0.2s ease;
+}
+.brand-logo-container:hover {
+    transform: scale(1.02);
+}
+.brand-logo {
+    width: 48px; 
+    height: 48px; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+.brand-text {
+    font-size: 2rem; 
+    letter-spacing: -0.5px; 
+    background: linear-gradient(135deg, #ffffff, #c7d2fe); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent;
+}
+body.light-mode .brand-text {
+    background: linear-gradient(135deg, #1e293b, #6d28d9); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent;
+}

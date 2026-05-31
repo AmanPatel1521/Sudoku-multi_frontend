@@ -76,6 +76,26 @@ const soloEliminationMessages = [
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded fired.');
+    
+    // Fetch live global stats
+    async function fetchGlobalStats() {
+        try {
+            const response = await fetch('https://sudoku-multi-backend.onrender.com/stats');
+            if (response.ok) {
+                const stats = await response.json();
+                const matchesEl = document.getElementById('stat-matches-played');
+                const playersEl = document.getElementById('stat-competitive-players');
+                if (matchesEl && playersEl) {
+                    matchesEl.textContent = stats.matches_played.toLocaleString() + '+';
+                    playersEl.textContent = stats.competitive_players.toLocaleString() + '+';
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch global stats:', error);
+        }
+    }
+    fetchGlobalStats();
+
 
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
