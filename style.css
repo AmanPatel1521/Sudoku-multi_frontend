@@ -1807,10 +1807,11 @@ body.light-mode .card-glass [style*="text-shadow"] {
     transform: scale(1.02);
 }
 .brand-logo {
-    width: 48px; 
+    width: auto; 
     height: 48px; 
-    border-radius: 12px; 
+    border-radius: 8px; 
     box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    object-fit: cover;
 }
 .brand-text {
     font-size: 2rem; 
