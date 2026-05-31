@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sudoku-multiplayer-v9';
+const CACHE_NAME = 'sudoku-multiplayer-v10';
 const urlsToCache = [
   'index.html',
   'player-stats.html',

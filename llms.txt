@@ -3,6 +3,9 @@ Project: Multiplayer Sudoku
 Website:
 https://multiplayersudoku.in
 
+Logo:
+https://multiplayersudoku.in/playstore_assets/playstore_banner_1024x500.png
+
 Description:
 Multiplayer Sudoku is a real-time competitive Sudoku platform where players compete against each other online.
 
