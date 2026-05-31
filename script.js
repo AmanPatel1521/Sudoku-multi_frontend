@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const roomManagementDiv = document.getElementById('room-management');
     const homepageSeoSection = document.getElementById('homepage-seo-section');
+    const socialProofSection = document.getElementById('social-proof-section');
     const waitingRoomDiv = document.getElementById('waiting-room');
     const playerNameInput = document.getElementById('player-name-input');
     const playerAvatarSelect = document.getElementById('player-avatar-select');
@@ -1622,6 +1623,7 @@ document.addEventListener('DOMContentLoaded', () => {
         roomManagementDiv.style.display = 'none';
         gameContainer.style.display = 'none';
         if (homepageSeoSection) homepageSeoSection.style.display = 'none';
+        if (socialProofSection) socialProofSection.style.display = 'none';
         waitingRoomDiv.style.display = 'flex';
         roomCodeDisplay.textContent = roomId;
         
@@ -1678,6 +1680,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         roomManagementDiv.style.display = 'none';
         if (homepageSeoSection) homepageSeoSection.style.display = 'none';
+        if (socialProofSection) socialProofSection.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         gameContainer.style.display = 'block';
         
@@ -1768,6 +1771,7 @@ document.addEventListener('DOMContentLoaded', () => {
         waitingRoomDiv.style.display = 'none';
         roomManagementDiv.style.display = 'block';
         if (homepageSeoSection) homepageSeoSection.style.display = 'block';
+        if (socialProofSection) socialProofSection.style.display = 'block';
         document.getElementById('mobile-game-header').classList.remove('d-flex');
 
         const seoFooter = document.getElementById('seo-footer');
