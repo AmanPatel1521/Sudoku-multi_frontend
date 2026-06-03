@@ -100,8 +100,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const customBoardStr = urlParams.get('custom_board');
+    const customUrlParams = new URLSearchParams(window.location.search);
+    const customBoardStr = customUrlParams.get('custom_board');
     if (customBoardStr && customBoardStr.length === 81) {
         // Automatically start solo mode using custom board
         setTimeout(() => {
