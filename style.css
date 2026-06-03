@@ -621,6 +621,19 @@ body.light-mode .nav-pills .nav-link.active {
     animation: flash-hint-related 1s;
 }
 
+/* AI Logic Visualizer Classes */
+.cell.logic-area {
+    background-color: rgba(56, 189, 248, 0.25) !important;
+}
+.cell.logic-target {
+    background-color: var(--card-background) !important;
+    border: 3px solid var(--accent-color) !important;
+    z-index: 5;
+}
+.cell.logic-conflict {
+    background-color: rgba(244, 63, 94, 0.2) !important;
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }

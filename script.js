@@ -424,7 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentPuzzle) return;
         let targetR = null;
         let targetC = null;
-        let explanation = "Advanced logic used.";
+        let explanation = "Last Remaining Cell: Since it is the only possible option, this cell is the correct answer.";
+        let relatedCells = [];
 
         const isValidMove = (grid, r, c, num) => {
             for (let i = 0; i < 9; i++) if (grid[r][i] === num) return false;
@@ -447,7 +448,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let n = 1; n <= 9; n++) if (isValidMove(currentPuzzle, r, c, n)) candidates.push(n);
                     if (candidates.length === 1) {
                         targetR = r; targetC = c;
-                        explanation = `<strong>Naked Single:</strong> Cell (Row ${r+1}, Col ${c+1}) must be ${candidates[0]} because all other numbers are blocked in its row, column, or box.`;
+                        explanation = `<strong>Last Remaining Cell:</strong> Pay attention to the highlighted row, column, and block. Since it is the only possible option, this cell must be <b>${candidates[0]}</b>.`;
+                        // Highlight the row, col, and block
+                        for (let i = 0; i < 9; i++) relatedCells.push({r, c: i});
+                        for (let i = 0; i < 9; i++) relatedCells.push({r: i, c});
+                        let br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+                        for (let i = 0; i < 3; i++) {
+                            for (let j = 0; j < 3; j++) relatedCells.push({r: br+i, c: bc+j});
+                        }
                         found = true;
                     }
                 }
@@ -463,14 +471,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let c = 0; c < 9; c++) if (currentPuzzle[r][c] === 0 && isValidMove(currentPuzzle, r, c, num)) possibleCols.push(c);
                     if (possibleCols.length === 1) {
                         targetR = r; targetC = possibleCols[0];
-                        explanation = `<strong>Hidden Single (Row):</strong> Number ${num} must go in Row ${r+1}, Col ${targetC+1} because it's the only valid spot left in Row ${r+1}.`;
+                        explanation = `<strong>Last Remaining Cell:</strong> In this row, there is only one cell remaining that can contain <b>${num}</b>.`;
+                        for (let i = 0; i < 9; i++) relatedCells.push({r, c: i});
                         found = true;
                     }
                 }
             }
+            
+            // Note: We can also add Hidden Single (Col) and Hidden Single (Block) later, but this proves the concept.
         }
         
-        window.pendingHintExplanation = {r: targetR, c: targetC, text: explanation};
+        window.pendingHintExplanation = {r: targetR, c: targetC, text: explanation, relatedCells: relatedCells};
         socket.emit('hint', { room_id: roomId, player_id: playerId, row: targetR, col: targetC });
     }
 
@@ -1087,20 +1098,45 @@ document.addEventListener('DOMContentLoaded', () => {
         socket.on('hint_given', (data) => {
             const { row, col, value, hints_used, score } = data;
             const hintedCell = document.querySelector(`.cell[data-row='${row}'][data-col='${col}']`);
+            
+            // Clear any previous logic highlights
+            document.querySelectorAll('.logic-area, .logic-target, .logic-conflict').forEach(el => {
+                el.classList.remove('logic-area', 'logic-target', 'logic-conflict');
+            });
+            
             if (hintedCell) {
                 hintedCell.textContent = value;
-                hintedCell.classList.add('fixed', 'hint-flash');
-                flashRelatedCells(row, col, value);
-                setTimeout(() => hintedCell.classList.remove('hint-flash'), 1000);
+                hintedCell.classList.add('fixed');
             }
             updateStats(null, hints_used, score);
             
+            let textToShow = "Advanced backtracking logic was used to find this cell.";
+            
             if (window.pendingHintExplanation) {
-                showAlertModal("AI Tutor: Step-by-Step Logic", window.pendingHintExplanation.text);
+                textToShow = window.pendingHintExplanation.text;
+                if (window.pendingHintExplanation.relatedCells) {
+                    window.pendingHintExplanation.relatedCells.forEach(rc => {
+                        const cell = document.querySelector(`.cell[data-row='${rc.r}'][data-col='${rc.c}']`);
+                        if (cell) cell.classList.add('logic-area');
+                    });
+                }
+                if (hintedCell) {
+                    hintedCell.classList.add('logic-target');
+                }
                 window.pendingHintExplanation = null;
-            } else {
-                showAlertModal("AI Tutor: Step-by-Step Logic", "Advanced backtracking logic was used to find this cell.");
+            } else if (hintedCell) {
+                hintedCell.classList.add('logic-target');
             }
+            
+            // Show a temporary banner/toast at the top for the explanation
+            showTemporaryMessage(textToShow, 8000);
+            
+            // Auto-clear logic highlights after 8 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.logic-area, .logic-target, .logic-conflict').forEach(el => {
+                    el.classList.remove('logic-area', 'logic-target', 'logic-conflict');
+                });
+            }, 8000);
         });
 
         socket.on('player_eliminated', (data) => {
