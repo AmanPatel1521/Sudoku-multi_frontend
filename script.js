@@ -101,7 +101,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initMonetization();
 
     const customUrlParams = new URLSearchParams(window.location.search);
-    const customBoardStr = customUrlParams.get('custom_board');
+    let customBoardStr = customUrlParams.get('custom_board');
+    if (customBoardStr) {
+        customBoardStr = customBoardStr.replace(/[a-i]/g, m => '0'.repeat(m.charCodeAt(0) - 96));
+    }
     if (customBoardStr && customBoardStr.length === 81) {
         // Automatically start solo mode using custom board
         setTimeout(() => {

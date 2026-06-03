@@ -324,6 +324,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         boardStr += grid[r][c].toString();
                     }
                 }
+                boardStr = boardStr.replace(/0{1,9}/g, m => String.fromCharCode(96 + m.length));
                 window.location.href = '/?custom_board=' + boardStr;
             });
 
