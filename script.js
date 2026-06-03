@@ -100,6 +100,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const customBoardStr = urlParams.get('custom_board');
+    if (customBoardStr && customBoardStr.length === 81) {
+        // Automatically start solo mode using custom board
+        setTimeout(() => {
+            handlePlaySolo(customBoardStr);
+        }, 500);
+    }
+
     // Pre-warm the backend (Render free tier cold start mitigation)
     fetch("https://sudoku-multi-backend.onrender.com/health").catch(() => {});
 
@@ -403,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     createRoomBtn.addEventListener('click', handleCreateRoom);
     joinRoomBtn.addEventListener('click', handleJoinRoom);
-    playSoloBtn.addEventListener('click', handlePlaySolo);
+    playSoloBtn.addEventListener('click', () => handlePlaySolo());
     if(quickPlayBtn) quickPlayBtn.addEventListener('click', handleQuickPlay);
     if(dailyChallengeBtn) dailyChallengeBtn.addEventListener('click', handleDailyChallenge);
     startGameBtn.addEventListener('click', () => socket.emit('start_game', { room_id: roomId, player_id: playerId }));
@@ -720,7 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function handlePlaySolo() {
+    async function handlePlaySolo(customBoardStr = null) {
         hideFinishedOverlay();
         if (!(await ensurePlayerName())) return;
         const difficulty = difficultySelect.value;
@@ -732,10 +741,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setLoading(true, 'Initializing solo mode...');
         disableMenuButtons(true);
         try {
+            const bodyData = { player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId };
+            if (customBoardStr) {
+                bodyData.custom_board = customBoardStr;
+            }
             const response = await fetch('https://sudoku-multi-backend.onrender.com/create_room', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ player_name: playerName, difficulty: difficulty, game_mode: 'solo', avatar: avatar, player_id: playerId }),
+                body: JSON.stringify(bodyData),
             });
             const data = await response.json();
             if (!response.ok) throw new Error(data.error || 'Unknown error');
