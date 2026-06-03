@@ -37,16 +37,16 @@
                     <div id="stats-content" style="display: none;">
                         <ul class="nav nav-pills justify-content-center mb-4" id="stats-tabs" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="tab-overall" data-bs-toggle="pill" data-mode="overall" type="button" role="tab">Overall</button>
+                                <button class="nav-link active" id="tab-overall" data-mode="overall" type="button" role="tab">Overall</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-solo" data-bs-toggle="pill" data-mode="solo" type="button" role="tab">Solo</button>
+                                <button class="nav-link" id="tab-solo" data-mode="solo" type="button" role="tab">Solo</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-daily" data-bs-toggle="pill" data-mode="daily" type="button" role="tab">Daily</button>
+                                <button class="nav-link" id="tab-daily" data-mode="daily" type="button" role="tab">Daily</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-multiplayer" data-bs-toggle="pill" data-mode="multiplayer" type="button" role="tab">Multiplayer</button>
+                                <button class="nav-link" id="tab-multiplayer" data-mode="multiplayer" type="button" role="tab">Multiplayer</button>
                             </li>
                         </ul>
                         
@@ -138,8 +138,10 @@
             }
 
             // Bind tab clicks
-            document.querySelectorAll('button[data-bs-toggle="pill"]').forEach(tabBtn => {
-                tabBtn.addEventListener('shown.bs.tab', (e) => {
+            document.querySelectorAll('#stats-tabs .nav-link').forEach(tabBtn => {
+                tabBtn.addEventListener('click', (e) => {
+                    document.querySelectorAll('#stats-tabs .nav-link').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
                     const mode = e.target.getAttribute('data-mode');
                     updateUIForMode(mode);
                 });
