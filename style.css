@@ -622,16 +622,91 @@ body.light-mode .nav-pills .nav-link.active {
 }
 
 /* AI Logic Visualizer Classes */
-.cell.logic-area {
-    background-color: rgba(56, 189, 248, 0.25) !important;
+.board-container {
+    position: relative;
+    transition: filter 0.3s ease;
 }
-.cell.logic-target {
+
+.board-container.board-dimmed .cell:not(.logic-area):not(.logic-target):not(.logic-conflict) {
+    opacity: 0.3;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ensure solver board cells dim correctly too */
+.board-container.board-dimmed .solver-cell:not(.logic-area):not(.logic-target):not(.logic-conflict) {
+    opacity: 0.3;
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.cell.logic-area, .solver-cell.logic-area {
+    background-color: rgba(56, 189, 248, 0.25) !important;
+    z-index: 2;
+}
+.cell.logic-target, .solver-cell.logic-target {
     background-color: var(--card-background) !important;
     border: 3px solid var(--accent-color) !important;
     z-index: 5;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
 }
-.cell.logic-conflict {
+.cell.logic-conflict, .solver-cell.logic-conflict {
     background-color: rgba(244, 63, 94, 0.2) !important;
+}
+
+/* AI Tutor Floating Card */
+#ai-tutor-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    background-color: white;
+    border-radius: 12px;
+    z-index: 100;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    color: #333;
+    overflow: hidden;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+body.light-mode #ai-tutor-card {
+    background-color: #fff;
+    color: #111;
+}
+
+body:not(.light-mode) #ai-tutor-card {
+    background-color: #1e293b;
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ai-tutor-header {
+    padding: 10px 15px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+}
+
+body:not(.light-mode) .ai-tutor-header {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.ai-tutor-body {
+    padding: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.ai-tutor-body strong {
+    color: var(--primary-color);
 }
 
 @keyframes shake {

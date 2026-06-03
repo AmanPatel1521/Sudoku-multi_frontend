@@ -1114,6 +1114,14 @@ document.addEventListener('DOMContentLoaded', () => {
             
             if (window.pendingHintExplanation) {
                 textToShow = window.pendingHintExplanation.text;
+                let titleMatch = textToShow.match(/<strong>(.*?)<\/strong>:(.*)/);
+                if (titleMatch) {
+                    // Extract title and text to set on card
+                    textToShow = titleMatch[2].trim();
+                    let cardTitle = document.querySelector('.ai-tutor-title');
+                    if(cardTitle) cardTitle.innerHTML = `💡 ${titleMatch[1]}`;
+                }
+                
                 if (window.pendingHintExplanation.relatedCells) {
                     window.pendingHintExplanation.relatedCells.forEach(rc => {
                         const cell = document.querySelector(`.cell[data-row='${rc.r}'][data-col='${rc.c}']`);
@@ -1128,15 +1136,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 hintedCell.classList.add('logic-target');
             }
             
-            // Show a temporary banner/toast at the top for the explanation
-            showTemporaryMessage(textToShow, 8000);
+            // Show the floating interactive card instead of a temporary banner
+            const card = document.getElementById('ai-tutor-card');
+            const textEl = document.getElementById('ai-tutor-text');
+            const boardContainer = document.querySelector('.board-container');
             
-            // Auto-clear logic highlights after 8 seconds
-            setTimeout(() => {
-                document.querySelectorAll('.logic-area, .logic-target, .logic-conflict').forEach(el => {
-                    el.classList.remove('logic-area', 'logic-target', 'logic-conflict');
-                });
-            }, 8000);
+            if (card && textEl && boardContainer) {
+                textEl.innerHTML = textToShow;
+                card.classList.remove('d-none');
+                boardContainer.classList.add('board-dimmed');
+                
+                const dismiss = () => {
+                    card.classList.add('d-none');
+                    boardContainer.classList.remove('board-dimmed');
+                    document.querySelectorAll('.logic-area, .logic-target, .logic-conflict').forEach(el => {
+                        el.classList.remove('logic-area', 'logic-target', 'logic-conflict');
+                    });
+                };
+                
+                const closeBtn = card.querySelector('.ai-tutor-close');
+                const applyBtn = card.querySelector('#ai-tutor-apply-btn');
+                
+                if (closeBtn) closeBtn.onclick = dismiss;
+                if (applyBtn) applyBtn.onclick = dismiss;
+            }
         });
 
         socket.on('player_eliminated', (data) => {

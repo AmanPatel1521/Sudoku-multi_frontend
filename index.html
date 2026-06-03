@@ -434,6 +434,18 @@ document.addEventListener("DOMContentLoaded", function() {
                     <div class="board-container">
                         <div id="sudoku-board" class="shadow-lg"></div>
                         <div id="pause-overlay" class="d-none"></div>
+                        
+                        <!-- Floating AI Tutor Card -->
+                        <div id="ai-tutor-card" class="d-none shadow-lg">
+                            <div class="ai-tutor-header">
+                                <span class="ai-tutor-title">💡 Last Remaining Cell</span>
+                                <button type="button" class="btn-close ai-tutor-close" aria-label="Close"></button>
+                            </div>
+                            <div class="ai-tutor-body">
+                                <p id="ai-tutor-text">Since it is the only possible option, this cell must be 4.</p>
+                                <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-100 mt-2">Got it!</button>
+                            </div>
+                        </div>
                     </div>
                     <div id="mobile-number-palette" class="d-lg-none">
                         <!-- Number palette will be dynamically populated or duplicated here -->

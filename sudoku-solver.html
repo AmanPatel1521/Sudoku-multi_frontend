@@ -100,7 +100,20 @@ document.addEventListener("DOMContentLoaded", function() {
 
                     <!-- Solver Tool UI -->
                     <div class="my-5 p-4 bg-dark bg-opacity-25 rounded-4 shadow-sm text-center">
+                    <div class="board-container">
                         <div id="solver-board" class="shadow-lg mb-4"></div>
+                        <!-- Floating AI Tutor Card -->
+                        <div id="ai-tutor-card" class="d-none shadow-lg">
+                            <div class="ai-tutor-header">
+                                <span class="ai-tutor-title">💡 Last Remaining Cell</span>
+                                <button type="button" class="btn-close ai-tutor-close" aria-label="Close"></button>
+                            </div>
+                            <div class="ai-tutor-body">
+                                <p id="ai-tutor-text">Since it is the only possible option, this cell must be 4.</p>
+                                <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-100 mt-2">Got it!</button>
+                            </div>
+                        </div>
+                    </div>
                         <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
                             <button id="explain-btn" class="btn btn-info text-white btn-lg rounded-pill px-4 fw-bold shadow">💡 Explain Next Step</button>
                             <button id="solve-btn" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow">Solve Instantly</button>
@@ -320,6 +333,37 @@ document.addEventListener("DOMContentLoaded", function() {
                     }
                     cells[targetIndex].classList.add('logic-target');
                     logMessage(text);
+                    
+                    // Show the floating interactive card
+                    const card = document.getElementById('ai-tutor-card');
+                    const textEl = document.getElementById('ai-tutor-text');
+                    const boardContainer = document.querySelector('.board-container');
+                    
+                    if (card && textEl && boardContainer) {
+                        let parsedText = text;
+                        let titleMatch = text.match(/<strong>(.*?)<\/strong>:(.*)/);
+                        if (titleMatch) {
+                            parsedText = titleMatch[2].trim();
+                            let cardTitle = document.querySelector('.ai-tutor-title');
+                            if(cardTitle) cardTitle.innerHTML = `💡 ${titleMatch[1]}`;
+                        }
+                        
+                        textEl.innerHTML = parsedText;
+                        card.classList.remove('d-none');
+                        boardContainer.classList.add('board-dimmed');
+                        
+                        const dismiss = () => {
+                            card.classList.add('d-none');
+                            boardContainer.classList.remove('board-dimmed');
+                            cells.forEach(cell => cell.classList.remove('logic-area', 'logic-target', 'logic-conflict'));
+                        };
+                        
+                        const closeBtn = card.querySelector('.ai-tutor-close');
+                        const applyBtn = card.querySelector('#ai-tutor-apply-btn');
+                        
+                        if (closeBtn) closeBtn.onclick = dismiss;
+                        if (applyBtn) applyBtn.onclick = dismiss;
+                    }
                 };
 
                 // Strategy 1: Naked Singles
