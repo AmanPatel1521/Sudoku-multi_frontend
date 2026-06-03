@@ -161,6 +161,35 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+    <!-- FAQPage Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [{
+        "@type": "Question",
+        "name": "How do you play multiplayer Sudoku online with friends?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "To play multiplayer Sudoku with friends, simply click 'Create Room' on the homepage, select your difficulty (Easy to Extreme), and share the generated Room Code with your friends. They can enter the Room Code under 'Join Room' to start playing together in real-time."
+        }
+      }, {
+        "@type": "Question",
+        "name": "What are the rules of Multiplayer Sudoku?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "The core rules are the same: Fill the 9x9 grid so that each column, row, and 3x3 subgrid contains digits 1-9. In multiplayer, you earn +50 points for each correct cell. However, you lose 20 points and get a strike for a mistake. Three strikes and you are eliminated from the match!"
+        }
+      }, {
+        "@type": "Question",
+        "name": "Can I play 2 player Sudoku online?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! You can play 2 player Sudoku online by creating a private room and inviting a friend. You can also use the 'Quick Play' matchmaking feature to instantly find another player online to compete against."
+        }
+      }]
+    }
+    </script>
 </head>
 <body>
     <div id="main-container" class="container-fluid pt-3 pb-0">
@@ -184,10 +213,11 @@ document.addEventListener("DOMContentLoaded", function() {
         </header>
 
         <div id="room-management" class="mx-auto">
+            <h2 class="visually-hidden">Play Sudoku Online With Friends in Real-Time</h2>
             <div class="card shadow-lg card-glass">
                 <div class="card-body p-4 position-relative">
                     <h2 class="card-title text-center mb-2 fw-bold text-white">Play Real-Time Multiplayer Sudoku</h2>
-                    <p class="text-center text-white-50 mb-4 px-2" style="font-size: 0.95rem;">Compete against players worldwide, climb global leaderboards, and solve daily challenges — completely free.</p>
+                    <p class="text-center text-white-50 mb-4 px-2" style="font-size: 0.95rem;">Play 2 player Sudoku online with friends, challenge players worldwide in matchmaking, and solve daily puzzles — completely free.</p>
 
                     <button class="btn btn-warning btn-lg w-100 mb-3 fw-bold glow-btn position-relative overflow-hidden shadow-lg" id="daily-challenge-btn" style="border-radius: 1rem; border: none; font-size: 1.25rem;">
                         <span class="text-dark">🔥 Play Daily Challenge <span class="badge bg-danger ms-2 shadow-sm" id="daily-badge">NEW</span></span>
