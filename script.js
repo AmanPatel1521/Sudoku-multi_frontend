@@ -417,7 +417,61 @@ document.addEventListener('DOMContentLoaded', () => {
     if(dailyChallengeBtn) dailyChallengeBtn.addEventListener('click', handleDailyChallenge);
     startGameBtn.addEventListener('click', () => socket.emit('start_game', { room_id: roomId, player_id: playerId }));
     
-    document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', () => socket.emit('hint', { room_id: roomId, player_id: playerId })));
+    function requestSmartHint() {
+        if (!currentPuzzle) return;
+        let targetR = null;
+        let targetC = null;
+        let explanation = "Advanced logic used.";
+
+        const isValidMove = (grid, r, c, num) => {
+            for (let i = 0; i < 9; i++) if (grid[r][i] === num) return false;
+            for (let i = 0; i < 9; i++) if (grid[i][c] === num) return false;
+            let br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    if (grid[br+i][bc+j] === num) return false;
+                }
+            }
+            return true;
+        };
+
+        // Find Naked Single
+        let found = false;
+        for (let r = 0; r < 9 && !found; r++) {
+            for (let c = 0; c < 9 && !found; c++) {
+                if (currentPuzzle[r][c] === 0) {
+                    let candidates = [];
+                    for (let n = 1; n <= 9; n++) if (isValidMove(currentPuzzle, r, c, n)) candidates.push(n);
+                    if (candidates.length === 1) {
+                        targetR = r; targetC = c;
+                        explanation = `<strong>Naked Single:</strong> Cell (Row ${r+1}, Col ${c+1}) must be ${candidates[0]} because all other numbers are blocked in its row, column, or box.`;
+                        found = true;
+                    }
+                }
+            }
+        }
+
+        // Find Hidden Single
+        if (!found) {
+            for (let r = 0; r < 9 && !found; r++) {
+                for (let num = 1; num <= 9 && !found; num++) {
+                    if (currentPuzzle[r].includes(num)) continue;
+                    let possibleCols = [];
+                    for (let c = 0; c < 9; c++) if (currentPuzzle[r][c] === 0 && isValidMove(currentPuzzle, r, c, num)) possibleCols.push(c);
+                    if (possibleCols.length === 1) {
+                        targetR = r; targetC = possibleCols[0];
+                        explanation = `<strong>Hidden Single (Row):</strong> Number ${num} must go in Row ${r+1}, Col ${targetC+1} because it's the only valid spot left in Row ${r+1}.`;
+                        found = true;
+                    }
+                }
+            }
+        }
+        
+        window.pendingHintExplanation = {r: targetR, c: targetC, text: explanation};
+        socket.emit('hint', { room_id: roomId, player_id: playerId, row: targetR, col: targetC });
+    }
+
+    document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', requestSmartHint));
     document.querySelectorAll('#undo-button').forEach(btn => btn.addEventListener('click', () => socket.emit('undo', { room_id: roomId, player_id: playerId })));
     document.querySelectorAll('#notes-button').forEach(btn => btn.addEventListener('click', toggleNotesMode));
     document.querySelectorAll('#eraser-button').forEach(btn => btn.addEventListener('click', handleErase));
@@ -1037,6 +1091,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => hintedCell.classList.remove('hint-flash'), 1000);
             }
             updateStats(null, hints_used, score);
+            
+            if (window.pendingHintExplanation) {
+                showAlertModal("AI Tutor: Step-by-Step Logic", window.pendingHintExplanation.text);
+                window.pendingHintExplanation = null;
+            } else {
+                showAlertModal("AI Tutor: Step-by-Step Logic", "Advanced backtracking logic was used to find this cell.");
+            }
         });
 
         socket.on('player_eliminated', (data) => {
