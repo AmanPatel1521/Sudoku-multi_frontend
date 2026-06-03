@@ -279,10 +279,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="p-3 rounded bg-dark bg-opacity-25 border border-secondary shadow-sm h-100 d-flex flex-column justify-content-center" style="backdrop-filter: blur(10px);">
-                    <h4 class="fw-bold text-success mb-1">Global</h4>
-                    <div class="text-white-50 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Leaderboards</div>
-                </div>
+                <a href="/leaderboard.html" class="text-decoration-none d-block h-100">
+                    <div class="p-3 rounded bg-dark bg-opacity-25 border border-secondary shadow-sm h-100 d-flex flex-column justify-content-center stat-box-hover" style="backdrop-filter: blur(10px); transition: transform 0.2s, background-color 0.2s;" onmouseover="this.style.transform='scale(1.03)'; this.classList.replace('bg-opacity-25', 'bg-opacity-50')" onmouseout="this.style.transform='scale(1)'; this.classList.replace('bg-opacity-50', 'bg-opacity-25')">
+                        <h4 class="fw-bold text-success mb-1">Global</h4>
+                        <div class="text-white-50 small text-uppercase fw-semibold" style="letter-spacing: 0.5px;">Leaderboards</div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>
