@@ -42,6 +42,12 @@
             color: var(--success-color);
             background: #f0fdf4;
         }
+        
+        /* 3x3 Block Borders */
+        .solver-cell:nth-child(3n) { border-right: 2px solid var(--primary-color); }
+        .solver-cell:nth-child(9n) { border-right: 1px solid #e2e8f0; } /* Reset last in row */
+        .solver-cell:nth-child(n+19):nth-child(-n+27),
+        .solver-cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--primary-color); }
         /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             #solver-board {
@@ -264,9 +270,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 // Validate first
                 let initialValid = true;
                 let isFull = true;
+                let isEmpty = true;
                 for (let r = 0; r < 9; r++) {
                     for (let c = 0; c < 9; c++) {
                         if (grid[r][c] !== 0) {
+                            isEmpty = false;
                             let temp = grid[r][c];
                             grid[r][c] = 0;
                             if (!isValid(grid, r, c, temp)) {
@@ -281,6 +289,10 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 if (!initialValid) {
                     logMessage('<span class="text-danger">Error: The current board contains conflicts! Please fix them first.</span>');
+                    return;
+                }
+                if (isEmpty) {
+                    logMessage('<span class="text-warning">Enter some numbers first! The AI cannot deduce logic from an empty board.</span>');
                     return;
                 }
                 if (isFull) {
@@ -450,6 +462,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     cell.value = '';
                     cell.classList.remove('solved-cell');
                 });
+                document.getElementById('explanation-log').innerHTML = '<em>AI Tutor Log: Enter numbers and click "Explain Next Step" to see the logic.</em><br>';
                 cells[0].focus();
             });
         });
