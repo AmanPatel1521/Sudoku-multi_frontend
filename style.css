@@ -627,13 +627,13 @@ body.light-mode .nav-pills .nav-link.active {
     transition: filter 0.3s ease;
 }
 
-.board-container.board-dimmed .cell:not(.logic-area):not(.logic-target):not(.logic-conflict) {
+.board-container.board-dimmed .cell:not(.logic-area):not(.logic-target):not(.logic-conflict):not(.tutor-highlight) {
     opacity: 0.3;
     background-color: rgba(0, 0, 0, 0.1) !important;
 }
 
 /* Ensure solver board cells dim correctly too */
-.board-container.board-dimmed .solver-cell:not(.logic-area):not(.logic-target):not(.logic-conflict) {
+.board-container.board-dimmed .solver-cell:not(.logic-area):not(.logic-target):not(.logic-conflict):not(.tutor-highlight) {
     opacity: 0.3;
     background-color: rgba(0, 0, 0, 0.1) !important;
 }
