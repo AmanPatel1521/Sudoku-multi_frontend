@@ -15,6 +15,9 @@ let isDailyGame = false;
 let timerInterval = null;
 let elapsedTime = 0;
 let isPaused = false;
+let isHintPaused = false;
+let accumulatedPauseTime = 0;
+let lastPauseStartTime = 0;
 let playersInRoom = [];
 let gameOverModal = null;
 let isReconnecting = false;
@@ -424,8 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentPuzzle) return;
         let targetR = null;
         let targetC = null;
-        let explanation = "Last Remaining Cell: Since it is the only possible option, this cell is the correct answer.";
-        let relatedCells = [];
+        let steps = [];
 
         const isValidMove = (grid, r, c, num) => {
             for (let i = 0; i < 9; i++) if (grid[r][i] === num) return false;
@@ -439,8 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return true;
         };
 
-        // Find Naked Single
         let found = false;
+        // Find Naked Single
         for (let r = 0; r < 9 && !found; r++) {
             for (let c = 0; c < 9 && !found; c++) {
                 if (currentPuzzle[r][c] === 0) {
@@ -448,14 +450,31 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let n = 1; n <= 9; n++) if (isValidMove(currentPuzzle, r, c, n)) candidates.push(n);
                     if (candidates.length === 1) {
                         targetR = r; targetC = c;
-                        explanation = `<strong>Last Remaining Cell:</strong> Pay attention to the highlighted row, column, and block. Since it is the only possible option, this cell must be <b>${candidates[0]}</b>.`;
-                        // Highlight the row, col, and block
+                        let relatedCells = [];
                         for (let i = 0; i < 9; i++) relatedCells.push({r, c: i});
                         for (let i = 0; i < 9; i++) relatedCells.push({r: i, c});
                         let br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
                         for (let i = 0; i < 3; i++) {
                             for (let j = 0; j < 3; j++) relatedCells.push({r: br+i, c: bc+j});
                         }
+                        
+                        steps = [
+                            {
+                                title: "💡 AI Tutor",
+                                text: "Let's find the Last Remaining Cell. Pay attention to the highlighted row, column, and block.",
+                                relatedCells: relatedCells,
+                                targetCell: null,
+                                showAnswer: false
+                            },
+                            {
+                                title: "💡 Last Remaining Cell",
+                                text: `Since it is the only possible option, this cell must be <b>${candidates[0]}</b>.`,
+                                relatedCells: relatedCells,
+                                targetCell: {r, c},
+                                showAnswer: true,
+                                ans: candidates[0]
+                            }
+                        ];
                         found = true;
                     }
                 }
@@ -471,18 +490,129 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (let c = 0; c < 9; c++) if (currentPuzzle[r][c] === 0 && isValidMove(currentPuzzle, r, c, num)) possibleCols.push(c);
                     if (possibleCols.length === 1) {
                         targetR = r; targetC = possibleCols[0];
-                        explanation = `<strong>Last Remaining Cell:</strong> In this row, there is only one cell remaining that can contain <b>${num}</b>.`;
+                        let relatedCells = [];
                         for (let i = 0; i < 9; i++) relatedCells.push({r, c: i});
+                        
+                        steps = [
+                            {
+                                title: "💡 AI Tutor",
+                                text: `Let's find where <b>${num}</b> can go in this row.`,
+                                relatedCells: relatedCells,
+                                targetCell: null,
+                                showAnswer: false
+                            },
+                            {
+                                title: "💡 Last Remaining Cell",
+                                text: `In this row, there is only one cell remaining that can contain <b>${num}</b>.`,
+                                relatedCells: relatedCells,
+                                targetCell: {r: targetR, c: targetC},
+                                showAnswer: true,
+                                ans: num
+                            }
+                        ];
                         found = true;
                     }
                 }
             }
-            
-            // Note: We can also add Hidden Single (Col) and Hidden Single (Block) later, but this proves the concept.
         }
         
-        window.pendingHintExplanation = {r: targetR, c: targetC, text: explanation, relatedCells: relatedCells};
-        socket.emit('hint', { room_id: roomId, player_id: playerId, row: targetR, col: targetC });
+        if (!found) {
+            // Fallback if no simple logic is found (just standard hint)
+            steps = [{
+                title: "💡 AI Tutor",
+                text: "Advanced backtracking logic was used to find this cell.",
+                relatedCells: [],
+                targetCell: null,
+                showAnswer: false
+            }];
+            // We need a server hint to tell us what it is.
+            socket.emit('hint', { room_id: roomId, player_id: playerId, row: null, col: null });
+            return;
+        }
+
+        window.pendingHintSteps = steps;
+        startAITutor(targetR, targetC);
+    }
+
+    function startAITutor(targetR, targetC, alreadyEmitted = false) {
+        if (!window.pendingHintSteps) return;
+        
+        isHintPaused = true;
+        let currentStep = 0;
+        const card = document.getElementById('ai-tutor-card');
+        const textEl = document.getElementById('ai-tutor-text');
+        const titleEl = document.querySelector('.ai-tutor-title');
+        const btn = document.getElementById('ai-tutor-apply-btn');
+        const boardContainer = document.querySelector('.board-container');
+        
+        if (!card) return;
+        
+        card.classList.remove('d-none');
+        boardContainer.classList.add('board-dimmed');
+        
+        function renderStep() {
+            const step = window.pendingHintSteps[currentStep];
+            if(titleEl) titleEl.innerHTML = step.title;
+            if(textEl) textEl.innerHTML = step.text;
+            
+            // Clear old highlights
+            document.querySelectorAll('.logic-area, .logic-target').forEach(el => el.classList.remove('logic-area', 'logic-target'));
+            
+            // Apply new highlights
+            if (step.relatedCells) {
+                step.relatedCells.forEach(rc => {
+                    let cell = document.querySelector(`.cell[data-row='${rc.r}'][data-col='${rc.c}']`);
+                    if(cell) cell.classList.add('logic-area');
+                });
+            }
+            if (step.targetCell) {
+                let cell = document.querySelector(`.cell[data-row='${step.targetCell.r}'][data-col='${step.targetCell.c}']`);
+                if(cell) {
+                    cell.classList.add('logic-target');
+                    if (step.showAnswer && !alreadyEmitted) {
+                        cell.textContent = step.ans; // Temporarily show it
+                    }
+                }
+            }
+            
+            if (currentStep < window.pendingHintSteps.length - 1) {
+                btn.textContent = "Next";
+            } else {
+                btn.textContent = "Got it!";
+            }
+        }
+        
+        const dismiss = () => {
+            card.classList.add('d-none');
+            boardContainer.classList.remove('board-dimmed');
+            document.querySelectorAll('.logic-area, .logic-target').forEach(el => {
+                el.classList.remove('logic-area', 'logic-target');
+                if (el.classList.contains('logic-target') && !alreadyEmitted) {
+                    el.textContent = ''; // clear temp answer
+                }
+            });
+            isHintPaused = false;
+            
+            // Now emit the hint to the server so it's officially recorded
+            if (!alreadyEmitted) {
+                socket.emit('hint', { room_id: roomId, player_id: playerId, row: targetR, col: targetC });
+            }
+            window.pendingHintSteps = null;
+        };
+        
+        btn.onclick = () => {
+            if (currentStep < window.pendingHintSteps.length - 1) {
+                currentStep++;
+                renderStep();
+            } else {
+                dismiss();
+            }
+        };
+        
+        const closeBtn = card.querySelector('.ai-tutor-close');
+        if(closeBtn) closeBtn.onclick = dismiss;
+        
+        renderStep();
     }
 
     document.querySelectorAll('#hint-button').forEach(btn => btn.addEventListener('click', requestSmartHint));
@@ -1110,55 +1240,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             updateStats(null, hints_used, score);
             
-            let textToShow = "Advanced backtracking logic was used to find this cell.";
-            
-            if (window.pendingHintExplanation) {
-                textToShow = window.pendingHintExplanation.text;
-                let titleMatch = textToShow.match(/<strong>(.*?)<\/strong>:(.*)/);
-                if (titleMatch) {
-                    // Extract title and text to set on card
-                    textToShow = titleMatch[2].trim();
-                    let cardTitle = document.querySelector('.ai-tutor-title');
-                    if(cardTitle) cardTitle.innerHTML = `💡 ${titleMatch[1]}`;
-                }
-                
-                if (window.pendingHintExplanation.relatedCells) {
-                    window.pendingHintExplanation.relatedCells.forEach(rc => {
-                        const cell = document.querySelector(`.cell[data-row='${rc.r}'][data-col='${rc.c}']`);
-                        if (cell) cell.classList.add('logic-area');
-                    });
-                }
-                if (hintedCell) {
-                    hintedCell.classList.add('logic-target');
-                }
-                window.pendingHintExplanation = null;
+            if (window.pendingHintSteps && window.pendingHintSteps.length > 0) {
+                // If it was a fallback that we just received from server
+                window.pendingHintSteps[0].targetCell = {r: row, c: col};
+                window.pendingHintSteps[0].ans = value;
+                startAITutor(row, col, true);
             } else if (hintedCell) {
                 hintedCell.classList.add('logic-target');
-            }
-            
-            // Show the floating interactive card instead of a temporary banner
-            const card = document.getElementById('ai-tutor-card');
-            const textEl = document.getElementById('ai-tutor-text');
-            const boardContainer = document.querySelector('.board-container');
-            
-            if (card && textEl && boardContainer) {
-                textEl.innerHTML = textToShow;
-                card.classList.remove('d-none');
-                boardContainer.classList.add('board-dimmed');
-                
-                const dismiss = () => {
-                    card.classList.add('d-none');
-                    boardContainer.classList.remove('board-dimmed');
-                    document.querySelectorAll('.logic-area, .logic-target, .logic-conflict').forEach(el => {
-                        el.classList.remove('logic-area', 'logic-target', 'logic-conflict');
-                    });
-                };
-                
-                const closeBtn = card.querySelector('.ai-tutor-close');
-                const applyBtn = card.querySelector('#ai-tutor-apply-btn');
-                
-                if (closeBtn) closeBtn.onclick = dismiss;
-                if (applyBtn) applyBtn.onclick = dismiss;
+                setTimeout(() => hintedCell.classList.remove('logic-target'), 2000);
             }
         });
 
@@ -1716,18 +1805,28 @@ document.addEventListener('DOMContentLoaded', () => {
         if (timerInterval) clearInterval(timerInterval);
 
         const startTime = isSolo ? Date.now() / 1000 : serverStartTime;
+        accumulatedPauseTime = 0;
+        lastPauseStartTime = 0;
 
         const updateDisplay = () => {
-            if (!isPaused) {
-                const now = Date.now() / 1000;
-                elapsedTime = Math.max(0, Math.floor(now - startTime));
-                
-                const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
-                const seconds = (elapsedTime % 60).toString().padStart(2, '0');
-                const timeString = `${minutes}:${seconds}`;
-                timerDisplay.textContent = timeString;
-                if (timerDisplayMobile) timerDisplayMobile.textContent = timeString;
+            if (isPaused || isHintPaused) {
+                if (lastPauseStartTime === 0) {
+                    lastPauseStartTime = Date.now() / 1000;
+                }
+                return;
+            } else if (lastPauseStartTime > 0) {
+                accumulatedPauseTime += (Date.now() / 1000) - lastPauseStartTime;
+                lastPauseStartTime = 0;
             }
+
+            const now = Date.now() / 1000;
+            elapsedTime = Math.max(0, Math.floor(now - startTime - accumulatedPauseTime));
+            
+            const minutes = Math.floor(elapsedTime / 60).toString().padStart(2, '0');
+            const seconds = (elapsedTime % 60).toString().padStart(2, '0');
+            const timeString = `${minutes}:${seconds}`;
+            timerDisplay.textContent = timeString;
+            if (timerDisplayMobile) timerDisplayMobile.textContent = timeString;
         };
 
         updateDisplay();

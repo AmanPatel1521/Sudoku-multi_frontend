@@ -323,46 +323,107 @@ document.addEventListener("DOMContentLoaded", function() {
 
                 const applyLogic = (ans, text, targetR, targetC, relatedCells) => {
                     let targetIndex = targetR * 9 + targetC;
-                    cells[targetIndex].value = ans;
-                    cells[targetIndex].classList.add('solved-cell');
                     
-                    if (relatedCells) {
-                        relatedCells.forEach(rc => {
-                            cells[rc.r * 9 + rc.c].classList.add('logic-area');
+                    let parsedText = text;
+                    let titleText = "💡 AI Tutor";
+                    let titleMatch = text.match(/<strong>(.*?)<\/strong>:(.*)/);
+                    if (titleMatch) {
+                        titleText = `💡 ${titleMatch[1]}`;
+                        parsedText = titleMatch[2].trim();
+                    }
+
+                    // Generate step-by-step
+                    let steps = [];
+                    if (relatedCells && relatedCells.length > 0) {
+                        steps.push({
+                            title: titleText,
+                            text: `Let's analyze this area to find the answer.`,
+                            relatedCells: relatedCells,
+                            targetCell: null,
+                            showAnswer: false
                         });
                     }
-                    cells[targetIndex].classList.add('logic-target');
-                    logMessage(text);
-                    
+                    steps.push({
+                        title: titleText,
+                        text: parsedText,
+                        relatedCells: relatedCells,
+                        targetCell: {r: targetR, c: targetC},
+                        showAnswer: true,
+                        ans: ans
+                    });
+
                     // Show the floating interactive card
                     const card = document.getElementById('ai-tutor-card');
                     const textEl = document.getElementById('ai-tutor-text');
+                    const titleEl = document.querySelector('.ai-tutor-title');
                     const boardContainer = document.querySelector('.board-container');
+                    const applyBtn = card.querySelector('#ai-tutor-apply-btn');
+                    const closeBtn = card.querySelector('.ai-tutor-close');
                     
                     if (card && textEl && boardContainer) {
-                        let parsedText = text;
-                        let titleMatch = text.match(/<strong>(.*?)<\/strong>:(.*)/);
-                        if (titleMatch) {
-                            parsedText = titleMatch[2].trim();
-                            let cardTitle = document.querySelector('.ai-tutor-title');
-                            if(cardTitle) cardTitle.innerHTML = `💡 ${titleMatch[1]}`;
-                        }
-                        
-                        textEl.innerHTML = parsedText;
+                        let currentStep = 0;
                         card.classList.remove('d-none');
                         boardContainer.classList.add('board-dimmed');
-                        
+
+                        function renderStep() {
+                            const step = steps[currentStep];
+                            if(titleEl) titleEl.innerHTML = step.title;
+                            textEl.innerHTML = step.text;
+
+                            cells.forEach(cell => cell.classList.remove('logic-area', 'logic-target'));
+                            
+                            if (step.relatedCells) {
+                                step.relatedCells.forEach(rc => {
+                                    cells[rc.r * 9 + rc.c].classList.add('logic-area');
+                                });
+                            }
+                            if (step.targetCell) {
+                                let tIdx = step.targetCell.r * 9 + step.targetCell.c;
+                                cells[tIdx].classList.add('logic-target');
+                                if (step.showAnswer) {
+                                    cells[tIdx].value = step.ans; // Temporarily show
+                                }
+                            }
+                            
+                            if (currentStep < steps.length - 1) {
+                                applyBtn.textContent = "Next";
+                            } else {
+                                applyBtn.textContent = "Got it!";
+                            }
+                        }
+
                         const dismiss = () => {
                             card.classList.add('d-none');
                             boardContainer.classList.remove('board-dimmed');
-                            cells.forEach(cell => cell.classList.remove('logic-area', 'logic-target', 'logic-conflict'));
+                            cells.forEach(cell => {
+                                cell.classList.remove('logic-area', 'logic-target');
+                                if (!cell.classList.contains('fixed') && !cell.classList.contains('solved-cell') && cell.value === String(ans)) {
+                                    cell.value = '';
+                                }
+                            });
+                            
+                            // Officially place the cell
+                            cells[targetIndex].value = ans;
+                            cells[targetIndex].classList.add('solved-cell');
+                            logMessage(text);
+                        };
+
+                        applyBtn.onclick = () => {
+                            if (currentStep < steps.length - 1) {
+                                currentStep++;
+                                renderStep();
+                            } else {
+                                dismiss();
+                            }
                         };
                         
-                        const closeBtn = card.querySelector('.ai-tutor-close');
-                        const applyBtn = card.querySelector('#ai-tutor-apply-btn');
-                        
                         if (closeBtn) closeBtn.onclick = dismiss;
-                        if (applyBtn) applyBtn.onclick = dismiss;
+                        renderStep();
+                    } else {
+                        // Fallback if UI is missing
+                        cells[targetIndex].value = ans;
+                        cells[targetIndex].classList.add('solved-cell');
+                        logMessage(text);
                     }
                 };
 

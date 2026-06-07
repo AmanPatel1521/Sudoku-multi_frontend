@@ -655,18 +655,20 @@ body.light-mode .nav-pills .nav-link.active {
 
 /* AI Tutor Floating Card */
 #ai-tutor-card {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 250px;
-    background-color: white;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 320px !important;
+    max-width: 90%;
+    background-color: var(--card-background) !important;
     border-radius: 12px;
-    z-index: 100;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    color: #333;
+    z-index: 1000 !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    color: var(--text-color) !important;
     overflow: hidden;
     animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(139, 92, 246, 0.3);
 }
 
 @keyframes popIn {
