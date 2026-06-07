@@ -653,59 +653,37 @@ body.light-mode .nav-pills .nav-link.active {
     background-color: rgba(244, 63, 94, 0.2) !important;
 }
 
-/* AI Tutor Floating Card */
+/* AI Tutor Static Card */
 #ai-tutor-card {
-    position: absolute !important;
-    left: 50% !important;
-    width: 320px !important;
-    max-width: 90%;
+    width: 100%;
     background-color: var(--card-background) !important;
     border-radius: 12px;
-    z-index: 1000 !important;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
     color: var(--text-color) !important;
     overflow: hidden;
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    transition: top 0.3s ease, bottom 0.3s ease;
+    border: 2px solid var(--primary-color);
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease;
 }
 
-#ai-tutor-card.tutor-top {
-    top: -20px !important;
-    bottom: auto !important;
-    transform: translate(-50%, -100%) !important;
-    animation: popInTop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(-10px); }
+    100% { opacity: 1; transform: translateY(0); }
 }
 
-#ai-tutor-card.tutor-bottom {
-    top: auto !important;
-    bottom: -20px !important;
-    transform: translate(-50%, 100%) !important;
-    animation: popInBottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+.number-button.tutor-highlight {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    transform: scale(1.1);
+    box-shadow: 0 0 15px var(--primary-color);
+    z-index: 10;
+    animation: pulseHighlight 1.5s infinite;
 }
 
-#ai-tutor-card.tutor-center {
-    top: 50% !important;
-    bottom: auto !important;
-    transform: translate(-50%, -50%) !important;
-    animation: popInCenter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes popInCenter {
-    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-@keyframes popInTop {
-    0% { transform: translate(-50%, -100%) scale(0.8); opacity: 0; }
-    100% { transform: translate(-50%, -100%) scale(1); opacity: 1; }
-}
-@keyframes popInBottom {
-    0% { transform: translate(-50%, 100%) scale(0.8); opacity: 0; }
-    100% { transform: translate(-50%, 100%) scale(1); opacity: 1; }
-}
-
-@keyframes popIn {
-    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+@keyframes pulseHighlight {
+    0% { box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(139, 92, 246, 0); }
 }
 
 body.light-mode #ai-tutor-card {
