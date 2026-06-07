@@ -582,10 +582,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.classList.add('logic-target');
                     if (step.showAnswer && !alreadyEmitted) {
                         cell.textContent = step.ans; // Temporarily show it
-                        
                         // Highlight the corresponding number button in the palette
                         document.querySelectorAll(`.number-button[data-number="${step.ans}"]`).forEach(btn => {
                             btn.classList.add('tutor-highlight');
+                        });
+                        
+                        // Highlight all other cells on the board with the same number
+                        document.querySelectorAll('.cell').forEach(c => {
+                            if (c.textContent === step.ans.toString() && c !== cell) {
+                                c.classList.add('tutor-highlight');
+                            }
                         });
                     }
                 }
