@@ -1047,11 +1047,13 @@ document.addEventListener("DOMContentLoaded", function() {
     <div id="ai-tutor-card" class="d-none">
         <div class="ai-tutor-header">
             <span class="ai-tutor-title">💡 Last Remaining Cell</span>
-            <button type="button" class="btn-close ai-tutor-close" aria-label="Close"></button>
         </div>
         <div class="ai-tutor-body">
             <p id="ai-tutor-text">Since it is the only possible option, this cell must be 4.</p>
-            <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-100 mt-2">Got it!</button>
+            <div class="d-flex gap-2 mt-2">
+                <button id="ai-tutor-back-btn" class="btn btn-secondary btn-sm w-50">Back</button>
+                <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-50">Next</button>
+            </div>
         </div>
     </div>
     

@@ -543,6 +543,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textEl = document.getElementById('ai-tutor-text');
         const titleEl = document.querySelector('.ai-tutor-title');
         const btn = document.getElementById('ai-tutor-apply-btn');
+        const backBtn = document.getElementById('ai-tutor-back-btn');
         const boardContainer = document.querySelector('.board-container');
         
         if (!card) return;
@@ -589,11 +590,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Highlight all other cells on the board with the same number
                         document.querySelectorAll('.cell').forEach(c => {
-                            if (c.textContent === step.ans.toString() && c !== cell) {
+                            if (parseInt(c.textContent) === step.ans && !c.classList.contains('has-notes') && c !== cell) {
                                 c.classList.add('tutor-highlight');
                             }
                         });
                     }
+                }
+            }
+            
+            if (backBtn) {
+                if (currentStep === 0) {
+                    backBtn.classList.add('d-none');
+                } else {
+                    backBtn.classList.remove('d-none');
                 }
             }
             
@@ -632,8 +641,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
         
-        const closeBtn = card.querySelector('.ai-tutor-close');
-        if(closeBtn) closeBtn.onclick = dismiss;
+        if (backBtn) {
+            backBtn.onclick = () => {
+                if (currentStep > 0) {
+                    currentStep--;
+                    renderStep();
+                }
+            };
+        }
         
         renderStep();
     }
