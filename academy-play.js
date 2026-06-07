@@ -126,9 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (val !== '0' && val !== '.') {
                 cell.value = val;
                 cell.readOnly = true;
-                cell.style.color = "var(--primary-color)";
-                cell.style.fontWeight = "bold";
-                cell.style.backgroundColor = "rgba(var(--bs-primary-rgb), 0.1)";
+                cell.classList.add('fixed');
             } else {
                 cell.addEventListener('input', handleInput);
                 cell.addEventListener('keydown', handleKeyDown);

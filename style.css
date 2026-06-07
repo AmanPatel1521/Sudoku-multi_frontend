@@ -581,9 +581,15 @@ body.light-mode .nav-pills .nav-link.active {
     background-color: rgba(128, 128, 128, 0.15);
 }
 
+.solver-cell.fixed {
+    color: var(--primary-color) !important;
+    font-weight: bold;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+}
+
 .cell.selected, .solver-cell.selected {
     background-color: var(--primary-color) !important;
-    color: white;
+    color: white !important;
     transform: scale(1.08);
     z-index: 10;
     box-shadow: 0 0 20px var(--primary-glow);
