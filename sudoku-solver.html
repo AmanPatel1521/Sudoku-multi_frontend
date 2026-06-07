@@ -80,6 +80,20 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821792173458370" crossorigin="anonymous"></script>
 
+    <!-- AI Tutor Floating Card Template -->
+    <div id="ai-tutor-card" class="d-none">
+        <div class="ai-tutor-header">
+            <span class="ai-tutor-title">💡 Last Remaining Cell</span>
+            <button type="button" class="btn-close ai-tutor-close" aria-label="Close"></button>
+        </div>
+        <div class="ai-tutor-body">
+            <p id="ai-tutor-text">Since it is the only possible option, this cell must be 4.</p>
+            <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-100 mt-2">Got it!</button>
+        </div>
+    </div>
+    
+    <script src="script.js?v=12"></script>
+
     <link rel="icon" type="image/png" href="playstore_assets/playstore_icon_neon_square.png">
     <link rel="apple-touch-icon" href="playstore_assets/playstore_icon_neon_square.png">
 </head>
@@ -101,18 +115,9 @@ document.addEventListener("DOMContentLoaded", function() {
                     <!-- Solver Tool UI -->
                     <div class="my-5 p-4 bg-dark bg-opacity-25 rounded-4 shadow-sm text-center">
                     <div class="board-container">
+                        <div id="ai-tutor-desktop-container" class="mb-3"></div>
+                        <div id="ai-tutor-mobile-container" class="d-lg-none mt-4"></div>
                         <div id="solver-board" class="shadow-lg mb-4"></div>
-                        <!-- Floating AI Tutor Card -->
-                        <div id="ai-tutor-card" class="d-none shadow-lg">
-                            <div class="ai-tutor-header">
-                                <span class="ai-tutor-title">💡 Last Remaining Cell</span>
-                                <button type="button" class="btn-close ai-tutor-close" aria-label="Close"></button>
-                            </div>
-                            <div class="ai-tutor-body">
-                                <p id="ai-tutor-text">Since it is the only possible option, this cell must be 4.</p>
-                                <button id="ai-tutor-apply-btn" class="btn btn-primary btn-sm w-100 mt-2">Got it!</button>
-                            </div>
-                        </div>
                     </div>
                         <div class="d-flex justify-content-center flex-wrap gap-3 mb-4">
                             <button id="explain-btn" class="btn btn-info text-white btn-lg rounded-pill px-4 fw-bold shadow">💡 Explain Next Step</button>

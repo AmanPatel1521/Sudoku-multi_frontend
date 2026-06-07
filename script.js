@@ -548,18 +548,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!card) return;
 
         // Dynamic Position
-        card.classList.remove('tutor-top', 'tutor-bottom', 'tutor-center', 'd-none');
-        let finalTargetR = 4;
-        const finalStep = window.pendingHintSteps.find(s => s.targetCell);
-        if (finalStep && finalStep.targetCell) {
-            finalTargetR = finalStep.targetCell.r;
-        }
-        if (finalTargetR > 4) {
-            card.classList.add('tutor-top');
-        } else if (finalTargetR < 4) {
-            card.classList.add('tutor-bottom');
+        card.classList.remove('d-none');
+        const isMobile = window.innerWidth < 992;
+        if (isMobile) {
+            const mobileContainer = document.getElementById('ai-tutor-mobile-container');
+            if(mobileContainer) mobileContainer.appendChild(card);
         } else {
-            card.classList.add('tutor-bottom'); // Default if strictly middle
+            const desktopContainer = document.getElementById('ai-tutor-desktop-container');
+            if(desktopContainer) desktopContainer.appendChild(card);
         }
         
         boardContainer.classList.add('board-dimmed');
@@ -571,6 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Clear old highlights
             document.querySelectorAll('.logic-area, .logic-target').forEach(el => el.classList.remove('logic-area', 'logic-target'));
+            document.querySelectorAll('.tutor-highlight').forEach(el => el.classList.remove('tutor-highlight'));
             
             // Apply new highlights
             if (step.relatedCells) {
@@ -585,6 +582,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     cell.classList.add('logic-target');
                     if (step.showAnswer && !alreadyEmitted) {
                         cell.textContent = step.ans; // Temporarily show it
+                        
+                        // Highlight the corresponding number button in the palette
+                        document.querySelectorAll(`.number-button[data-number="${step.ans}"]`).forEach(btn => {
+                            btn.classList.add('tutor-highlight');
+                        });
                     }
                 }
             }
@@ -599,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const dismiss = () => {
             card.classList.add('d-none');
             boardContainer.classList.remove('board-dimmed');
+            document.querySelectorAll('.tutor-highlight').forEach(el => el.classList.remove('tutor-highlight'));
             document.querySelectorAll('.logic-area, .logic-target').forEach(el => {
                 el.classList.remove('logic-area', 'logic-target');
                 if (el.classList.contains('logic-target') && !alreadyEmitted) {
