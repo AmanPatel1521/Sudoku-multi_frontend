@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
-                                targetCell: {r, c},
+                                targetCell: null,
                                 showAnswer: false,
                                 ans: candidates[0]
                             },
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
-                                targetCell: {r: targetR, c: targetC},
+                                targetCell: null,
                                 showAnswer: false,
                                 ans: num
                             },
