@@ -869,6 +869,29 @@ body:not(.light-mode) .ai-tutor-header {
     z-index: 20;
 }
 
+body.game-paused #number-palette,
+body.game-paused #actions-container,
+body.game-paused #mobile-number-palette,
+body.game-paused #mobile-actions-container {
+    position: relative;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+body.game-paused #number-palette::after,
+body.game-paused #actions-container::after,
+body.game-paused #mobile-number-palette::after,
+body.game-paused #mobile-actions-container::after {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    z-index: 20;
+    border-radius: inherit;
+}
+
 #finished-overlay {
     position: fixed;
     top: 0;

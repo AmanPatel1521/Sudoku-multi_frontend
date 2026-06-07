@@ -1890,6 +1890,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(mobilePauseButton) mobilePauseButton.classList.toggle('btn-success', isPaused);
 
         pauseOverlay.classList.toggle('d-none', !isPaused);
+        document.body.classList.toggle('game-paused', isPaused);
     }
 
     function transitionToWaitingRoom() {
