@@ -1925,6 +1925,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function transitionToWaitingRoom() {
+        document.body.classList.remove('game-active');
         roomManagementDiv.style.display = 'none';
         gameContainer.style.display = 'none';
         if (homepageSeoSection) homepageSeoSection.style.display = 'none';
@@ -1988,6 +1989,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (socialProofSection) socialProofSection.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         gameContainer.style.display = 'block';
+        document.body.classList.add('game-active');
         
         const seoFooter = document.getElementById('seo-footer');
         if (seoFooter) seoFooter.style.display = 'none';
@@ -2072,6 +2074,7 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.disconnect();
             socket = null;
         }
+        document.body.classList.remove('game-active');
         gameContainer.style.display = 'none';
         waitingRoomDiv.style.display = 'none';
         roomManagementDiv.style.display = 'block';

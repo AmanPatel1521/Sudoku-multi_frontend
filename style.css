@@ -160,6 +160,14 @@ ins.adsbygoogle[data-ad-slot] iframe,
     pointer-events: auto !important;
 }
 
+/* Hide all ads when the game is actively being played */
+body.game-active amp-auto-ads,
+body.game-active amp-ad,
+body.game-active .google-auto-placed,
+body.game-active ins.adsbygoogle {
+    display: none !important;
+}
+
 .btn-primary {
     background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
     border: none !important;

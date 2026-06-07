@@ -18,8 +18,14 @@
         });
     </script>
     <link rel="icon" type="image/png" href="../playstore_assets/playstore_icon_neon_square.png">
+<script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
 </head>
 <body>
+<amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-9821792173458370">
+</amp-auto-ads>
     <div id="main-container" class="container py-4">
         <header class="main-header mb-5 text-center">
             <span class="badge bg-danger mb-2 px-3 py-2 fs-6 rounded-pill">Level 6</span>
@@ -40,6 +46,14 @@
                     <h3 class="text-white fw-bold mt-5 mb-3">Combinatorics and Restrictions</h3>
                     <p>Because the sum must fit into a single digit in the bulb, the sum cannot exceed 9. This means an arrow that is 4 cells long MUST contain the numbers 1, 2, 3, and 4 (which sum to 10... wait! That means an arrow cannot be 4 cells long if numbers can't repeat, but in Arrow Sudoku, numbers CAN repeat along the arrow as long as standard Sudoku rules aren't violated!).</p>
                     <p>If an arrow passes through a 3x3 block, the numbers inside that block cannot repeat, which severely restricts the available sums.</p>
+                    
+                    <div class="text-center my-5">
+                        <img src="../playstore_assets/arrow_example.png" class="img-fluid rounded shadow border border-secondary" style="max-width: 100%; height: auto;" alt="Arrow Sudoku Rule Diagram">
+                    </div>
+
+                    <div class="alert alert-warning mt-4 text-dark" role="alert">
+                        <strong>💡 Easy Practice:</strong> We have pre-filled almost the entire board for you! To solve this challenge, simply look at the paths of the arrows. Ensure the numbers along the path add up exactly to the number in the bulb (circle).
+                    </div>
                 </div>
 
                 <!-- Interactive Puzzle Section -->

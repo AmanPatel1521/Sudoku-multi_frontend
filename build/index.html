@@ -56,7 +56,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#5a67d8">
     <!-- Google AdSense Auto-Ads (TEMPORARILY COMMENTED OUT FOR DEBUGGING) -->
-    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821792173458370" crossorigin="anonymous"></script> -->
+    <!--  -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     if(localStorage.getItem('sudoku-theme') === 'light') {
@@ -64,8 +64,14 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 </script>
+<script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
 </head>
 <body>
+<amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-9821792173458370">
+</amp-auto-ads>
     <div id="main-container" class="container-fluid py-3">
         <header class="main-header d-flex flex-column flex-md-row align-items-center justify-content-between mb-4 px-md-3 gap-3">
             <div class="d-none d-md-block w-100"></div>
