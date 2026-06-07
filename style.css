@@ -656,13 +656,11 @@ body.light-mode .nav-pills .nav-link.active {
 /* AI Tutor Static Card */
 #ai-tutor-card {
     width: 100%;
-    background-color: var(--card-background) !important;
+    background-color: #ffffff !important;
     border-radius: 12px;
     z-index: 1000;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-    color: var(--text-color) !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
     overflow: hidden;
-    border: 2px solid var(--primary-color);
     margin-bottom: 15px;
     animation: fadeIn 0.3s ease;
 }
@@ -695,14 +693,18 @@ body.light-mode .nav-pills .nav-link.active {
 }
 
 body.light-mode #ai-tutor-card {
-    background-color: #fff;
-    color: #111;
+    /* No override needed, it's always white now */
 }
 
-body:not(.light-mode) #ai-tutor-card {
-    background-color: #1e293b;
-    color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.ai-tutor-dots .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #cbd5e1;
+    transition: background-color 0.3s ease;
+}
+.ai-tutor-dots .dot.active {
+    background-color: #3b82f6;
 }
 
 .ai-tutor-header {

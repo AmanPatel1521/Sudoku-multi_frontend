@@ -460,15 +460,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         steps = [
                             {
-                                title: "💡 AI Tutor",
-                                text: "Let's find the Last Remaining Cell. Pay attention to the highlighted row, column, and block.",
+                                title: "Last Remaining Cell",
+                                text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
                                 targetCell: null,
-                                showAnswer: false
+                                showAnswer: false,
+                                ans: candidates[0]
                             },
                             {
-                                title: "💡 Last Remaining Cell",
-                                text: `Since it is the only possible option, this cell must be <b>${candidates[0]}</b>.`,
+                                title: "Last Remaining Cell",
+                                text: `In <b>this block</b>, there is only one cell remaining that can contain ${candidates[0]}`,
+                                relatedCells: relatedCells,
+                                targetCell: null,
+                                showAnswer: false,
+                                ans: candidates[0]
+                            },
+                            {
+                                title: "Last Remaining Cell",
+                                text: `Since it is the only possible option, this cell must be ${candidates[0]}`,
                                 relatedCells: relatedCells,
                                 targetCell: {r, c},
                                 showAnswer: true,
@@ -492,18 +501,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         targetR = r; targetC = possibleCols[0];
                         let relatedCells = [];
                         for (let i = 0; i < 9; i++) relatedCells.push({r, c: i});
-                        
-                        steps = [
+                        let type = "row";
+                        let steps = [
                             {
-                                title: "💡 AI Tutor",
-                                text: `Let's find where <b>${num}</b> can go in this row.`,
+                                title: "Last Remaining Cell",
+                                text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
                                 targetCell: null,
-                                showAnswer: false
+                                showAnswer: false,
+                                ans: num
                             },
                             {
-                                title: "💡 Last Remaining Cell",
-                                text: `In this row, there is only one cell remaining that can contain <b>${num}</b>.`,
+                                title: "Last Remaining Cell",
+                                text: `In <b>this ${type}</b>, there is only one cell remaining that can contain ${num}`,
+                                relatedCells: relatedCells,
+                                targetCell: null,
+                                showAnswer: false,
+                                ans: num
+                            },
+                            {
+                                title: "Last Remaining Cell",
+                                text: `Since it is the only possible option, this cell must be ${num}`,
                                 relatedCells: relatedCells,
                                 targetCell: {r: targetR, c: targetC},
                                 showAnswer: true,
@@ -587,30 +605,45 @@ document.addEventListener('DOMContentLoaded', () => {
                         document.querySelectorAll(`.number-button[data-number="${step.ans}"]`).forEach(btn => {
                             btn.classList.add('tutor-highlight');
                         });
-                        
-                        // Highlight all other cells on the board with the same number
-                        document.querySelectorAll('.cell').forEach(c => {
-                            if (parseInt(c.textContent) === step.ans && !c.classList.contains('has-notes') && c !== cell) {
-                                c.classList.add('tutor-highlight');
-                            }
-                        });
                     }
                 }
             }
             
+            // Highlight all other cells on the board with the same number on EVERY step
+            if (step.ans) {
+                document.querySelectorAll('.cell').forEach(c => {
+                    if (parseInt(c.textContent) === step.ans && !c.classList.contains('has-notes') && (!step.targetCell || c.dataset.row != step.targetCell.r || c.dataset.col != step.targetCell.c)) {
+                        c.classList.add('tutor-highlight');
+                    }
+                });
+            }
+            
             if (backBtn) {
                 if (currentStep === 0) {
-                    backBtn.classList.add('d-none');
+                    backBtn.style.visibility = 'hidden';
                 } else {
-                    backBtn.classList.remove('d-none');
+                    backBtn.style.visibility = 'visible';
                 }
             }
             
+            const nextIcon = document.getElementById('ai-tutor-next-icon');
+            const checkIcon = document.getElementById('ai-tutor-check-icon');
             if (currentStep < window.pendingHintSteps.length - 1) {
-                btn.textContent = "Next";
+                if(nextIcon) nextIcon.classList.remove('d-none');
+                if(checkIcon) checkIcon.classList.add('d-none');
             } else {
-                btn.textContent = "Got it!";
+                if(nextIcon) nextIcon.classList.add('d-none');
+                if(checkIcon) checkIcon.classList.remove('d-none');
             }
+            
+            // Update dots
+            document.querySelectorAll('.ai-tutor-dots .dot').forEach((dot, index) => {
+                if (index === currentStep) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
         }
         
         const dismiss = () => {
