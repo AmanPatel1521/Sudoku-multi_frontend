@@ -14,21 +14,87 @@ document.addEventListener('DOMContentLoaded', async () => {
     let puzzleData = null;
     let variantsEngine = null;
 
-    // Load levels
-    try {
-        const res = await fetch(`${API_URL}/academy/levels`);
-        const data = await res.json();
-        const level = data.levels.find(l => l.id === ACADEMY_LEVEL);
-        if (!level) {
-            boardEl.innerHTML = "<p class='text-danger'>Level not found.</p>";
-            return;
+    const ACADEMY_LEVELS = [
+        {
+            "id": "basics",
+            "title": "The Basics",
+            "difficulty": "Beginner",
+            "estimated_minutes": 5,
+            "puzzle": "530070000600195000098000060800060003400803001700020006060000280000419005000080079",
+            "solution": "534678912672195348198342567859761423426853791713924856961537284287419635345286179",
+            "type": "classic"
+        },
+        {
+            "id": "hidden-singles",
+            "title": "Hidden Singles",
+            "difficulty": "Beginner",
+            "estimated_minutes": 5,
+            "puzzle": "000000000000003085001020000000507000004000100090000000500000073002010000000040009",
+            "solution": "987654321246173985351928647128537496734896152695241837519482273862319574473765219",
+            "type": "classic"
+        },
+        {
+            "id": "naked-pairs",
+            "title": "Naked Pairs",
+            "difficulty": "Intermediate",
+            "estimated_minutes": 10,
+            "puzzle": "400000000000009000000000000000000000000000000000000000000000000000000000000000000",
+            "solution": "412356789567891234893427561124568973739142658685739142271985346946273815358614427",
+            "type": "classic"
+        },
+        {
+            "id": "thermo",
+            "title": "Thermo Sudoku",
+            "difficulty": "Advanced",
+            "estimated_minutes": 15,
+            "puzzle": "000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "solution": "123456789456789123789123456231564897564897231897231564312978645645312978978645312",
+            "type": "thermo",
+            "variant_data": {
+                "thermos": [
+                    [[0,0], [0,1], [0,2], [0,3], [0,4]],
+                    [[8,8], [7,8], [6,8]]
+                ]
+            }
+        },
+        {
+            "id": "killer",
+            "title": "Killer Sudoku",
+            "difficulty": "Expert",
+            "estimated_minutes": 20,
+            "puzzle": "000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "solution": "123456789456789123789123456231564897564897231897231564312978645645312978978645312",
+            "type": "killer",
+            "variant_data": {
+                "cages": [
+                    {"sum": 3, "cells": [[0,0], [0,1]]},
+                    {"sum": 15, "cells": [[1,0], [1,1], [1,2]]}
+                ]
+            }
+        },
+        {
+            "id": "arrow",
+            "title": "Arrow Sudoku",
+            "difficulty": "Expert",
+            "estimated_minutes": 20,
+            "puzzle": "000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+            "solution": "123456789456789123789123456231564897564897231897231564312978645645312978978645312",
+            "type": "arrow",
+            "variant_data": {
+                "arrows": [
+                    {"sum_cell": [0,0], "path": [[0,1], [0,2]]}
+                ]
+            }
         }
-        puzzleData = level;
-        initBoard(level);
-    } catch (e) {
-        console.error("Failed to load level", e);
-        boardEl.innerHTML = "<p class='text-danger'>Failed to load puzzle.</p>";
+    ];
+
+    const level = ACADEMY_LEVELS.find(l => l.id === ACADEMY_LEVEL);
+    if (!level) {
+        boardEl.innerHTML = "<p class='text-danger'>Level not found.</p>";
+        return;
     }
+    puzzleData = level;
+    initBoard(level);
 
     function initBoard(level) {
         boardEl.innerHTML = "";
