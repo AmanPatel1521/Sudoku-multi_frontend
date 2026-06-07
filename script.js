@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
-                                targetCell: null,
+                                targetCell: {r, c},
                                 showAnswer: false,
                                 ans: candidates[0]
                             },
@@ -471,7 +471,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: `In <b>this block</b>, there is only one cell remaining that can contain ${candidates[0]}`,
                                 relatedCells: relatedCells,
-                                targetCell: null,
+                                targetCell: {r, c},
                                 showAnswer: false,
                                 ans: candidates[0]
                             },
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: "Pay attention to <b>these cells</b> and the highlighted areas",
                                 relatedCells: relatedCells,
-                                targetCell: null,
+                                targetCell: {r: targetR, c: targetC},
                                 showAnswer: false,
                                 ans: num
                             },
@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 title: "Last Remaining Cell",
                                 text: `In <b>this ${type}</b>, there is only one cell remaining that can contain ${num}`,
                                 relatedCells: relatedCells,
-                                targetCell: null,
+                                targetCell: {r: targetR, c: targetC},
                                 showAnswer: false,
                                 ans: num
                             },
