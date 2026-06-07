@@ -607,8 +607,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // Highlight all other cells on the board with the same number on EVERY step
-            if (step.ans) {
+            // Highlight all other cells on the board with the same number on the 2nd and 3rd step
+            if (step.ans && currentStep >= 1) {
                 document.querySelectorAll('.cell').forEach(c => {
                     if (parseInt(c.textContent) === step.ans && !c.classList.contains('has-notes') && (!step.targetCell || c.dataset.row != step.targetCell.r || c.dataset.col != step.targetCell.c)) {
                         c.classList.add('tutor-highlight');
