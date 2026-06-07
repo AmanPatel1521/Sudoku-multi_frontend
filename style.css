@@ -2073,3 +2073,65 @@ body.light-mode .brand-text {
 }
 
 .hover-opacity-100:hover { opacity: 1 !important; transition: opacity 0.2s ease-in-out; }
+
+/* Solver and Academy Board General Styles */
+#solver-board, #academy-board {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 0;
+    background: white;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
+}
+.solver-cell {
+    width: 100%;
+    aspect-ratio: 1;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    border: 1px solid #e2e8f0;
+    background: transparent;
+    color: #0f172a;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+}
+.solver-cell:focus {
+    outline: none;
+    background: #e0f2fe;
+}
+.solver-cell.solved-cell {
+    color: var(--success-color);
+    background: #f0fdf4;
+}
+
+/* 3x3 Block Borders */
+.solver-cell:nth-child(3n) { border-right: 2px solid var(--primary-color); }
+.solver-cell:nth-child(9n) { border-right: 1px solid #e2e8f0; } /* Reset last in row */
+.solver-cell:nth-child(n+19):nth-child(-n+27),
+.solver-cell:nth-child(n+46):nth-child(-n+54) { border-bottom: 2px solid var(--primary-color); }
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    #solver-board, #academy-board {
+        background: rgba(15, 23, 42, 0.8);
+    }
+    .solver-cell {
+        color: white;
+        border-color: rgba(255,255,255,0.1);
+    }
+    .solver-cell.solved-cell {
+        color: #4ade80;
+        background: rgba(74, 222, 128, 0.1);
+    }
+    .solver-cell:focus {
+        background: rgba(56, 189, 248, 0.2);
+    }
+}

@@ -98,13 +98,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function initBoard(level) {
         boardEl.innerHTML = "";
-        boardEl.style.display = "grid";
-        boardEl.style.gridTemplateColumns = "repeat(9, 1fr)";
-        boardEl.style.gap = "0";
-        boardEl.style.width = "100%";
-        boardEl.style.aspectRatio = "1 / 1";
-        boardEl.style.border = "3px solid var(--text-color)";
+        boardEl.classList.add('academy-board-active');
         
+        // Add SVG Layer for custom rules
         let puzzleStr = level.puzzle;
         if (Array.isArray(puzzleStr)) {
             puzzleStr = puzzleStr.flat().join('');
