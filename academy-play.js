@@ -134,8 +134,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cell.addEventListener('keydown', handleKeyDown);
             }
             
-            cell.addEventListener('focus', () => highlightSameNumbers(cell.value));
-            cell.addEventListener('click', () => highlightSameNumbers(cell.value));
+            cell.addEventListener('focus', () => selectCellAndHighlight(cell));
+            cell.addEventListener('click', () => selectCellAndHighlight(cell));
 
             boardEl.appendChild(cell);
             cells.push(cell);
@@ -148,14 +148,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function highlightSameNumbers(val) {
-        cells.forEach(c => c.classList.remove('highlight-active'));
-        if (!val || val === '') return;
+    function clearHighlights() {
         cells.forEach(c => {
-            if (c.value === val) {
-                c.classList.add('highlight-active');
+            c.classList.remove('highlight', 'highlight-active', 'selected');
+        });
+    }
+
+    function selectCellAndHighlight(cell) {
+        clearHighlights();
+        
+        cell.classList.add('selected');
+        
+        const row = parseInt(cell.dataset.row);
+        const col = parseInt(cell.dataset.col);
+        const boxRowStart = Math.floor(row / 3) * 3;
+        const boxColStart = Math.floor(col / 3) * 3;
+
+        cells.forEach(c => {
+            const r = parseInt(c.dataset.row);
+            const cl = parseInt(c.dataset.col);
+            const inRow = r === row;
+            const inCol = cl === col;
+            const inBox = (r >= boxRowStart && r < boxRowStart + 3 && cl >= boxColStart && cl < boxColStart + 3);
+
+            if (inRow || inCol || inBox) {
+                c.classList.add('highlight');
             }
         });
+
+        const val = cell.value;
+        if (val && /^[1-9]$/.test(val)) {
+            cells.forEach(c => {
+                if (c.value === val) {
+                    c.classList.add('highlight-active');
+                }
+            });
+        }
     }
 
     function handleInput(e) {
@@ -167,7 +195,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (!/^[1-9]$/.test(val)) {
             cell.value = '';
-            highlightSameNumbers('');
+            selectCellAndHighlight(cell);
         } else {
             // Check against solution for immediate feedback
             if (puzzleData && puzzleData.solution) {
@@ -184,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     }
                 }
             }
-            highlightSameNumbers(val);
+            selectCellAndHighlight(cell);
         }
         checkWinCondition();
     }
