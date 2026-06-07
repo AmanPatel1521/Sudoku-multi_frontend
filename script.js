@@ -546,8 +546,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const boardContainer = document.querySelector('.board-container');
         
         if (!card) return;
+
+        // Dynamic Position
+        card.classList.remove('tutor-top', 'tutor-bottom', 'tutor-center', 'd-none');
+        let finalTargetR = 4;
+        const finalStep = window.pendingHintSteps.find(s => s.targetCell);
+        if (finalStep && finalStep.targetCell) {
+            finalTargetR = finalStep.targetCell.r;
+        }
+        if (finalTargetR > 4) {
+            card.classList.add('tutor-top');
+        } else if (finalTargetR < 4) {
+            card.classList.add('tutor-bottom');
+        } else {
+            card.classList.add('tutor-bottom'); // Default if strictly middle
+        }
         
-        card.classList.remove('d-none');
         boardContainer.classList.add('board-dimmed');
         
         function renderStep() {

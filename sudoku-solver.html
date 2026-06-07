@@ -362,7 +362,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     
                     if (card && textEl && boardContainer) {
                         let currentStep = 0;
-                        card.classList.remove('d-none');
+                        
+                        card.classList.remove('tutor-top', 'tutor-bottom', 'tutor-center', 'd-none');
+                        if (targetR > 4) {
+                            card.classList.add('tutor-top');
+                        } else {
+                            card.classList.add('tutor-bottom');
+                        }
+
                         boardContainer.classList.add('board-dimmed');
 
                         function renderStep() {
