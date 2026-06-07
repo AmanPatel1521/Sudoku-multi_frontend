@@ -83,32 +83,7 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9821792173458370" crossorigin="anonymous"></script>
 
-    <!-- AI Tutor Floating Card Template -->
-    <div id="ai-tutor-card" class="d-none">
-        <div class="ai-tutor-header text-center border-0 pt-3 pb-1">
-            <h4 class="ai-tutor-title fw-bold mb-0" style="font-size: 1.1rem;">Last Remaining Cell</h4>
-        </div>
-        <div class="ai-tutor-body text-center px-4 pb-4 pt-2">
-            <p id="ai-tutor-text" style="font-size: 0.95rem; font-weight: 500; min-height: 45px;" class="mb-4">Since it is the only possible option, this cell must be 4.</p>
-            <div class="d-flex justify-content-between align-items-center mt-2 px-2">
-                <button id="ai-tutor-back-btn" class="btn btn-icon rounded-circle d-flex justify-content-center align-items-center tutor-nav-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
-                </button>
-                
-                <div class="ai-tutor-dots d-flex gap-2">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </div>
 
-                <button id="ai-tutor-apply-btn" class="btn btn-icon rounded-circle d-flex justify-content-center align-items-center tutor-nav-btn">
-                    <svg id="ai-tutor-next-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
-                    <svg id="ai-tutor-check-icon" class="d-none" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
-    
     <script src="script.js?v=12"></script>
 
     <link rel="icon" type="image/png" href="playstore_assets/playstore_icon_neon_square.png">
@@ -364,34 +339,68 @@ document.addEventListener("DOMContentLoaded", function() {
                             targetCell: null,
                             showAnswer: false
                         });
+                        steps.push({
+                            title: titleText,
+                            text: parsedText,
+                            relatedCells: relatedCells,
+                            targetCell: {r: targetR, c: targetC},
+                            showAnswer: false
+                        });
+                        steps.push({
+                            title: titleText,
+                            text: `So, the answer for this cell must be <strong>${ans}</strong>.`,
+                            relatedCells: [],
+                            targetCell: {r: targetR, c: targetC},
+                            showAnswer: true,
+                            ans: ans
+                        });
+                    } else {
+                        steps.push({
+                            title: titleText,
+                            text: `Let's look at this specific cell.`,
+                            relatedCells: [],
+                            targetCell: {r: targetR, c: targetC},
+                            showAnswer: false
+                        });
+                        steps.push({
+                            title: titleText,
+                            text: parsedText,
+                            relatedCells: [],
+                            targetCell: {r: targetR, c: targetC},
+                            showAnswer: false
+                        });
+                        steps.push({
+                            title: titleText,
+                            text: `So, the answer for this cell must be <strong>${ans}</strong>.`,
+                            relatedCells: [],
+                            targetCell: {r: targetR, c: targetC},
+                            showAnswer: true,
+                            ans: ans
+                        });
                     }
-                    steps.push({
-                        title: titleText,
-                        text: parsedText,
-                        relatedCells: relatedCells,
-                        targetCell: {r: targetR, c: targetC},
-                        showAnswer: true,
-                        ans: ans
-                    });
 
                     // Show the floating interactive card
                     const card = document.getElementById('ai-tutor-card');
+                    
+                    if (window.innerWidth < 992) {
+                        document.getElementById('ai-tutor-mobile-container').appendChild(card);
+                    } else {
+                        document.getElementById('ai-tutor-desktop-container').appendChild(card);
+                    }
+
                     const textEl = document.getElementById('ai-tutor-text');
                     const titleEl = document.querySelector('.ai-tutor-title');
                     const boardContainer = document.querySelector('.board-container');
                     const applyBtn = card.querySelector('#ai-tutor-apply-btn');
-                    const closeBtn = card.querySelector('.ai-tutor-close');
+                    const backBtn = card.querySelector('#ai-tutor-back-btn');
+                    const dots = card.querySelectorAll('.ai-tutor-dots .dot');
+                    const nextIcon = card.querySelector('#ai-tutor-next-icon');
+                    const checkIcon = card.querySelector('#ai-tutor-check-icon');
                     
                     if (card && textEl && boardContainer) {
                         let currentStep = 0;
                         
-                        card.classList.remove('tutor-top', 'tutor-bottom', 'tutor-center', 'd-none');
-                        if (targetR > 4) {
-                            card.classList.add('tutor-top');
-                        } else {
-                            card.classList.add('tutor-bottom');
-                        }
-
+                        card.classList.remove('d-none');
                         boardContainer.classList.add('board-dimmed');
 
                         function renderStep() {
@@ -401,24 +410,44 @@ document.addEventListener("DOMContentLoaded", function() {
 
                             cells.forEach(cell => cell.classList.remove('logic-area', 'logic-target'));
                             
-                            if (step.relatedCells) {
+                            if (currentStep >= 1 && step.relatedCells) {
                                 step.relatedCells.forEach(rc => {
                                     cells[rc.r * 9 + rc.c].classList.add('logic-area');
                                 });
                             }
-                            if (step.targetCell) {
+                            if (currentStep >= 1 && step.targetCell) {
                                 let tIdx = step.targetCell.r * 9 + step.targetCell.c;
                                 cells[tIdx].classList.add('logic-target');
                                 if (step.showAnswer) {
                                     cells[tIdx].value = step.ans; // Temporarily show
+                                } else if (!cells[tIdx].classList.contains('solved-cell') && cells[tIdx].value === String(step.ans)) {
+                                    cells[tIdx].value = '';
                                 }
                             }
                             
-                            if (currentStep < steps.length - 1) {
-                                applyBtn.textContent = "Next";
+                            // Navigation UI updates
+                            if (currentStep === 0) {
+                                backBtn.style.visibility = 'hidden';
                             } else {
-                                applyBtn.textContent = "Got it!";
+                                backBtn.style.visibility = 'visible';
                             }
+
+                            if (currentStep === steps.length - 1) {
+                                nextIcon.classList.add('d-none');
+                                checkIcon.classList.remove('d-none');
+                                applyBtn.classList.remove('btn-info');
+                                applyBtn.classList.add('btn-success');
+                            } else {
+                                nextIcon.classList.remove('d-none');
+                                checkIcon.classList.add('d-none');
+                                applyBtn.classList.add('btn-info');
+                                applyBtn.classList.remove('btn-success');
+                            }
+
+                            dots.forEach((dot, index) => {
+                                if (index === currentStep) dot.classList.add('active');
+                                else dot.classList.remove('active');
+                            });
                         }
 
                         const dismiss = () => {
@@ -446,7 +475,13 @@ document.addEventListener("DOMContentLoaded", function() {
                             }
                         };
                         
-                        if (closeBtn) closeBtn.onclick = dismiss;
+                        backBtn.onclick = () => {
+                            if (currentStep > 0) {
+                                currentStep--;
+                                renderStep();
+                            }
+                        };
+                        
                         renderStep();
                     } else {
                         // Fallback if UI is missing
@@ -619,6 +654,31 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     </script>
 
+    <!-- AI Tutor Floating Card Template -->
+    <div id="ai-tutor-card" class="d-none">
+        <div class="ai-tutor-header text-center border-0 pt-3 pb-1">
+            <h4 class="ai-tutor-title fw-bold mb-0" style="font-size: 1.1rem;">Last Remaining Cell</h4>
+        </div>
+        <div class="ai-tutor-body text-center px-4 pb-4 pt-2">
+            <p id="ai-tutor-text" style="font-size: 0.95rem; font-weight: 500; min-height: 45px;" class="mb-4">Since it is the only possible option, this cell must be 4.</p>
+            <div class="d-flex justify-content-between align-items-center mt-2 px-2">
+                <button id="ai-tutor-back-btn" class="btn btn-icon rounded-circle d-flex justify-content-center align-items-center tutor-nav-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+                </button>
+                
+                <div class="ai-tutor-dots d-flex gap-2">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+
+                <button id="ai-tutor-apply-btn" class="btn btn-icon rounded-circle d-flex justify-content-center align-items-center tutor-nav-btn">
+                    <svg id="ai-tutor-next-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+                    <svg id="ai-tutor-check-icon" class="d-none" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
             <footer id="seo-footer" class="pt-5 pb-4 mt-5" style="background-color: rgba(0, 0, 0, 0.2);">
         <div class="container text-start">
             <div class="row mb-4">
