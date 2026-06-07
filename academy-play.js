@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 
                 // Submit progress
-                let playerId = localStorage.getItem("player_id");
+                let playerId = localStorage.getItem("sudokuPlayerId");
                 if (playerId) {
                     fetch(`${API_URL}/academy/complete`, {
                         method: 'POST',
