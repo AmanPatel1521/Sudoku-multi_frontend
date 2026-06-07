@@ -590,22 +590,22 @@ body.light-mode .nav-pills .nav-link.active {
     border-radius: 0.5rem;
 }
 
-.cell.highlight {
+.cell.highlight, .solver-cell.highlight {
     background-color: rgba(139, 92, 246, 0.2);
 }
 
-.cell.highlight-active {
+.cell.highlight-active, .solver-cell.highlight-active {
     background-color: var(--accent-color);
     color: white;
 }
 
-.cell.wrong {
+.cell.wrong, .solver-cell.wrong {
     background-color: var(--error-color) !important;
     color: white !important;
     animation: shake 0.4s;
 }
 
-.cell.incorrect {
+.cell.incorrect, .solver-cell.incorrect {
     color: var(--error-color) !important;
 }
 

@@ -133,6 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cell.addEventListener('input', handleInput);
                 cell.addEventListener('keydown', handleKeyDown);
             }
+            
+            cell.addEventListener('focus', () => highlightSameNumbers(cell.value));
+            cell.addEventListener('click', () => highlightSameNumbers(cell.value));
 
             boardEl.appendChild(cell);
             cells.push(cell);
@@ -145,16 +148,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    function highlightSameNumbers(val) {
+        cells.forEach(c => c.classList.remove('highlight-active'));
+        if (!val || val === '') return;
+        cells.forEach(c => {
+            if (c.value === val) {
+                c.classList.add('highlight-active');
+            }
+        });
+    }
+
     function handleInput(e) {
         const cell = e.target;
         const val = cell.value;
+        const idx = parseInt(cell.dataset.index);
+        
+        cell.classList.remove('incorrect');
+        
         if (!/^[1-9]$/.test(val)) {
             cell.value = '';
-            cell.classList.remove('error-text');
+            highlightSameNumbers('');
         } else {
-            // Check against solution if we want immediate feedback, 
-            // or just let them fill it and check at the end.
-            // Let's check at the end.
+            // Check against solution for immediate feedback
+            if (puzzleData && puzzleData.solution) {
+                let solStr = puzzleData.solution;
+                if (Array.isArray(solStr)) solStr = solStr.flat().join('');
+                
+                if (val !== solStr[idx].toString()) {
+                    cell.classList.add('incorrect');
+                    // Add shake effect
+                    cell.classList.add('wrong');
+                    setTimeout(() => cell.classList.remove('wrong'), 400);
+                    if (window.navigator && window.navigator.vibrate) {
+                        window.navigator.vibrate(200);
+                    }
+                }
+            }
+            highlightSameNumbers(val);
         }
         checkWinCondition();
     }
