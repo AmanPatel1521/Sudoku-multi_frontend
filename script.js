@@ -236,6 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { id: 'novice', name: 'Novice', desc: 'Complete 1 Easy Sudoku', icon: 'ach_novice.png' },
         { id: 'speedster', name: 'Speedster', desc: 'Complete any Sudoku under 3 minutes', icon: 'ach_speedster.png' },
         { id: 'perfect', name: 'Perfect Game', desc: 'Complete any puzzle with 0 mistakes', icon: 'ach_perfect.png' },
+        { id: 'master', name: 'Master', desc: 'Complete an Expert Sudoku', icon: 'ach_master.png' },
+        { id: 'flawless_victory', name: 'Flawless Victory', desc: 'Complete a puzzle with 0 mistakes in under 5 minutes', icon: 'ach_flawless.png' },
+        { id: 'multiplayer_champ', name: 'Multiplayer Champ', desc: 'Win your first multiplayer match', icon: 'ach_champ.png' },
+        { id: 'veteran', name: 'Veteran', desc: 'Win 10 total games', icon: 'ach_veteran.png' },
     ];
 
     if (achievementsBtn) {
