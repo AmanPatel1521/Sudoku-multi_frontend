@@ -38,6 +38,28 @@
                     </div>
 
                     <div id="stats-content" style="display: none;">
+                        <!-- Academy Progress Banner -->
+                        <div class="row mb-4 g-3">
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 bg-dark bg-opacity-75 rounded border border-warning d-flex align-items-center justify-content-between shadow-sm">
+                                    <div>
+                                        <div class="text-white-50 small text-uppercase mb-1 fw-bold">Academy Stars</div>
+                                        <h3 id="stat-academy-stars" class="fw-bold text-warning mb-0">0</h3>
+                                    </div>
+                                    <div class="fs-1">⭐</div>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="p-3 bg-dark bg-opacity-75 rounded border border-info d-flex align-items-center justify-content-between shadow-sm">
+                                    <div>
+                                        <div class="text-white-50 small text-uppercase mb-1 fw-bold">Academy Score</div>
+                                        <h3 id="stat-academy-score" class="fw-bold text-info mb-0">0</h3>
+                                    </div>
+                                    <div class="fs-1">🎓</div>
+                                </div>
+                            </div>
+                        </div>
+
                         <ul class="nav nav-pills justify-content-center mb-4" id="stats-tabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" id="tab-overall" data-mode="overall" type="button" role="tab">Overall</button>
@@ -157,6 +179,26 @@
                     fullStatsData = await response.json();
                     
                     updateUIForMode('overall'); // default
+
+                    // Fetch Academy Progress
+                    try {
+                        const acadResponse = await fetch(`https://sudoku-multi-backend.onrender.com/academy/progress/${playerId}`);
+                        if (acadResponse.ok) {
+                            const acadData = await acadResponse.json();
+                            let totalStars = 0;
+                            let totalScore = 0;
+                            if (acadData.progress && Array.isArray(acadData.progress)) {
+                                acadData.progress.forEach(p => {
+                                    totalStars += (p.stars || 0);
+                                    totalScore += (p.score || 0);
+                                });
+                            }
+                            document.getElementById('stat-academy-stars').textContent = totalStars;
+                            document.getElementById('stat-academy-score').textContent = totalScore;
+                        }
+                    } catch(e) {
+                        console.error("Failed to load academy stats", e);
+                    }
 
                     loadingDiv.style.display = 'none';
                     contentDiv.style.display = 'block';
