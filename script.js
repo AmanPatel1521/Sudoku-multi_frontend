@@ -99,6 +99,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fetchGlobalStats();
 
+    // Floating Numbers Background for Homepage
+    const floatingContainer = document.getElementById('floating-numbers-container');
+    if (floatingContainer) {
+        const createFloatingNumber = () => {
+            const numEl = document.createElement('div');
+            numEl.classList.add('floating-number');
+            numEl.textContent = Math.floor(Math.random() * 9) + 1;
+            
+            // Randomize position, delay, and duration
+            numEl.style.left = `${Math.random() * 100}vw`;
+            numEl.style.animationDuration = `${15 + Math.random() * 20}s`; // 15s to 35s
+            numEl.style.animationDelay = `-${Math.random() * 20}s`; // Start at different heights
+            
+            floatingContainer.appendChild(numEl);
+            
+            // Cleanup to prevent memory leaks if left running forever
+            setTimeout(() => {
+                if (numEl.parentNode) {
+                    numEl.parentNode.removeChild(numEl);
+                }
+                createFloatingNumber();
+            }, parseFloat(numEl.style.animationDuration) * 1000);
+        };
+        
+        // Spawn initial batch
+        for (let i = 0; i < 25; i++) {
+            createFloatingNumber();
+        }
+    }
+
 
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
