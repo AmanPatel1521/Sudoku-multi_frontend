@@ -1974,6 +1974,10 @@ body.light-mode .card-glass {
     color: #0f172a !important;
 }
 
+body.light-mode .card-glass .bg-dark {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
 body.light-mode .card-glass * {
     color: inherit;
 }
