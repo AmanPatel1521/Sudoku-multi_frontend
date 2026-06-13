@@ -2178,9 +2178,9 @@ body.light-mode .brand-text {
 }
 
 body.light-mode .floating-number {
-    color: rgba(139, 92, 246, 0.15); /* Crisper purple for light backgrounds */
+    color: rgba(139, 92, 246, 0.4); /* Much more visible purple for light backgrounds */
     text-shadow: none; /* Remove glow because light mode glow looks like smudges */
-    filter: blur(1px); /* Reduce blur slightly in light mode for cleaner look */
+    filter: none; /* Remove blur completely to make them crisp in light mode */
 }
 
 @keyframes float-up {

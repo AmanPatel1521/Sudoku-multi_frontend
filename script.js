@@ -114,19 +114,29 @@ document.addEventListener('DOMContentLoaded', () => {
             
             floatingContainer.appendChild(numEl);
             
-            // Cleanup to prevent memory leaks if left running forever
-            setTimeout(() => {
-                if (numEl.parentNode) {
-                    numEl.parentNode.removeChild(numEl);
-                }
-                createFloatingNumber();
-            }, parseFloat(numEl.style.animationDuration) * 1000);
+            // Re-randomize every time the animation loops
+            numEl.addEventListener('animationiteration', () => {
+                numEl.textContent = Math.floor(Math.random() * 9) + 1;
+                numEl.style.left = `${Math.random() * 100}vw`;
+                numEl.style.animationDuration = `${15 + Math.random() * 20}s`;
+            });
         };
         
         // Spawn initial batch
+        floatingContainer.innerHTML = ''; // Prevent duplicates if returning via bfcache/turbo
         for (let i = 0; i < 25; i++) {
             createFloatingNumber();
         }
+
+        // Bulletproof fix: Respawn if user navigates back using browser Back button (bfcache)
+        window.addEventListener('pageshow', (event) => {
+            if (event.persisted) {
+                floatingContainer.innerHTML = '';
+                for (let i = 0; i < 25; i++) {
+                    createFloatingNumber();
+                }
+            }
+        });
     }
 
 
