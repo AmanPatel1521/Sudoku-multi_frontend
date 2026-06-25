@@ -2164,6 +2164,12 @@ body.light-mode .brand-text {
     pointer-events: none;
     z-index: -1;
     overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+body.game-active #floating-numbers-container {
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
 .floating-number {

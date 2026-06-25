@@ -99,46 +99,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     fetchGlobalStats();
 
-    // Floating Numbers Background for Homepage
-    const floatingContainer = document.getElementById('floating-numbers-container');
-    if (floatingContainer) {
-        const createFloatingNumber = () => {
-            const numEl = document.createElement('div');
-            numEl.classList.add('floating-number');
-            numEl.textContent = Math.floor(Math.random() * 9) + 1;
-            
-            // Randomize position, delay, and duration
-            numEl.style.left = `${Math.random() * 100}vw`;
-            numEl.style.animationDuration = `${15 + Math.random() * 20}s`; // 15s to 35s
-            numEl.style.animationDelay = `-${Math.random() * 20}s`; // Start at different heights
-            
-            floatingContainer.appendChild(numEl);
-            
-            // Re-randomize every time the animation loops
-            numEl.addEventListener('animationiteration', () => {
-                numEl.textContent = Math.floor(Math.random() * 9) + 1;
-                numEl.style.left = `${Math.random() * 100}vw`;
-                numEl.style.animationDuration = `${15 + Math.random() * 20}s`;
-            });
-        };
-        
-        // Spawn initial batch
-        floatingContainer.innerHTML = ''; // Prevent duplicates if returning via bfcache/turbo
-        for (let i = 0; i < 25; i++) {
-            createFloatingNumber();
-        }
-
-        // Bulletproof fix: Respawn if user navigates back using browser Back button (bfcache)
-        window.addEventListener('pageshow', (event) => {
-            if (event.persisted) {
-                floatingContainer.innerHTML = '';
-                for (let i = 0; i < 25; i++) {
-                    createFloatingNumber();
-                }
-            }
-        });
-    }
-
 
     // Initialize App Monetization (Web AdSense vs Android AdMob)
     initMonetization();
