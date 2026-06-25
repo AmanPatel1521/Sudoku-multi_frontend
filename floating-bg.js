@@ -27,10 +27,13 @@
             font-weight: 800 !important;
             color: rgba(139, 92, 246, 0.22) !important;
             text-shadow: 0 0 10px rgba(139, 92, 246, 0.15) !important;
-            animation: float-up-universal linear infinite !important;
+            animation-name: float-up-universal !important;
+            animation-timing-function: linear !important;
+            animation-iteration-count: infinite !important;
             user-select: none !important;
             pointer-events: none !important;
             filter: blur(1.5px) !important;
+            will-change: transform;
         }
         body.light-mode .floating-number {
             color: rgba(139, 92, 246, 0.4) !important;
@@ -82,8 +85,8 @@
             
             // Randomize duration between 15s and 35s
             const dur = 15 + Math.random() * 20;
-            numEl.style.animationDuration = `${dur}s`;
-            numEl.style.animationDelay = `-${Math.random() * dur}s`;
+            numEl.style.setProperty('animation-duration', `${dur}s`, 'important');
+            numEl.style.setProperty('animation-delay', `-${Math.random() * dur}s`, 'important');
             
             container.appendChild(numEl);
 
