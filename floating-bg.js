@@ -22,16 +22,13 @@
         }
         .floating-number {
             position: absolute !important;
-            top: 0 !important;
             font-size: 2.5rem !important;
             font-weight: 800 !important;
             color: rgba(139, 92, 246, 0.22) !important;
             text-shadow: 0 0 10px rgba(139, 92, 246, 0.15) !important;
             animation: float-up-universal linear infinite !important;
             user-select: none !important;
-            pointer-events: none !important;
             filter: blur(1.5px) !important;
-            will-change: transform;
         }
         body.light-mode .floating-number {
             color: rgba(139, 92, 246, 0.4) !important;

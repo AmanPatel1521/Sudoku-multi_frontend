@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking System & Elo Tiers - Multiplayer Sudoku Documentation</title>
+    <meta name="description" content="Understand how the Multiplayer Sudoku ranking system works. Learn about Elo rating distribution, winning and losing points, and our competitive tier breakdown.">
+    <link rel="canonical" href="https://multiplayersudoku.in/ranking-system.html">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=16">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Article",
+          "headline": "Multiplayer Sudoku Ranking System & Elo Tiers Explained",
+          "description": "Complete documentation on how Elo ratings are calculated, how to climb the ladder, and the various competitive tiers in Multiplayer Sudoku.",
+          "author": {
+            "@type": "Organization",
+            "name": "Multiplayer Sudoku"
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://multiplayersudoku.in/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Documentation",
+              "item": "https://multiplayersudoku.in/ranking-system.html"
+            }
+          ]
+        }
+      ]
+    }
+    </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
+
+    <link rel="icon" type="image/png" href="playstore_assets/playstore_icon_neon_square.png">
+    <link rel="apple-touch-icon" href="playstore_assets/playstore_icon_neon_square.png">
+<script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+</head>
+<body>
+<amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-9821792173458370">
+</amp-auto-ads>
+    <div id="main-container" class="container py-4">
+        <header class="main-header mb-5 text-center">
+            <h1 class="display-4 fw-bold text-white mb-3">Ranking System & Tiers</h1>
+            <p class="lead text-white-50">Documentation on how the Multiplayer Sudoku Elo system works.</p>
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="card shadow-lg card-glass p-4 p-md-5 fs-5 lh-lg" style="color: rgba(255,255,255,0.9);">
+                    
+                    <h2 class="text-white fw-bold mb-4 border-bottom border-secondary pb-2">How Elo Ratings Work</h2>
+                    <p>When you participate in <strong>Ranked Matchmaking</strong> (Quick Play), your performance is measured using a modified Elo rating system. This is the same statistical framework used by chess grandmasters and modern competitive e-sports to gauge relative skill levels.</p>
+                    <p>Every player starts with a base rating of <strong>1000 Elo</strong>. From there, your rating will fluctuate based purely on match outcomes:</p>
+                    <ul>
+                        <li><strong>Winning a Match:</strong> You will gain points. The exact number of points depends on the rating difference between you and your opponent.</li>
+                        <li><strong>Losing a Match:</strong> You will lose points. Losing to a much higher-rated player results in a minor point deduction, while losing to a lower-rated player will heavily penalize your score.</li>
+                        <li><strong>Draws/Disconnects:</strong> If the server registers a simultaneous finish, it is a draw with zero point changes. If a player disconnects, they immediately forfeit the match and lose points.</li>
+                    </ul>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Gaining and Losing Points (The Math)</h2>
+                    <p>The system is designed to dynamically balance itself. If a 1500-rated player beats a 1000-rated player, the system expected that outcome. Therefore, the higher-rated player will only gain a minimal amount of points (e.g., +2 or +3), while the lower-rated player will only lose a few points.</p>
+                    <p>However, if the 1000-rated player achieves an upset and wins, the system recognizes a significant skill discrepancy. The lower-rated player might gain +25 points, while the 1500-rated player will suffer a -25 point penalty.</p>
+                    <p>To prevent ranking inflation, the point exchange is usually a zero-sum calculation. The points you win are directly subtracted from your opponent.</p>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Competitive Tier Breakdown</h2>
+                    <p>To give players milestones to strive for, the Elo ratings are grouped into distinct skill tiers. As you cross these thresholds, your badge and status on the global leaderboards will update.</p>
+                    
+                    <div class="table-responsive my-4">
+                        <table class="table table-dark table-striped table-bordered text-center align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tier Name</th>
+                                    <th>Elo Range</th>
+                                    <th>Skill Description</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-white-50">
+                                <tr>
+                                    <td class="fw-bold text-white">Bronze</td>
+                                    <td>0 - 999</td>
+                                    <td>Beginners learning basic rules and row/column scanning.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-white" style="color: #c0c0c0 !important;">Silver</td>
+                                    <td>1000 - 1199</td>
+                                    <td>The starting tier. Players who understand cross-hatching.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-warning">Gold</td>
+                                    <td>1200 - 1399</td>
+                                    <td>Intermediate players. Comfortable with fast placements and notes.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-info">Platinum</td>
+                                    <td>1400 - 1599</td>
+                                    <td>Advanced competitors with high APM (Actions Per Minute) and accuracy.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold" style="color: #9b59b6 !important;">Diamond</td>
+                                    <td>1600 - 1799</td>
+                                    <td>Experts who utilize visual slicing and complex chaining strategies.</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold text-danger">Master</td>
+                                    <td>1800+</td>
+                                    <td>The top 1% of players worldwide. Found on the global leaderboards.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="text-white fw-bold mt-5 mb-4 border-bottom border-secondary pb-2">Rating Decay</h2>
+                    <p>To ensure the global leaderboards remain active and reflect current skill levels, accounts in the <strong>Diamond</strong> and <strong>Master</strong> tiers are subject to rating decay. If a player in these tiers does not participate in a ranked match for 14 consecutive days, they will slowly lose Elo points every week until they drop back into Platinum.</p>
+
+                    <div class="text-center mt-5 mb-3">
+                        <a href="/" class="btn btn-primary btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg">Play a Ranked Match 📈</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <footer id="seo-footer" class="pt-5 pb-4 mt-5" style="background-color: rgba(0, 0, 0, 0.2);">
+        <div class="container text-start">
+            <div class="row mb-4">
+                <div class="col-12 col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white fw-bold mb-3">Multiplayer Sudoku</h5>
+                    <p class="small text-white-50 pe-md-4">A completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally.</p>
+                </div>
+                <div class="col-12 col-sm-6 col-md-2 offset-md-1 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Game</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100">Play Now</a></li>
+                        <li><a href="/leaderboard.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Leaderboards</a></li>
+                        <li><a href="/daily-sudoku-challenge.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Daily Challenge</a></li>
+                        <li><a href="/sudoku-solver.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Sudoku Solver</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Guides &amp; Tips</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Blog</a></li>
+                        <li><a href="/multiplayer-sudoku-strategy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Strategy Guide</a></li>
+                        <li><a href="/sudoku-difficulty-levels.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Difficulty Levels</a></li>
+                        <li><a href="/common-sudoku-mistakes.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Common Mistakes</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6 col-md-2 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/about.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">About Us</a></li>
+                        <li><a href="/contact.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Contact</a></li>
+                        <li><a href="/terms.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Terms of Service</a></li>
+                        <li><a href="/privacy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary opacity-25">
+            <div class="small text-white-50 text-center mt-3">
+                &copy; 2026 Multiplayer Sudoku. All rights reserved.
+            </div>
+        </div>
+    </footer>
+<script src="floating-bg.js?v=3" defer></script>
+</body>
+</html>

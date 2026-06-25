@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Sudoku Sandbox – Design & Share Puzzles - Multiplayer Sudoku</title>
+    <meta name="description" content="Design your own custom Sudoku puzzles and generate a unique link to challenge your friends online.">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=16">
+    
+    <style>
+        #solver-board {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 0;
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+        .solver-cell {
+            width: 100%;
+            aspect-ratio: 1;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border: 1px solid #e2e8f0;
+            background: transparent;
+            color: #0f172a;
+            padding: 0;
+        }
+        .solver-cell:focus {
+            outline: none;
+            background: #e0f2fe;
+        }
+        .solver-cell.solved-cell {
+            color: var(--success-color);
+            background: #f0fdf4;
+        }
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            #solver-board {
+                background: rgba(15, 23, 42, 0.8);
+            }
+            .solver-cell {
+                color: white;
+                border-color: rgba(255,255,255,0.1);
+            }
+            .solver-cell.solved-cell {
+                color: #4ade80;
+                background: rgba(74, 222, 128, 0.1);
+            }
+            .solver-cell:focus {
+                background: rgba(56, 189, 248, 0.2);
+            }
+        }
+    </style>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(localStorage.getItem('sudoku-theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+});
+</script>
+    
+
+    <link rel="icon" type="image/png" href="playstore_assets/playstore_icon_neon_square.png">
+    <link rel="apple-touch-icon" href="playstore_assets/playstore_icon_neon_square.png">
+<script async custom-element="amp-auto-ads"
+        src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js">
+</script>
+</head>
+<body>
+<amp-auto-ads type="adsense"
+        data-ad-client="ca-pub-9821792173458370">
+</amp-auto-ads>
+    <div id="main-container" class="container py-4">
+        <header class="main-header mb-5 text-center">
+            <h1 class="display-5 fw-bold text-white mb-3">Custom Sudoku Sandbox</h1>
+            <p class="lead text-white-50">Design your own puzzle and share it with friends.</p>
+            <div class="mt-4">
+                <a href="/" class="btn btn-outline-light rounded-pill px-4">⬅ Back to Home</a>
+            </div>
+        </header>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card shadow-lg card-glass p-3 p-md-5 fs-6 fs-md-5 lh-lg" style="color: rgba(255,255,255,0.85);">
+                    <p>Welcome to the <strong>Custom Sudoku Sandbox</strong>! Enter numbers into the grid below to design your very own puzzle. Once you're done, you can generate a unique link and send it to your friends to see if they can solve it.</p>
+
+                    <!-- Sandbox Tool UI -->
+                    <div class="my-5 p-4 bg-dark bg-opacity-25 rounded-4 shadow-sm text-center">
+                        <div id="solver-board" class="shadow-lg mb-4"></div>
+                        
+                        <div id="share-link-container" class="mb-4" style="display: none;">
+                            <label class="text-white-50 small mb-1">Your Custom Puzzle Link:</label>
+                            <div class="input-group">
+                                <input type="text" id="share-url-input" class="form-control bg-dark text-white border-secondary" readonly>
+                                <button id="copy-link-btn" class="btn btn-success">Copy Link</button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center flex-wrap gap-3">
+                            <button id="generate-btn" class="btn btn-primary btn-lg rounded-pill px-4 fw-bold shadow">🔗 Generate Share Link</button>
+                            <button id="play-btn" class="btn btn-info text-white btn-lg rounded-pill px-4 fw-bold shadow">🎮 Play It Myself</button>
+                            <button id="clear-btn" class="btn btn-outline-light btn-lg rounded-pill px-4 fw-bold shadow">Clear Grid</button>
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-white fw-bold mt-5 mb-3">How It Works</h2>
+                    <ol>
+                        <li>Enter the starting numbers of your custom puzzle into the grid.</li>
+                        <li>Click "Generate Share Link".</li>
+                        <li>We'll automatically verify that your puzzle is mathematically solvable.</li>
+                        <li>If it's solvable, we'll give you a unique URL to send to anyone!</li>
+                    </ol>
+
+                    <h2 class="text-white fw-bold mt-5 mb-3">Practice with Multiplayer Sudoku</h2>
+                    <p>After using the solver, test your skills in our <a href="/" class="text-info fw-bold text-decoration-none">multiplayer Sudoku game</a> and apply what you’ve learned in real-time competition.</p>
+
+                    <div class="text-center mt-5">
+                        <p class="fs-4 fw-bold">Start solving smarter today!</p>
+                        <a href="/" class="btn btn-info text-white btn-lg rounded-pill px-5 py-3 fw-bold shadow-lg mt-2">Play Now 🚀</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('solver-board');
+            let cells = [];
+
+            // Create 9x9 grid
+            for (let r = 0; r < 9; r++) {
+                for (let c = 0; c < 9; c++) {
+                    const cell = document.createElement('input');
+                    cell.type = 'text';
+                    cell.maxLength = 1;
+                    cell.className = 'solver-cell';
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    
+                    // Add grid borders (thick borders for 3x3 boxes)
+                    if (c % 3 === 2 && c !== 8) cell.style.borderRight = '2px solid var(--primary-color)';
+                    if (r % 3 === 2 && r !== 8) cell.style.borderBottom = '2px solid var(--primary-color)';
+
+                    // Only allow numbers 1-9
+                    cell.addEventListener('input', function(e) {
+                        this.classList.remove('solved-cell');
+                        if (!/^[1-9]$/.test(this.value)) {
+                            this.value = '';
+                        }
+                    });
+
+                    // Arrow key navigation
+                    cell.addEventListener('keydown', function(e) {
+                        const row = parseInt(this.dataset.row);
+                        const col = parseInt(this.dataset.col);
+                        let nextRow = row;
+                        let nextCol = col;
+
+                        if (e.key === 'ArrowRight') nextCol++;
+                        else if (e.key === 'ArrowLeft') nextCol--;
+                        else if (e.key === 'ArrowDown') nextRow++;
+                        else if (e.key === 'ArrowUp') nextRow--;
+
+                        if (nextRow >= 0 && nextRow < 9 && nextCol >= 0 && nextCol < 9) {
+                            cells[nextRow * 9 + nextCol].focus();
+                        }
+                    });
+
+                    board.appendChild(cell);
+                    cells.push(cell);
+                }
+            }
+
+            function getGrid() {
+                let grid = [];
+                for (let r = 0; r < 9; r++) {
+                    grid[r] = [];
+                    for (let c = 0; c < 9; c++) {
+                        let val = cells[r * 9 + c].value;
+                        grid[r][c] = val === '' ? 0 : parseInt(val);
+                    }
+                }
+                return grid;
+            }
+
+            function setGrid(grid) {
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        if (cells[r * 9 + c].value === '') {
+                            cells[r * 9 + c].value = grid[r][c];
+                            cells[r * 9 + c].classList.add('solved-cell');
+                        }
+                    }
+                }
+            }
+
+            function isValid(grid, row, col, num) {
+                for (let i = 0; i < 9; i++) {
+                    if (grid[row][i] === num) return false;
+                    if (grid[i][col] === num) return false;
+                }
+                let startRow = Math.floor(row / 3) * 3;
+                let startCol = Math.floor(col / 3) * 3;
+                for (let i = 0; i < 3; i++) {
+                    for (let j = 0; j < 3; j++) {
+                        if (grid[startRow + i][startCol + j] === num) return false;
+                    }
+                }
+                return true;
+            }
+
+            function solve(grid) {
+                for (let row = 0; row < 9; row++) {
+                    for (let col = 0; col < 9; col++) {
+                        if (grid[row][col] === 0) {
+                            for (let num = 1; num <= 9; num++) {
+                                if (isValid(grid, row, col, num)) {
+                                    grid[row][col] = num;
+                                    if (solve(grid)) return true;
+                                    grid[row][col] = 0;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            document.getElementById('generate-btn').addEventListener('click', () => {
+                let grid = getGrid();
+                
+                // Basic validation for initial grid state
+                let initialValid = true;
+                let emptyCells = 0;
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        if (grid[r][c] !== 0) {
+                            let temp = grid[r][c];
+                            grid[r][c] = 0;
+                            if (!isValid(grid, r, c, temp)) {
+                                initialValid = false;
+                                break;
+                            }
+                            grid[r][c] = temp;
+                        } else {
+                            emptyCells++;
+                        }
+                    }
+                }
+
+                if (!initialValid) {
+                    alert('The puzzle you entered is invalid (contains conflicting numbers). Please fix it before sharing.');
+                    return;
+                }
+                if (emptyCells === 81) {
+                    alert('Please enter at least one number to create a puzzle!');
+                    return;
+                }
+
+                // Verify it is solvable
+                let gridCopy = JSON.parse(JSON.stringify(grid));
+                if (!solve(gridCopy)) {
+                    alert('No solution exists for this Sudoku configuration! Please fix your puzzle.');
+                    return;
+                }
+
+                // Generate 81-char string
+                let boardStr = '';
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        boardStr += grid[r][c].toString();
+                    }
+                }
+
+                const shareUrl = window.location.origin + '/?custom_board=' + boardStr;
+                document.getElementById('share-url-input').value = shareUrl;
+                document.getElementById('share-link-container').style.display = 'block';
+            });
+
+            document.getElementById('copy-link-btn').addEventListener('click', () => {
+                const urlInput = document.getElementById('share-url-input');
+                urlInput.select();
+                document.execCommand('copy');
+                
+                const btn = document.getElementById('copy-link-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'Copied!';
+                btn.classList.replace('btn-success', 'btn-secondary');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.replace('btn-secondary', 'btn-success');
+                }, 2000);
+            });
+
+            document.getElementById('play-btn').addEventListener('click', () => {
+                let grid = getGrid();
+                let initialValid = true;
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        if (grid[r][c] !== 0) {
+                            let temp = grid[r][c];
+                            grid[r][c] = 0;
+                            if (!isValid(grid, r, c, temp)) {
+                                initialValid = false;
+                                break;
+                            }
+                            grid[r][c] = temp;
+                        }
+                    }
+                }
+                if (!initialValid) {
+                    alert('The puzzle you entered is invalid!');
+                    return;
+                }
+                
+                let boardStr = '';
+                for (let r = 0; r < 9; r++) {
+                    for (let c = 0; c < 9; c++) {
+                        boardStr += grid[r][c].toString();
+                    }
+                }
+                boardStr = boardStr.replace(/0{1,9}/g, m => String.fromCharCode(96 + m.length));
+                window.location.href = '/?custom_board=' + boardStr;
+            });
+
+            document.getElementById('clear-btn').addEventListener('click', () => {
+                cells.forEach(cell => {
+                    cell.value = '';
+                    cell.classList.remove('solved-cell');
+                });
+                cells[0].focus();
+            });
+        });
+    </script>
+
+            <footer id="seo-footer" class="pt-5 pb-4 mt-5" style="background-color: rgba(0, 0, 0, 0.2);">
+        <div class="container text-start">
+            <div class="row mb-4">
+                <div class="col-12 col-md-4 mb-4 mb-md-0">
+                    <h5 class="text-white fw-bold mb-3">Multiplayer Sudoku</h5>
+                    <p class="small text-white-50 pe-md-4">A completely free, real-time competitive logic puzzle game. Test your speed and accuracy against players globally.</p>
+                </div>
+                <div class="col-12 col-sm-6 col-md-2 offset-md-1 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Game</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/" class="text-decoration-none text-white opacity-75 hover-opacity-100">Play Now</a></li>
+                        <li><a href="/leaderboard.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Leaderboards</a></li>
+                        <li><a href="/daily-sudoku-challenge.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Daily Challenge</a></li>
+                        <li><a href="/sudoku-solver.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Sudoku Solver</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Guides &amp; Tips</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/blog.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Blog</a></li>
+                        <li><a href="/multiplayer-sudoku-strategy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Strategy Guide</a></li>
+                        <li><a href="/sudoku-difficulty-levels.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Difficulty Levels</a></li>
+                        <li><a href="/common-sudoku-mistakes.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Common Mistakes</a></li>
+                    </ul>
+                </div>
+                <div class="col-12 col-sm-6 col-md-2 mb-4 mb-md-0">
+                    <h6 class="text-white fw-bold mb-3">Company</h6>
+                    <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                        <li><a href="/about.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">About Us</a></li>
+                        <li><a href="/contact.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Contact</a></li>
+                        <li><a href="/terms.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Terms of Service</a></li>
+                        <li><a href="/privacy.html" class="text-decoration-none text-white opacity-75 hover-opacity-100">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary opacity-25">
+            <div class="small text-white-50 text-center mt-3">
+                &copy; 2026 Multiplayer Sudoku. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+<script src="floating-bg.js?v=3" defer></script>
+</body>
+</html>
