@@ -863,10 +863,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    const badWordsList = ['fuck', 'shit', 'bitch', 'asshole', 'dick', 'pussy', 'cunt', 'bastard', 'slut', 'whore', 'fag', 'retard', 'damn', 'crap'];
+    function filterProfanity(text) {
+        let clean = text;
+        badWordsList.forEach(w => {
+            const reg = new RegExp('\\b' + w + '\\b', 'gi');
+            clean = clean.replace(reg, '*'.repeat(w.length));
+        });
+        return clean;
+    }
+
     function sendChatMessage(message) {
         const messageToSend = message || chatInput.value.trim();
         if (messageToSend) {
-            socket.emit('chat_message', { room_id: roomId, player_id: playerId, message: messageToSend });
+            const cleanMessage = filterProfanity(messageToSend);
+            socket.emit('chat_message', { room_id: roomId, player_id: playerId, message: cleanMessage });
             chatInput.value = '';
         }
     }
